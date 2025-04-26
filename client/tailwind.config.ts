@@ -9,6 +9,9 @@ const config: Config = {
   theme: {
     extend: {
       colors: {},
+      animation: {
+        "bounce-slow": "bounce 2s infinite",
+      },
     },
   },
   plugins: [],

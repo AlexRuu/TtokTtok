@@ -1,0 +1,70 @@
+"use client";
+
+import { useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import Verifying from "./components/verifying";
+import Verified from "./components/verified";
+import Invalid from "./components/invalid";
+import useLoading from "@/hooks/use-loading";
+import Loader from "@/components/ui/loader";
+
+const VerificationPage = () => {
+  const { isLoading, startLoading, stopLoading } = useLoading();
+  const [email, setEmail] = useState<string>("");
+  const [status, setStatus] = useState<"verifying" | "verified" | "invalid">();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    startLoading();
+    const token = searchParams.get("token");
+    if (!token) {
+      setStatus("verifying");
+      const pendingEmail = localStorage.getItem("pendingEmail");
+      if (!pendingEmail) {
+        setStatus("invalid");
+        stopLoading();
+        return;
+      }
+      setEmail(pendingEmail!);
+      stopLoading();
+      return;
+    }
+
+    const verifyEmail = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/auth/verify`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ token }),
+          }
+        );
+        if (res.ok) {
+          stopLoading();
+          setStatus("verified");
+        } else {
+          stopLoading();
+          setStatus("invalid");
+        }
+      } catch {
+        stopLoading();
+        setStatus("invalid");
+      }
+    };
+
+    verifyEmail();
+  }, [searchParams, startLoading, stopLoading]);
+
+  if (isLoading) {
+    <Loader />;
+  }
+
+  if (status == "verifying") return <Verifying email={email} />;
+  if (status == "verified") return <Verified />;
+  if (status == "invalid") return <Invalid />;
+};
+
+export default VerificationPage;
