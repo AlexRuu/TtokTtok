@@ -62,11 +62,13 @@ const SignInForm = () => {
 
   useEffect(() => {
     const fetchProviders = async () => {
+      startLoading();
       const res = await getProviders();
       setProviders(res);
+      stopLoading();
     };
     fetchProviders();
-  }, []);
+  }, [startLoading, stopLoading]);
 
   const onSubmit: SubmitHandler<SignInFormValues> = async (data) => {
     startLoading();
