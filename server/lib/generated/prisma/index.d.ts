@@ -28,6 +28,11 @@ export type Account = $Result.DefaultSelection<Prisma.$AccountPayload>
  * 
  */
 export type VerificationToken = $Result.DefaultSelection<Prisma.$VerificationTokenPayload>
+/**
+ * Model ForgotPasswordToken
+ * 
+ */
+export type ForgotPasswordToken = $Result.DefaultSelection<Prisma.$ForgotPasswordTokenPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -183,6 +188,16 @@ export class PrismaClient<
     * ```
     */
   get verificationToken(): Prisma.VerificationTokenDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.forgotPasswordToken`: Exposes CRUD operations for the **ForgotPasswordToken** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ForgotPasswordTokens
+    * const forgotPasswordTokens = await prisma.forgotPasswordToken.findMany()
+    * ```
+    */
+  get forgotPasswordToken(): Prisma.ForgotPasswordTokenDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -625,7 +640,8 @@ export namespace Prisma {
   export const ModelName: {
     User: 'User',
     Account: 'Account',
-    VerificationToken: 'VerificationToken'
+    VerificationToken: 'VerificationToken',
+    ForgotPasswordToken: 'ForgotPasswordToken'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -644,7 +660,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "verificationToken"
+      modelProps: "user" | "account" | "verificationToken" | "forgotPasswordToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -870,6 +886,80 @@ export namespace Prisma {
           }
         }
       }
+      ForgotPasswordToken: {
+        payload: Prisma.$ForgotPasswordTokenPayload<ExtArgs>
+        fields: Prisma.ForgotPasswordTokenFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ForgotPasswordTokenFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ForgotPasswordTokenPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ForgotPasswordTokenFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ForgotPasswordTokenPayload>
+          }
+          findFirst: {
+            args: Prisma.ForgotPasswordTokenFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ForgotPasswordTokenPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ForgotPasswordTokenFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ForgotPasswordTokenPayload>
+          }
+          findMany: {
+            args: Prisma.ForgotPasswordTokenFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ForgotPasswordTokenPayload>[]
+          }
+          create: {
+            args: Prisma.ForgotPasswordTokenCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ForgotPasswordTokenPayload>
+          }
+          createMany: {
+            args: Prisma.ForgotPasswordTokenCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ForgotPasswordTokenCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ForgotPasswordTokenPayload>[]
+          }
+          delete: {
+            args: Prisma.ForgotPasswordTokenDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ForgotPasswordTokenPayload>
+          }
+          update: {
+            args: Prisma.ForgotPasswordTokenUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ForgotPasswordTokenPayload>
+          }
+          deleteMany: {
+            args: Prisma.ForgotPasswordTokenDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ForgotPasswordTokenUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ForgotPasswordTokenUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ForgotPasswordTokenPayload>[]
+          }
+          upsert: {
+            args: Prisma.ForgotPasswordTokenUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ForgotPasswordTokenPayload>
+          }
+          aggregate: {
+            args: Prisma.ForgotPasswordTokenAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateForgotPasswordToken>
+          }
+          groupBy: {
+            args: Prisma.ForgotPasswordTokenGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ForgotPasswordTokenGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ForgotPasswordTokenCountArgs<ExtArgs>
+            result: $Utils.Optional<ForgotPasswordTokenCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -957,6 +1047,7 @@ export namespace Prisma {
     user?: UserOmit
     account?: AccountOmit
     verificationToken?: VerificationTokenOmit
+    forgotPasswordToken?: ForgotPasswordTokenOmit
   }
 
   /* Types for Logging */
@@ -1053,11 +1144,13 @@ export namespace Prisma {
   export type UserCountOutputType = {
     accounts: number
     VerificationToken: number
+    ForgotPasswordToken: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | UserCountOutputTypeCountAccountsArgs
     VerificationToken?: boolean | UserCountOutputTypeCountVerificationTokenArgs
+    ForgotPasswordToken?: boolean | UserCountOutputTypeCountForgotPasswordTokenArgs
   }
 
   // Custom InputTypes
@@ -1083,6 +1176,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountVerificationTokenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: VerificationTokenWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountForgotPasswordTokenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ForgotPasswordTokenWhereInput
   }
 
 
@@ -1252,7 +1352,7 @@ export namespace Prisma {
     firstName: string
     lastName: string
     email: string
-    password: string
+    password: string | null
     emailVerified: Date | null
     image: string | null
     updatedAt: Date
@@ -1288,6 +1388,7 @@ export namespace Prisma {
     createdAt?: boolean
     accounts?: boolean | User$accountsArgs<ExtArgs>
     VerificationToken?: boolean | User$VerificationTokenArgs<ExtArgs>
+    ForgotPasswordToken?: boolean | User$ForgotPasswordTokenArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -1331,6 +1432,7 @@ export namespace Prisma {
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | User$accountsArgs<ExtArgs>
     VerificationToken?: boolean | User$VerificationTokenArgs<ExtArgs>
+    ForgotPasswordToken?: boolean | User$ForgotPasswordTokenArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -1341,13 +1443,14 @@ export namespace Prisma {
     objects: {
       accounts: Prisma.$AccountPayload<ExtArgs>[]
       VerificationToken: Prisma.$VerificationTokenPayload<ExtArgs>[]
+      ForgotPasswordToken: Prisma.$ForgotPasswordTokenPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       firstName: string
       lastName: string
       email: string
-      password: string
+      password: string | null
       emailVerified: Date | null
       image: string | null
       updatedAt: Date
@@ -1748,6 +1851,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     accounts<T extends User$accountsArgs<ExtArgs> = {}>(args?: Subset<T, User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     VerificationToken<T extends User$VerificationTokenArgs<ExtArgs> = {}>(args?: Subset<T, User$VerificationTokenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VerificationTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    ForgotPasswordToken<T extends User$ForgotPasswordTokenArgs<ExtArgs> = {}>(args?: Subset<T, User$ForgotPasswordTokenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ForgotPasswordTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2219,6 +2323,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: VerificationTokenScalarFieldEnum | VerificationTokenScalarFieldEnum[]
+  }
+
+  /**
+   * User.ForgotPasswordToken
+   */
+  export type User$ForgotPasswordTokenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ForgotPasswordToken
+     */
+    select?: ForgotPasswordTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ForgotPasswordToken
+     */
+    omit?: ForgotPasswordTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ForgotPasswordTokenInclude<ExtArgs> | null
+    where?: ForgotPasswordTokenWhereInput
+    orderBy?: ForgotPasswordTokenOrderByWithRelationInput | ForgotPasswordTokenOrderByWithRelationInput[]
+    cursor?: ForgotPasswordTokenWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ForgotPasswordTokenScalarFieldEnum | ForgotPasswordTokenScalarFieldEnum[]
   }
 
   /**
@@ -3438,6 +3566,8 @@ export namespace Prisma {
     identifier: string | null
     token: string | null
     expires: Date | null
+    used: boolean | null
+    usedAt: Date | null
     userId: string | null
     createdAt: Date | null
   }
@@ -3447,6 +3577,8 @@ export namespace Prisma {
     identifier: string | null
     token: string | null
     expires: Date | null
+    used: boolean | null
+    usedAt: Date | null
     userId: string | null
     createdAt: Date | null
   }
@@ -3456,6 +3588,8 @@ export namespace Prisma {
     identifier: number
     token: number
     expires: number
+    used: number
+    usedAt: number
     userId: number
     createdAt: number
     _all: number
@@ -3467,6 +3601,8 @@ export namespace Prisma {
     identifier?: true
     token?: true
     expires?: true
+    used?: true
+    usedAt?: true
     userId?: true
     createdAt?: true
   }
@@ -3476,6 +3612,8 @@ export namespace Prisma {
     identifier?: true
     token?: true
     expires?: true
+    used?: true
+    usedAt?: true
     userId?: true
     createdAt?: true
   }
@@ -3485,6 +3623,8 @@ export namespace Prisma {
     identifier?: true
     token?: true
     expires?: true
+    used?: true
+    usedAt?: true
     userId?: true
     createdAt?: true
     _all?: true
@@ -3567,6 +3707,8 @@ export namespace Prisma {
     identifier: string
     token: string
     expires: Date
+    used: boolean
+    usedAt: Date | null
     userId: string
     createdAt: Date
     _count: VerificationTokenCountAggregateOutputType | null
@@ -3593,6 +3735,8 @@ export namespace Prisma {
     identifier?: boolean
     token?: boolean
     expires?: boolean
+    used?: boolean
+    usedAt?: boolean
     userId?: boolean
     createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -3603,6 +3747,8 @@ export namespace Prisma {
     identifier?: boolean
     token?: boolean
     expires?: boolean
+    used?: boolean
+    usedAt?: boolean
     userId?: boolean
     createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -3613,6 +3759,8 @@ export namespace Prisma {
     identifier?: boolean
     token?: boolean
     expires?: boolean
+    used?: boolean
+    usedAt?: boolean
     userId?: boolean
     createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -3623,11 +3771,13 @@ export namespace Prisma {
     identifier?: boolean
     token?: boolean
     expires?: boolean
+    used?: boolean
+    usedAt?: boolean
     userId?: boolean
     createdAt?: boolean
   }
 
-  export type VerificationTokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "identifier" | "token" | "expires" | "userId" | "createdAt", ExtArgs["result"]["verificationToken"]>
+  export type VerificationTokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "identifier" | "token" | "expires" | "used" | "usedAt" | "userId" | "createdAt", ExtArgs["result"]["verificationToken"]>
   export type VerificationTokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -3648,6 +3798,8 @@ export namespace Prisma {
       identifier: string
       token: string
       expires: Date
+      used: boolean
+      usedAt: Date | null
       userId: string
       createdAt: Date
     }, ExtArgs["result"]["verificationToken"]>
@@ -4078,6 +4230,8 @@ export namespace Prisma {
     readonly identifier: FieldRef<"VerificationToken", 'String'>
     readonly token: FieldRef<"VerificationToken", 'String'>
     readonly expires: FieldRef<"VerificationToken", 'DateTime'>
+    readonly used: FieldRef<"VerificationToken", 'Boolean'>
+    readonly usedAt: FieldRef<"VerificationToken", 'DateTime'>
     readonly userId: FieldRef<"VerificationToken", 'String'>
     readonly createdAt: FieldRef<"VerificationToken", 'DateTime'>
   }
@@ -4495,6 +4649,1103 @@ export namespace Prisma {
 
 
   /**
+   * Model ForgotPasswordToken
+   */
+
+  export type AggregateForgotPasswordToken = {
+    _count: ForgotPasswordTokenCountAggregateOutputType | null
+    _min: ForgotPasswordTokenMinAggregateOutputType | null
+    _max: ForgotPasswordTokenMaxAggregateOutputType | null
+  }
+
+  export type ForgotPasswordTokenMinAggregateOutputType = {
+    id: string | null
+    identifier: string | null
+    token: string | null
+    expires: Date | null
+    userId: string | null
+    used: boolean | null
+    usedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type ForgotPasswordTokenMaxAggregateOutputType = {
+    id: string | null
+    identifier: string | null
+    token: string | null
+    expires: Date | null
+    userId: string | null
+    used: boolean | null
+    usedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type ForgotPasswordTokenCountAggregateOutputType = {
+    id: number
+    identifier: number
+    token: number
+    expires: number
+    userId: number
+    used: number
+    usedAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type ForgotPasswordTokenMinAggregateInputType = {
+    id?: true
+    identifier?: true
+    token?: true
+    expires?: true
+    userId?: true
+    used?: true
+    usedAt?: true
+    createdAt?: true
+  }
+
+  export type ForgotPasswordTokenMaxAggregateInputType = {
+    id?: true
+    identifier?: true
+    token?: true
+    expires?: true
+    userId?: true
+    used?: true
+    usedAt?: true
+    createdAt?: true
+  }
+
+  export type ForgotPasswordTokenCountAggregateInputType = {
+    id?: true
+    identifier?: true
+    token?: true
+    expires?: true
+    userId?: true
+    used?: true
+    usedAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type ForgotPasswordTokenAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ForgotPasswordToken to aggregate.
+     */
+    where?: ForgotPasswordTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ForgotPasswordTokens to fetch.
+     */
+    orderBy?: ForgotPasswordTokenOrderByWithRelationInput | ForgotPasswordTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ForgotPasswordTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ForgotPasswordTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ForgotPasswordTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ForgotPasswordTokens
+    **/
+    _count?: true | ForgotPasswordTokenCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ForgotPasswordTokenMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ForgotPasswordTokenMaxAggregateInputType
+  }
+
+  export type GetForgotPasswordTokenAggregateType<T extends ForgotPasswordTokenAggregateArgs> = {
+        [P in keyof T & keyof AggregateForgotPasswordToken]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateForgotPasswordToken[P]>
+      : GetScalarType<T[P], AggregateForgotPasswordToken[P]>
+  }
+
+
+
+
+  export type ForgotPasswordTokenGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ForgotPasswordTokenWhereInput
+    orderBy?: ForgotPasswordTokenOrderByWithAggregationInput | ForgotPasswordTokenOrderByWithAggregationInput[]
+    by: ForgotPasswordTokenScalarFieldEnum[] | ForgotPasswordTokenScalarFieldEnum
+    having?: ForgotPasswordTokenScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ForgotPasswordTokenCountAggregateInputType | true
+    _min?: ForgotPasswordTokenMinAggregateInputType
+    _max?: ForgotPasswordTokenMaxAggregateInputType
+  }
+
+  export type ForgotPasswordTokenGroupByOutputType = {
+    id: string
+    identifier: string
+    token: string
+    expires: Date
+    userId: string
+    used: boolean
+    usedAt: Date | null
+    createdAt: Date
+    _count: ForgotPasswordTokenCountAggregateOutputType | null
+    _min: ForgotPasswordTokenMinAggregateOutputType | null
+    _max: ForgotPasswordTokenMaxAggregateOutputType | null
+  }
+
+  type GetForgotPasswordTokenGroupByPayload<T extends ForgotPasswordTokenGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ForgotPasswordTokenGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ForgotPasswordTokenGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ForgotPasswordTokenGroupByOutputType[P]>
+            : GetScalarType<T[P], ForgotPasswordTokenGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ForgotPasswordTokenSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    identifier?: boolean
+    token?: boolean
+    expires?: boolean
+    userId?: boolean
+    used?: boolean
+    usedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["forgotPasswordToken"]>
+
+  export type ForgotPasswordTokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    identifier?: boolean
+    token?: boolean
+    expires?: boolean
+    userId?: boolean
+    used?: boolean
+    usedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["forgotPasswordToken"]>
+
+  export type ForgotPasswordTokenSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    identifier?: boolean
+    token?: boolean
+    expires?: boolean
+    userId?: boolean
+    used?: boolean
+    usedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["forgotPasswordToken"]>
+
+  export type ForgotPasswordTokenSelectScalar = {
+    id?: boolean
+    identifier?: boolean
+    token?: boolean
+    expires?: boolean
+    userId?: boolean
+    used?: boolean
+    usedAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type ForgotPasswordTokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "identifier" | "token" | "expires" | "userId" | "used" | "usedAt" | "createdAt", ExtArgs["result"]["forgotPasswordToken"]>
+  export type ForgotPasswordTokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ForgotPasswordTokenIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ForgotPasswordTokenIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $ForgotPasswordTokenPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ForgotPasswordToken"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      identifier: string
+      token: string
+      expires: Date
+      userId: string
+      used: boolean
+      usedAt: Date | null
+      createdAt: Date
+    }, ExtArgs["result"]["forgotPasswordToken"]>
+    composites: {}
+  }
+
+  type ForgotPasswordTokenGetPayload<S extends boolean | null | undefined | ForgotPasswordTokenDefaultArgs> = $Result.GetResult<Prisma.$ForgotPasswordTokenPayload, S>
+
+  type ForgotPasswordTokenCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ForgotPasswordTokenFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ForgotPasswordTokenCountAggregateInputType | true
+    }
+
+  export interface ForgotPasswordTokenDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ForgotPasswordToken'], meta: { name: 'ForgotPasswordToken' } }
+    /**
+     * Find zero or one ForgotPasswordToken that matches the filter.
+     * @param {ForgotPasswordTokenFindUniqueArgs} args - Arguments to find a ForgotPasswordToken
+     * @example
+     * // Get one ForgotPasswordToken
+     * const forgotPasswordToken = await prisma.forgotPasswordToken.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ForgotPasswordTokenFindUniqueArgs>(args: SelectSubset<T, ForgotPasswordTokenFindUniqueArgs<ExtArgs>>): Prisma__ForgotPasswordTokenClient<$Result.GetResult<Prisma.$ForgotPasswordTokenPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ForgotPasswordToken that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ForgotPasswordTokenFindUniqueOrThrowArgs} args - Arguments to find a ForgotPasswordToken
+     * @example
+     * // Get one ForgotPasswordToken
+     * const forgotPasswordToken = await prisma.forgotPasswordToken.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ForgotPasswordTokenFindUniqueOrThrowArgs>(args: SelectSubset<T, ForgotPasswordTokenFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ForgotPasswordTokenClient<$Result.GetResult<Prisma.$ForgotPasswordTokenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ForgotPasswordToken that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ForgotPasswordTokenFindFirstArgs} args - Arguments to find a ForgotPasswordToken
+     * @example
+     * // Get one ForgotPasswordToken
+     * const forgotPasswordToken = await prisma.forgotPasswordToken.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ForgotPasswordTokenFindFirstArgs>(args?: SelectSubset<T, ForgotPasswordTokenFindFirstArgs<ExtArgs>>): Prisma__ForgotPasswordTokenClient<$Result.GetResult<Prisma.$ForgotPasswordTokenPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ForgotPasswordToken that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ForgotPasswordTokenFindFirstOrThrowArgs} args - Arguments to find a ForgotPasswordToken
+     * @example
+     * // Get one ForgotPasswordToken
+     * const forgotPasswordToken = await prisma.forgotPasswordToken.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ForgotPasswordTokenFindFirstOrThrowArgs>(args?: SelectSubset<T, ForgotPasswordTokenFindFirstOrThrowArgs<ExtArgs>>): Prisma__ForgotPasswordTokenClient<$Result.GetResult<Prisma.$ForgotPasswordTokenPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ForgotPasswordTokens that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ForgotPasswordTokenFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ForgotPasswordTokens
+     * const forgotPasswordTokens = await prisma.forgotPasswordToken.findMany()
+     * 
+     * // Get first 10 ForgotPasswordTokens
+     * const forgotPasswordTokens = await prisma.forgotPasswordToken.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const forgotPasswordTokenWithIdOnly = await prisma.forgotPasswordToken.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ForgotPasswordTokenFindManyArgs>(args?: SelectSubset<T, ForgotPasswordTokenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ForgotPasswordTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ForgotPasswordToken.
+     * @param {ForgotPasswordTokenCreateArgs} args - Arguments to create a ForgotPasswordToken.
+     * @example
+     * // Create one ForgotPasswordToken
+     * const ForgotPasswordToken = await prisma.forgotPasswordToken.create({
+     *   data: {
+     *     // ... data to create a ForgotPasswordToken
+     *   }
+     * })
+     * 
+     */
+    create<T extends ForgotPasswordTokenCreateArgs>(args: SelectSubset<T, ForgotPasswordTokenCreateArgs<ExtArgs>>): Prisma__ForgotPasswordTokenClient<$Result.GetResult<Prisma.$ForgotPasswordTokenPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ForgotPasswordTokens.
+     * @param {ForgotPasswordTokenCreateManyArgs} args - Arguments to create many ForgotPasswordTokens.
+     * @example
+     * // Create many ForgotPasswordTokens
+     * const forgotPasswordToken = await prisma.forgotPasswordToken.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ForgotPasswordTokenCreateManyArgs>(args?: SelectSubset<T, ForgotPasswordTokenCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ForgotPasswordTokens and returns the data saved in the database.
+     * @param {ForgotPasswordTokenCreateManyAndReturnArgs} args - Arguments to create many ForgotPasswordTokens.
+     * @example
+     * // Create many ForgotPasswordTokens
+     * const forgotPasswordToken = await prisma.forgotPasswordToken.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ForgotPasswordTokens and only return the `id`
+     * const forgotPasswordTokenWithIdOnly = await prisma.forgotPasswordToken.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ForgotPasswordTokenCreateManyAndReturnArgs>(args?: SelectSubset<T, ForgotPasswordTokenCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ForgotPasswordTokenPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ForgotPasswordToken.
+     * @param {ForgotPasswordTokenDeleteArgs} args - Arguments to delete one ForgotPasswordToken.
+     * @example
+     * // Delete one ForgotPasswordToken
+     * const ForgotPasswordToken = await prisma.forgotPasswordToken.delete({
+     *   where: {
+     *     // ... filter to delete one ForgotPasswordToken
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ForgotPasswordTokenDeleteArgs>(args: SelectSubset<T, ForgotPasswordTokenDeleteArgs<ExtArgs>>): Prisma__ForgotPasswordTokenClient<$Result.GetResult<Prisma.$ForgotPasswordTokenPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ForgotPasswordToken.
+     * @param {ForgotPasswordTokenUpdateArgs} args - Arguments to update one ForgotPasswordToken.
+     * @example
+     * // Update one ForgotPasswordToken
+     * const forgotPasswordToken = await prisma.forgotPasswordToken.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ForgotPasswordTokenUpdateArgs>(args: SelectSubset<T, ForgotPasswordTokenUpdateArgs<ExtArgs>>): Prisma__ForgotPasswordTokenClient<$Result.GetResult<Prisma.$ForgotPasswordTokenPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ForgotPasswordTokens.
+     * @param {ForgotPasswordTokenDeleteManyArgs} args - Arguments to filter ForgotPasswordTokens to delete.
+     * @example
+     * // Delete a few ForgotPasswordTokens
+     * const { count } = await prisma.forgotPasswordToken.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ForgotPasswordTokenDeleteManyArgs>(args?: SelectSubset<T, ForgotPasswordTokenDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ForgotPasswordTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ForgotPasswordTokenUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ForgotPasswordTokens
+     * const forgotPasswordToken = await prisma.forgotPasswordToken.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ForgotPasswordTokenUpdateManyArgs>(args: SelectSubset<T, ForgotPasswordTokenUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ForgotPasswordTokens and returns the data updated in the database.
+     * @param {ForgotPasswordTokenUpdateManyAndReturnArgs} args - Arguments to update many ForgotPasswordTokens.
+     * @example
+     * // Update many ForgotPasswordTokens
+     * const forgotPasswordToken = await prisma.forgotPasswordToken.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ForgotPasswordTokens and only return the `id`
+     * const forgotPasswordTokenWithIdOnly = await prisma.forgotPasswordToken.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ForgotPasswordTokenUpdateManyAndReturnArgs>(args: SelectSubset<T, ForgotPasswordTokenUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ForgotPasswordTokenPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ForgotPasswordToken.
+     * @param {ForgotPasswordTokenUpsertArgs} args - Arguments to update or create a ForgotPasswordToken.
+     * @example
+     * // Update or create a ForgotPasswordToken
+     * const forgotPasswordToken = await prisma.forgotPasswordToken.upsert({
+     *   create: {
+     *     // ... data to create a ForgotPasswordToken
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ForgotPasswordToken we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ForgotPasswordTokenUpsertArgs>(args: SelectSubset<T, ForgotPasswordTokenUpsertArgs<ExtArgs>>): Prisma__ForgotPasswordTokenClient<$Result.GetResult<Prisma.$ForgotPasswordTokenPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ForgotPasswordTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ForgotPasswordTokenCountArgs} args - Arguments to filter ForgotPasswordTokens to count.
+     * @example
+     * // Count the number of ForgotPasswordTokens
+     * const count = await prisma.forgotPasswordToken.count({
+     *   where: {
+     *     // ... the filter for the ForgotPasswordTokens we want to count
+     *   }
+     * })
+    **/
+    count<T extends ForgotPasswordTokenCountArgs>(
+      args?: Subset<T, ForgotPasswordTokenCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ForgotPasswordTokenCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ForgotPasswordToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ForgotPasswordTokenAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ForgotPasswordTokenAggregateArgs>(args: Subset<T, ForgotPasswordTokenAggregateArgs>): Prisma.PrismaPromise<GetForgotPasswordTokenAggregateType<T>>
+
+    /**
+     * Group by ForgotPasswordToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ForgotPasswordTokenGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ForgotPasswordTokenGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ForgotPasswordTokenGroupByArgs['orderBy'] }
+        : { orderBy?: ForgotPasswordTokenGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ForgotPasswordTokenGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetForgotPasswordTokenGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ForgotPasswordToken model
+   */
+  readonly fields: ForgotPasswordTokenFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ForgotPasswordToken.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ForgotPasswordTokenClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ForgotPasswordToken model
+   */
+  interface ForgotPasswordTokenFieldRefs {
+    readonly id: FieldRef<"ForgotPasswordToken", 'String'>
+    readonly identifier: FieldRef<"ForgotPasswordToken", 'String'>
+    readonly token: FieldRef<"ForgotPasswordToken", 'String'>
+    readonly expires: FieldRef<"ForgotPasswordToken", 'DateTime'>
+    readonly userId: FieldRef<"ForgotPasswordToken", 'String'>
+    readonly used: FieldRef<"ForgotPasswordToken", 'Boolean'>
+    readonly usedAt: FieldRef<"ForgotPasswordToken", 'DateTime'>
+    readonly createdAt: FieldRef<"ForgotPasswordToken", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ForgotPasswordToken findUnique
+   */
+  export type ForgotPasswordTokenFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ForgotPasswordToken
+     */
+    select?: ForgotPasswordTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ForgotPasswordToken
+     */
+    omit?: ForgotPasswordTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ForgotPasswordTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which ForgotPasswordToken to fetch.
+     */
+    where: ForgotPasswordTokenWhereUniqueInput
+  }
+
+  /**
+   * ForgotPasswordToken findUniqueOrThrow
+   */
+  export type ForgotPasswordTokenFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ForgotPasswordToken
+     */
+    select?: ForgotPasswordTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ForgotPasswordToken
+     */
+    omit?: ForgotPasswordTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ForgotPasswordTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which ForgotPasswordToken to fetch.
+     */
+    where: ForgotPasswordTokenWhereUniqueInput
+  }
+
+  /**
+   * ForgotPasswordToken findFirst
+   */
+  export type ForgotPasswordTokenFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ForgotPasswordToken
+     */
+    select?: ForgotPasswordTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ForgotPasswordToken
+     */
+    omit?: ForgotPasswordTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ForgotPasswordTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which ForgotPasswordToken to fetch.
+     */
+    where?: ForgotPasswordTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ForgotPasswordTokens to fetch.
+     */
+    orderBy?: ForgotPasswordTokenOrderByWithRelationInput | ForgotPasswordTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ForgotPasswordTokens.
+     */
+    cursor?: ForgotPasswordTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ForgotPasswordTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ForgotPasswordTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ForgotPasswordTokens.
+     */
+    distinct?: ForgotPasswordTokenScalarFieldEnum | ForgotPasswordTokenScalarFieldEnum[]
+  }
+
+  /**
+   * ForgotPasswordToken findFirstOrThrow
+   */
+  export type ForgotPasswordTokenFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ForgotPasswordToken
+     */
+    select?: ForgotPasswordTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ForgotPasswordToken
+     */
+    omit?: ForgotPasswordTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ForgotPasswordTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which ForgotPasswordToken to fetch.
+     */
+    where?: ForgotPasswordTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ForgotPasswordTokens to fetch.
+     */
+    orderBy?: ForgotPasswordTokenOrderByWithRelationInput | ForgotPasswordTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ForgotPasswordTokens.
+     */
+    cursor?: ForgotPasswordTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ForgotPasswordTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ForgotPasswordTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ForgotPasswordTokens.
+     */
+    distinct?: ForgotPasswordTokenScalarFieldEnum | ForgotPasswordTokenScalarFieldEnum[]
+  }
+
+  /**
+   * ForgotPasswordToken findMany
+   */
+  export type ForgotPasswordTokenFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ForgotPasswordToken
+     */
+    select?: ForgotPasswordTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ForgotPasswordToken
+     */
+    omit?: ForgotPasswordTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ForgotPasswordTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which ForgotPasswordTokens to fetch.
+     */
+    where?: ForgotPasswordTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ForgotPasswordTokens to fetch.
+     */
+    orderBy?: ForgotPasswordTokenOrderByWithRelationInput | ForgotPasswordTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ForgotPasswordTokens.
+     */
+    cursor?: ForgotPasswordTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ForgotPasswordTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ForgotPasswordTokens.
+     */
+    skip?: number
+    distinct?: ForgotPasswordTokenScalarFieldEnum | ForgotPasswordTokenScalarFieldEnum[]
+  }
+
+  /**
+   * ForgotPasswordToken create
+   */
+  export type ForgotPasswordTokenCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ForgotPasswordToken
+     */
+    select?: ForgotPasswordTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ForgotPasswordToken
+     */
+    omit?: ForgotPasswordTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ForgotPasswordTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ForgotPasswordToken.
+     */
+    data: XOR<ForgotPasswordTokenCreateInput, ForgotPasswordTokenUncheckedCreateInput>
+  }
+
+  /**
+   * ForgotPasswordToken createMany
+   */
+  export type ForgotPasswordTokenCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ForgotPasswordTokens.
+     */
+    data: ForgotPasswordTokenCreateManyInput | ForgotPasswordTokenCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ForgotPasswordToken createManyAndReturn
+   */
+  export type ForgotPasswordTokenCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ForgotPasswordToken
+     */
+    select?: ForgotPasswordTokenSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ForgotPasswordToken
+     */
+    omit?: ForgotPasswordTokenOmit<ExtArgs> | null
+    /**
+     * The data used to create many ForgotPasswordTokens.
+     */
+    data: ForgotPasswordTokenCreateManyInput | ForgotPasswordTokenCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ForgotPasswordTokenIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ForgotPasswordToken update
+   */
+  export type ForgotPasswordTokenUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ForgotPasswordToken
+     */
+    select?: ForgotPasswordTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ForgotPasswordToken
+     */
+    omit?: ForgotPasswordTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ForgotPasswordTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ForgotPasswordToken.
+     */
+    data: XOR<ForgotPasswordTokenUpdateInput, ForgotPasswordTokenUncheckedUpdateInput>
+    /**
+     * Choose, which ForgotPasswordToken to update.
+     */
+    where: ForgotPasswordTokenWhereUniqueInput
+  }
+
+  /**
+   * ForgotPasswordToken updateMany
+   */
+  export type ForgotPasswordTokenUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ForgotPasswordTokens.
+     */
+    data: XOR<ForgotPasswordTokenUpdateManyMutationInput, ForgotPasswordTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which ForgotPasswordTokens to update
+     */
+    where?: ForgotPasswordTokenWhereInput
+    /**
+     * Limit how many ForgotPasswordTokens to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ForgotPasswordToken updateManyAndReturn
+   */
+  export type ForgotPasswordTokenUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ForgotPasswordToken
+     */
+    select?: ForgotPasswordTokenSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ForgotPasswordToken
+     */
+    omit?: ForgotPasswordTokenOmit<ExtArgs> | null
+    /**
+     * The data used to update ForgotPasswordTokens.
+     */
+    data: XOR<ForgotPasswordTokenUpdateManyMutationInput, ForgotPasswordTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which ForgotPasswordTokens to update
+     */
+    where?: ForgotPasswordTokenWhereInput
+    /**
+     * Limit how many ForgotPasswordTokens to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ForgotPasswordTokenIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ForgotPasswordToken upsert
+   */
+  export type ForgotPasswordTokenUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ForgotPasswordToken
+     */
+    select?: ForgotPasswordTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ForgotPasswordToken
+     */
+    omit?: ForgotPasswordTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ForgotPasswordTokenInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ForgotPasswordToken to update in case it exists.
+     */
+    where: ForgotPasswordTokenWhereUniqueInput
+    /**
+     * In case the ForgotPasswordToken found by the `where` argument doesn't exist, create a new ForgotPasswordToken with this data.
+     */
+    create: XOR<ForgotPasswordTokenCreateInput, ForgotPasswordTokenUncheckedCreateInput>
+    /**
+     * In case the ForgotPasswordToken was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ForgotPasswordTokenUpdateInput, ForgotPasswordTokenUncheckedUpdateInput>
+  }
+
+  /**
+   * ForgotPasswordToken delete
+   */
+  export type ForgotPasswordTokenDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ForgotPasswordToken
+     */
+    select?: ForgotPasswordTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ForgotPasswordToken
+     */
+    omit?: ForgotPasswordTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ForgotPasswordTokenInclude<ExtArgs> | null
+    /**
+     * Filter which ForgotPasswordToken to delete.
+     */
+    where: ForgotPasswordTokenWhereUniqueInput
+  }
+
+  /**
+   * ForgotPasswordToken deleteMany
+   */
+  export type ForgotPasswordTokenDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ForgotPasswordTokens to delete
+     */
+    where?: ForgotPasswordTokenWhereInput
+    /**
+     * Limit how many ForgotPasswordTokens to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ForgotPasswordToken without action
+   */
+  export type ForgotPasswordTokenDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ForgotPasswordToken
+     */
+    select?: ForgotPasswordTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ForgotPasswordToken
+     */
+    omit?: ForgotPasswordTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ForgotPasswordTokenInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -4546,11 +5797,27 @@ export namespace Prisma {
     identifier: 'identifier',
     token: 'token',
     expires: 'expires',
+    used: 'used',
+    usedAt: 'usedAt',
     userId: 'userId',
     createdAt: 'createdAt'
   };
 
   export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
+
+
+  export const ForgotPasswordTokenScalarFieldEnum: {
+    id: 'id',
+    identifier: 'identifier',
+    token: 'token',
+    expires: 'expires',
+    userId: 'userId',
+    used: 'used',
+    usedAt: 'usedAt',
+    createdAt: 'createdAt'
+  };
+
+  export type ForgotPasswordTokenScalarFieldEnum = (typeof ForgotPasswordTokenScalarFieldEnum)[keyof typeof ForgotPasswordTokenScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -4625,6 +5892,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -4649,13 +5923,14 @@ export namespace Prisma {
     firstName?: StringFilter<"User"> | string
     lastName?: StringFilter<"User"> | string
     email?: StringFilter<"User"> | string
-    password?: StringFilter<"User"> | string
+    password?: StringNullableFilter<"User"> | string | null
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     image?: StringNullableFilter<"User"> | string | null
     updatedAt?: DateTimeFilter<"User"> | Date | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     accounts?: AccountListRelationFilter
     VerificationToken?: VerificationTokenListRelationFilter
+    ForgotPasswordToken?: ForgotPasswordTokenListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -4663,13 +5938,14 @@ export namespace Prisma {
     firstName?: SortOrder
     lastName?: SortOrder
     email?: SortOrder
-    password?: SortOrder
+    password?: SortOrderInput | SortOrder
     emailVerified?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
     createdAt?: SortOrder
     accounts?: AccountOrderByRelationAggregateInput
     VerificationToken?: VerificationTokenOrderByRelationAggregateInput
+    ForgotPasswordToken?: ForgotPasswordTokenOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -4680,13 +5956,14 @@ export namespace Prisma {
     NOT?: UserWhereInput | UserWhereInput[]
     firstName?: StringFilter<"User"> | string
     lastName?: StringFilter<"User"> | string
-    password?: StringFilter<"User"> | string
+    password?: StringNullableFilter<"User"> | string | null
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     image?: StringNullableFilter<"User"> | string | null
     updatedAt?: DateTimeFilter<"User"> | Date | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     accounts?: AccountListRelationFilter
     VerificationToken?: VerificationTokenListRelationFilter
+    ForgotPasswordToken?: ForgotPasswordTokenListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -4694,7 +5971,7 @@ export namespace Prisma {
     firstName?: SortOrder
     lastName?: SortOrder
     email?: SortOrder
-    password?: SortOrder
+    password?: SortOrderInput | SortOrder
     emailVerified?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
@@ -4712,7 +5989,7 @@ export namespace Prisma {
     firstName?: StringWithAggregatesFilter<"User"> | string
     lastName?: StringWithAggregatesFilter<"User"> | string
     email?: StringWithAggregatesFilter<"User"> | string
-    password?: StringWithAggregatesFilter<"User"> | string
+    password?: StringNullableWithAggregatesFilter<"User"> | string | null
     emailVerified?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     image?: StringNullableWithAggregatesFilter<"User"> | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -4820,6 +6097,8 @@ export namespace Prisma {
     identifier?: StringFilter<"VerificationToken"> | string
     token?: StringFilter<"VerificationToken"> | string
     expires?: DateTimeFilter<"VerificationToken"> | Date | string
+    used?: BoolFilter<"VerificationToken"> | boolean
+    usedAt?: DateTimeNullableFilter<"VerificationToken"> | Date | string | null
     userId?: StringFilter<"VerificationToken"> | string
     createdAt?: DateTimeFilter<"VerificationToken"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -4830,6 +6109,8 @@ export namespace Prisma {
     identifier?: SortOrder
     token?: SortOrder
     expires?: SortOrder
+    used?: SortOrder
+    usedAt?: SortOrderInput | SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -4844,6 +6125,8 @@ export namespace Prisma {
     NOT?: VerificationTokenWhereInput | VerificationTokenWhereInput[]
     identifier?: StringFilter<"VerificationToken"> | string
     expires?: DateTimeFilter<"VerificationToken"> | Date | string
+    used?: BoolFilter<"VerificationToken"> | boolean
+    usedAt?: DateTimeNullableFilter<"VerificationToken"> | Date | string | null
     userId?: StringFilter<"VerificationToken"> | string
     createdAt?: DateTimeFilter<"VerificationToken"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -4854,6 +6137,8 @@ export namespace Prisma {
     identifier?: SortOrder
     token?: SortOrder
     expires?: SortOrder
+    used?: SortOrder
+    usedAt?: SortOrderInput | SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
     _count?: VerificationTokenCountOrderByAggregateInput
@@ -4869,8 +6154,81 @@ export namespace Prisma {
     identifier?: StringWithAggregatesFilter<"VerificationToken"> | string
     token?: StringWithAggregatesFilter<"VerificationToken"> | string
     expires?: DateTimeWithAggregatesFilter<"VerificationToken"> | Date | string
+    used?: BoolWithAggregatesFilter<"VerificationToken"> | boolean
+    usedAt?: DateTimeNullableWithAggregatesFilter<"VerificationToken"> | Date | string | null
     userId?: StringWithAggregatesFilter<"VerificationToken"> | string
     createdAt?: DateTimeWithAggregatesFilter<"VerificationToken"> | Date | string
+  }
+
+  export type ForgotPasswordTokenWhereInput = {
+    AND?: ForgotPasswordTokenWhereInput | ForgotPasswordTokenWhereInput[]
+    OR?: ForgotPasswordTokenWhereInput[]
+    NOT?: ForgotPasswordTokenWhereInput | ForgotPasswordTokenWhereInput[]
+    id?: StringFilter<"ForgotPasswordToken"> | string
+    identifier?: StringFilter<"ForgotPasswordToken"> | string
+    token?: StringFilter<"ForgotPasswordToken"> | string
+    expires?: DateTimeFilter<"ForgotPasswordToken"> | Date | string
+    userId?: StringFilter<"ForgotPasswordToken"> | string
+    used?: BoolFilter<"ForgotPasswordToken"> | boolean
+    usedAt?: DateTimeNullableFilter<"ForgotPasswordToken"> | Date | string | null
+    createdAt?: DateTimeFilter<"ForgotPasswordToken"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type ForgotPasswordTokenOrderByWithRelationInput = {
+    id?: SortOrder
+    identifier?: SortOrder
+    token?: SortOrder
+    expires?: SortOrder
+    userId?: SortOrder
+    used?: SortOrder
+    usedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type ForgotPasswordTokenWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    token?: string
+    identifier_token?: ForgotPasswordTokenIdentifierTokenCompoundUniqueInput
+    AND?: ForgotPasswordTokenWhereInput | ForgotPasswordTokenWhereInput[]
+    OR?: ForgotPasswordTokenWhereInput[]
+    NOT?: ForgotPasswordTokenWhereInput | ForgotPasswordTokenWhereInput[]
+    identifier?: StringFilter<"ForgotPasswordToken"> | string
+    expires?: DateTimeFilter<"ForgotPasswordToken"> | Date | string
+    userId?: StringFilter<"ForgotPasswordToken"> | string
+    used?: BoolFilter<"ForgotPasswordToken"> | boolean
+    usedAt?: DateTimeNullableFilter<"ForgotPasswordToken"> | Date | string | null
+    createdAt?: DateTimeFilter<"ForgotPasswordToken"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "token" | "identifier_token">
+
+  export type ForgotPasswordTokenOrderByWithAggregationInput = {
+    id?: SortOrder
+    identifier?: SortOrder
+    token?: SortOrder
+    expires?: SortOrder
+    userId?: SortOrder
+    used?: SortOrder
+    usedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: ForgotPasswordTokenCountOrderByAggregateInput
+    _max?: ForgotPasswordTokenMaxOrderByAggregateInput
+    _min?: ForgotPasswordTokenMinOrderByAggregateInput
+  }
+
+  export type ForgotPasswordTokenScalarWhereWithAggregatesInput = {
+    AND?: ForgotPasswordTokenScalarWhereWithAggregatesInput | ForgotPasswordTokenScalarWhereWithAggregatesInput[]
+    OR?: ForgotPasswordTokenScalarWhereWithAggregatesInput[]
+    NOT?: ForgotPasswordTokenScalarWhereWithAggregatesInput | ForgotPasswordTokenScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ForgotPasswordToken"> | string
+    identifier?: StringWithAggregatesFilter<"ForgotPasswordToken"> | string
+    token?: StringWithAggregatesFilter<"ForgotPasswordToken"> | string
+    expires?: DateTimeWithAggregatesFilter<"ForgotPasswordToken"> | Date | string
+    userId?: StringWithAggregatesFilter<"ForgotPasswordToken"> | string
+    used?: BoolWithAggregatesFilter<"ForgotPasswordToken"> | boolean
+    usedAt?: DateTimeNullableWithAggregatesFilter<"ForgotPasswordToken"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"ForgotPasswordToken"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -4878,13 +6236,14 @@ export namespace Prisma {
     firstName: string
     lastName: string
     email: string
-    password: string
+    password?: string | null
     emailVerified?: Date | string | null
     image?: string | null
     updatedAt?: Date | string
     createdAt?: Date | string
     accounts?: AccountCreateNestedManyWithoutUserInput
     VerificationToken?: VerificationTokenCreateNestedManyWithoutUserInput
+    ForgotPasswordToken?: ForgotPasswordTokenCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -4892,13 +6251,14 @@ export namespace Prisma {
     firstName: string
     lastName: string
     email: string
-    password: string
+    password?: string | null
     emailVerified?: Date | string | null
     image?: string | null
     updatedAt?: Date | string
     createdAt?: Date | string
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     VerificationToken?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    ForgotPasswordToken?: ForgotPasswordTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -4906,13 +6266,14 @@ export namespace Prisma {
     firstName?: StringFieldUpdateOperationsInput | string
     lastName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUpdateManyWithoutUserNestedInput
     VerificationToken?: VerificationTokenUpdateManyWithoutUserNestedInput
+    ForgotPasswordToken?: ForgotPasswordTokenUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -4920,13 +6281,14 @@ export namespace Prisma {
     firstName?: StringFieldUpdateOperationsInput | string
     lastName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     VerificationToken?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    ForgotPasswordToken?: ForgotPasswordTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -4934,7 +6296,7 @@ export namespace Prisma {
     firstName: string
     lastName: string
     email: string
-    password: string
+    password?: string | null
     emailVerified?: Date | string | null
     image?: string | null
     updatedAt?: Date | string
@@ -4946,7 +6308,7 @@ export namespace Prisma {
     firstName?: StringFieldUpdateOperationsInput | string
     lastName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -4958,7 +6320,7 @@ export namespace Prisma {
     firstName?: StringFieldUpdateOperationsInput | string
     lastName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -5074,6 +6436,8 @@ export namespace Prisma {
     identifier: string
     token: string
     expires: Date | string
+    used?: boolean
+    usedAt?: Date | string | null
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutVerificationTokenInput
   }
@@ -5083,6 +6447,8 @@ export namespace Prisma {
     identifier: string
     token: string
     expires: Date | string
+    used?: boolean
+    usedAt?: Date | string | null
     userId: string
     createdAt?: Date | string
   }
@@ -5092,6 +6458,8 @@ export namespace Prisma {
     identifier?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutVerificationTokenNestedInput
   }
@@ -5101,6 +6469,8 @@ export namespace Prisma {
     identifier?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     userId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5110,6 +6480,8 @@ export namespace Prisma {
     identifier: string
     token: string
     expires: Date | string
+    used?: boolean
+    usedAt?: Date | string | null
     userId: string
     createdAt?: Date | string
   }
@@ -5119,6 +6491,8 @@ export namespace Prisma {
     identifier?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -5127,7 +6501,85 @@ export namespace Prisma {
     identifier?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     userId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ForgotPasswordTokenCreateInput = {
+    id?: string
+    identifier: string
+    token: string
+    expires: Date | string
+    used?: boolean
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutForgotPasswordTokenInput
+  }
+
+  export type ForgotPasswordTokenUncheckedCreateInput = {
+    id?: string
+    identifier: string
+    token: string
+    expires: Date | string
+    userId: string
+    used?: boolean
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type ForgotPasswordTokenUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    identifier?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutForgotPasswordTokenNestedInput
+  }
+
+  export type ForgotPasswordTokenUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    identifier?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ForgotPasswordTokenCreateManyInput = {
+    id?: string
+    identifier: string
+    token: string
+    expires: Date | string
+    userId: string
+    used?: boolean
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type ForgotPasswordTokenUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    identifier?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ForgotPasswordTokenUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    identifier?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -5146,17 +6598,6 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -5170,6 +6611,17 @@ export namespace Prisma {
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     mode?: QueryMode
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type DateTimeFilter<$PrismaModel = never> = {
@@ -5195,6 +6647,12 @@ export namespace Prisma {
     none?: VerificationTokenWhereInput
   }
 
+  export type ForgotPasswordTokenListRelationFilter = {
+    every?: ForgotPasswordTokenWhereInput
+    some?: ForgotPasswordTokenWhereInput
+    none?: ForgotPasswordTokenWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -5205,6 +6663,10 @@ export namespace Prisma {
   }
 
   export type VerificationTokenOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ForgotPasswordTokenOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -5262,20 +6724,6 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -5292,6 +6740,20 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -5398,6 +6860,11 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type VerificationTokenIdentifierTokenCompoundUniqueInput = {
     identifier: string
     token: string
@@ -5408,6 +6875,8 @@ export namespace Prisma {
     identifier?: SortOrder
     token?: SortOrder
     expires?: SortOrder
+    used?: SortOrder
+    usedAt?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
   }
@@ -5417,6 +6886,8 @@ export namespace Prisma {
     identifier?: SortOrder
     token?: SortOrder
     expires?: SortOrder
+    used?: SortOrder
+    usedAt?: SortOrder
     userId?: SortOrder
     createdAt?: SortOrder
   }
@@ -5426,7 +6897,55 @@ export namespace Prisma {
     identifier?: SortOrder
     token?: SortOrder
     expires?: SortOrder
+    used?: SortOrder
+    usedAt?: SortOrder
     userId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type ForgotPasswordTokenIdentifierTokenCompoundUniqueInput = {
+    identifier: string
+    token: string
+  }
+
+  export type ForgotPasswordTokenCountOrderByAggregateInput = {
+    id?: SortOrder
+    identifier?: SortOrder
+    token?: SortOrder
+    expires?: SortOrder
+    userId?: SortOrder
+    used?: SortOrder
+    usedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ForgotPasswordTokenMaxOrderByAggregateInput = {
+    id?: SortOrder
+    identifier?: SortOrder
+    token?: SortOrder
+    expires?: SortOrder
+    userId?: SortOrder
+    used?: SortOrder
+    usedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ForgotPasswordTokenMinOrderByAggregateInput = {
+    id?: SortOrder
+    identifier?: SortOrder
+    token?: SortOrder
+    expires?: SortOrder
+    userId?: SortOrder
+    used?: SortOrder
+    usedAt?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -5444,6 +6963,13 @@ export namespace Prisma {
     connect?: VerificationTokenWhereUniqueInput | VerificationTokenWhereUniqueInput[]
   }
 
+  export type ForgotPasswordTokenCreateNestedManyWithoutUserInput = {
+    create?: XOR<ForgotPasswordTokenCreateWithoutUserInput, ForgotPasswordTokenUncheckedCreateWithoutUserInput> | ForgotPasswordTokenCreateWithoutUserInput[] | ForgotPasswordTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ForgotPasswordTokenCreateOrConnectWithoutUserInput | ForgotPasswordTokenCreateOrConnectWithoutUserInput[]
+    createMany?: ForgotPasswordTokenCreateManyUserInputEnvelope
+    connect?: ForgotPasswordTokenWhereUniqueInput | ForgotPasswordTokenWhereUniqueInput[]
+  }
+
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -5458,16 +6984,23 @@ export namespace Prisma {
     connect?: VerificationTokenWhereUniqueInput | VerificationTokenWhereUniqueInput[]
   }
 
+  export type ForgotPasswordTokenUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ForgotPasswordTokenCreateWithoutUserInput, ForgotPasswordTokenUncheckedCreateWithoutUserInput> | ForgotPasswordTokenCreateWithoutUserInput[] | ForgotPasswordTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ForgotPasswordTokenCreateOrConnectWithoutUserInput | ForgotPasswordTokenCreateOrConnectWithoutUserInput[]
+    createMany?: ForgotPasswordTokenCreateManyUserInputEnvelope
+    connect?: ForgotPasswordTokenWhereUniqueInput | ForgotPasswordTokenWhereUniqueInput[]
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
 
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
-  }
-
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
@@ -5502,6 +7035,20 @@ export namespace Prisma {
     deleteMany?: VerificationTokenScalarWhereInput | VerificationTokenScalarWhereInput[]
   }
 
+  export type ForgotPasswordTokenUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ForgotPasswordTokenCreateWithoutUserInput, ForgotPasswordTokenUncheckedCreateWithoutUserInput> | ForgotPasswordTokenCreateWithoutUserInput[] | ForgotPasswordTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ForgotPasswordTokenCreateOrConnectWithoutUserInput | ForgotPasswordTokenCreateOrConnectWithoutUserInput[]
+    upsert?: ForgotPasswordTokenUpsertWithWhereUniqueWithoutUserInput | ForgotPasswordTokenUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ForgotPasswordTokenCreateManyUserInputEnvelope
+    set?: ForgotPasswordTokenWhereUniqueInput | ForgotPasswordTokenWhereUniqueInput[]
+    disconnect?: ForgotPasswordTokenWhereUniqueInput | ForgotPasswordTokenWhereUniqueInput[]
+    delete?: ForgotPasswordTokenWhereUniqueInput | ForgotPasswordTokenWhereUniqueInput[]
+    connect?: ForgotPasswordTokenWhereUniqueInput | ForgotPasswordTokenWhereUniqueInput[]
+    update?: ForgotPasswordTokenUpdateWithWhereUniqueWithoutUserInput | ForgotPasswordTokenUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ForgotPasswordTokenUpdateManyWithWhereWithoutUserInput | ForgotPasswordTokenUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ForgotPasswordTokenScalarWhereInput | ForgotPasswordTokenScalarWhereInput[]
+  }
+
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -5528,6 +7075,20 @@ export namespace Prisma {
     update?: VerificationTokenUpdateWithWhereUniqueWithoutUserInput | VerificationTokenUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: VerificationTokenUpdateManyWithWhereWithoutUserInput | VerificationTokenUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: VerificationTokenScalarWhereInput | VerificationTokenScalarWhereInput[]
+  }
+
+  export type ForgotPasswordTokenUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ForgotPasswordTokenCreateWithoutUserInput, ForgotPasswordTokenUncheckedCreateWithoutUserInput> | ForgotPasswordTokenCreateWithoutUserInput[] | ForgotPasswordTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ForgotPasswordTokenCreateOrConnectWithoutUserInput | ForgotPasswordTokenCreateOrConnectWithoutUserInput[]
+    upsert?: ForgotPasswordTokenUpsertWithWhereUniqueWithoutUserInput | ForgotPasswordTokenUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ForgotPasswordTokenCreateManyUserInputEnvelope
+    set?: ForgotPasswordTokenWhereUniqueInput | ForgotPasswordTokenWhereUniqueInput[]
+    disconnect?: ForgotPasswordTokenWhereUniqueInput | ForgotPasswordTokenWhereUniqueInput[]
+    delete?: ForgotPasswordTokenWhereUniqueInput | ForgotPasswordTokenWhereUniqueInput[]
+    connect?: ForgotPasswordTokenWhereUniqueInput | ForgotPasswordTokenWhereUniqueInput[]
+    update?: ForgotPasswordTokenUpdateWithWhereUniqueWithoutUserInput | ForgotPasswordTokenUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ForgotPasswordTokenUpdateManyWithWhereWithoutUserInput | ForgotPasswordTokenUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ForgotPasswordTokenScalarWhereInput | ForgotPasswordTokenScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutAccountsInput = {
@@ -5558,12 +7119,30 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
   export type UserUpdateOneRequiredWithoutVerificationTokenNestedInput = {
     create?: XOR<UserCreateWithoutVerificationTokenInput, UserUncheckedCreateWithoutVerificationTokenInput>
     connectOrCreate?: UserCreateOrConnectWithoutVerificationTokenInput
     upsert?: UserUpsertWithoutVerificationTokenInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutVerificationTokenInput, UserUpdateWithoutVerificationTokenInput>, UserUncheckedUpdateWithoutVerificationTokenInput>
+  }
+
+  export type UserCreateNestedOneWithoutForgotPasswordTokenInput = {
+    create?: XOR<UserCreateWithoutForgotPasswordTokenInput, UserUncheckedCreateWithoutForgotPasswordTokenInput>
+    connectOrCreate?: UserCreateOrConnectWithoutForgotPasswordTokenInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutForgotPasswordTokenNestedInput = {
+    create?: XOR<UserCreateWithoutForgotPasswordTokenInput, UserUncheckedCreateWithoutForgotPasswordTokenInput>
+    connectOrCreate?: UserCreateOrConnectWithoutForgotPasswordTokenInput
+    upsert?: UserUpsertWithoutForgotPasswordTokenInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutForgotPasswordTokenInput, UserUpdateWithoutForgotPasswordTokenInput>, UserUncheckedUpdateWithoutForgotPasswordTokenInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -5580,17 +7159,6 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -5603,6 +7171,17 @@ export namespace Prisma {
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
@@ -5644,31 +7223,6 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -5684,6 +7238,31 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -5725,6 +7304,19 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type AccountCreateWithoutUserInput = {
@@ -5770,6 +7362,8 @@ export namespace Prisma {
     identifier: string
     token: string
     expires: Date | string
+    used?: boolean
+    usedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -5778,6 +7372,8 @@ export namespace Prisma {
     identifier: string
     token: string
     expires: Date | string
+    used?: boolean
+    usedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -5788,6 +7384,36 @@ export namespace Prisma {
 
   export type VerificationTokenCreateManyUserInputEnvelope = {
     data: VerificationTokenCreateManyUserInput | VerificationTokenCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ForgotPasswordTokenCreateWithoutUserInput = {
+    id?: string
+    identifier: string
+    token: string
+    expires: Date | string
+    used?: boolean
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type ForgotPasswordTokenUncheckedCreateWithoutUserInput = {
+    id?: string
+    identifier: string
+    token: string
+    expires: Date | string
+    used?: boolean
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type ForgotPasswordTokenCreateOrConnectWithoutUserInput = {
+    where: ForgotPasswordTokenWhereUniqueInput
+    create: XOR<ForgotPasswordTokenCreateWithoutUserInput, ForgotPasswordTokenUncheckedCreateWithoutUserInput>
+  }
+
+  export type ForgotPasswordTokenCreateManyUserInputEnvelope = {
+    data: ForgotPasswordTokenCreateManyUserInput | ForgotPasswordTokenCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -5849,8 +7475,40 @@ export namespace Prisma {
     identifier?: StringFilter<"VerificationToken"> | string
     token?: StringFilter<"VerificationToken"> | string
     expires?: DateTimeFilter<"VerificationToken"> | Date | string
+    used?: BoolFilter<"VerificationToken"> | boolean
+    usedAt?: DateTimeNullableFilter<"VerificationToken"> | Date | string | null
     userId?: StringFilter<"VerificationToken"> | string
     createdAt?: DateTimeFilter<"VerificationToken"> | Date | string
+  }
+
+  export type ForgotPasswordTokenUpsertWithWhereUniqueWithoutUserInput = {
+    where: ForgotPasswordTokenWhereUniqueInput
+    update: XOR<ForgotPasswordTokenUpdateWithoutUserInput, ForgotPasswordTokenUncheckedUpdateWithoutUserInput>
+    create: XOR<ForgotPasswordTokenCreateWithoutUserInput, ForgotPasswordTokenUncheckedCreateWithoutUserInput>
+  }
+
+  export type ForgotPasswordTokenUpdateWithWhereUniqueWithoutUserInput = {
+    where: ForgotPasswordTokenWhereUniqueInput
+    data: XOR<ForgotPasswordTokenUpdateWithoutUserInput, ForgotPasswordTokenUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ForgotPasswordTokenUpdateManyWithWhereWithoutUserInput = {
+    where: ForgotPasswordTokenScalarWhereInput
+    data: XOR<ForgotPasswordTokenUpdateManyMutationInput, ForgotPasswordTokenUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ForgotPasswordTokenScalarWhereInput = {
+    AND?: ForgotPasswordTokenScalarWhereInput | ForgotPasswordTokenScalarWhereInput[]
+    OR?: ForgotPasswordTokenScalarWhereInput[]
+    NOT?: ForgotPasswordTokenScalarWhereInput | ForgotPasswordTokenScalarWhereInput[]
+    id?: StringFilter<"ForgotPasswordToken"> | string
+    identifier?: StringFilter<"ForgotPasswordToken"> | string
+    token?: StringFilter<"ForgotPasswordToken"> | string
+    expires?: DateTimeFilter<"ForgotPasswordToken"> | Date | string
+    userId?: StringFilter<"ForgotPasswordToken"> | string
+    used?: BoolFilter<"ForgotPasswordToken"> | boolean
+    usedAt?: DateTimeNullableFilter<"ForgotPasswordToken"> | Date | string | null
+    createdAt?: DateTimeFilter<"ForgotPasswordToken"> | Date | string
   }
 
   export type UserCreateWithoutAccountsInput = {
@@ -5858,12 +7516,13 @@ export namespace Prisma {
     firstName: string
     lastName: string
     email: string
-    password: string
+    password?: string | null
     emailVerified?: Date | string | null
     image?: string | null
     updatedAt?: Date | string
     createdAt?: Date | string
     VerificationToken?: VerificationTokenCreateNestedManyWithoutUserInput
+    ForgotPasswordToken?: ForgotPasswordTokenCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -5871,12 +7530,13 @@ export namespace Prisma {
     firstName: string
     lastName: string
     email: string
-    password: string
+    password?: string | null
     emailVerified?: Date | string | null
     image?: string | null
     updatedAt?: Date | string
     createdAt?: Date | string
     VerificationToken?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    ForgotPasswordToken?: ForgotPasswordTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -5900,12 +7560,13 @@ export namespace Prisma {
     firstName?: StringFieldUpdateOperationsInput | string
     lastName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     VerificationToken?: VerificationTokenUpdateManyWithoutUserNestedInput
+    ForgotPasswordToken?: ForgotPasswordTokenUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -5913,12 +7574,13 @@ export namespace Prisma {
     firstName?: StringFieldUpdateOperationsInput | string
     lastName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     VerificationToken?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    ForgotPasswordToken?: ForgotPasswordTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutVerificationTokenInput = {
@@ -5926,12 +7588,13 @@ export namespace Prisma {
     firstName: string
     lastName: string
     email: string
-    password: string
+    password?: string | null
     emailVerified?: Date | string | null
     image?: string | null
     updatedAt?: Date | string
     createdAt?: Date | string
     accounts?: AccountCreateNestedManyWithoutUserInput
+    ForgotPasswordToken?: ForgotPasswordTokenCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutVerificationTokenInput = {
@@ -5939,12 +7602,13 @@ export namespace Prisma {
     firstName: string
     lastName: string
     email: string
-    password: string
+    password?: string | null
     emailVerified?: Date | string | null
     image?: string | null
     updatedAt?: Date | string
     createdAt?: Date | string
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    ForgotPasswordToken?: ForgotPasswordTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutVerificationTokenInput = {
@@ -5968,12 +7632,13 @@ export namespace Prisma {
     firstName?: StringFieldUpdateOperationsInput | string
     lastName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    ForgotPasswordToken?: ForgotPasswordTokenUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutVerificationTokenInput = {
@@ -5981,12 +7646,85 @@ export namespace Prisma {
     firstName?: StringFieldUpdateOperationsInput | string
     lastName?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    ForgotPasswordToken?: ForgotPasswordTokenUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutForgotPasswordTokenInput = {
+    id?: string
+    firstName: string
+    lastName: string
+    email: string
+    password?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    updatedAt?: Date | string
+    createdAt?: Date | string
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    VerificationToken?: VerificationTokenCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutForgotPasswordTokenInput = {
+    id?: string
+    firstName: string
+    lastName: string
+    email: string
+    password?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    updatedAt?: Date | string
+    createdAt?: Date | string
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    VerificationToken?: VerificationTokenUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutForgotPasswordTokenInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutForgotPasswordTokenInput, UserUncheckedCreateWithoutForgotPasswordTokenInput>
+  }
+
+  export type UserUpsertWithoutForgotPasswordTokenInput = {
+    update: XOR<UserUpdateWithoutForgotPasswordTokenInput, UserUncheckedUpdateWithoutForgotPasswordTokenInput>
+    create: XOR<UserCreateWithoutForgotPasswordTokenInput, UserUncheckedCreateWithoutForgotPasswordTokenInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutForgotPasswordTokenInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutForgotPasswordTokenInput, UserUncheckedUpdateWithoutForgotPasswordTokenInput>
+  }
+
+  export type UserUpdateWithoutForgotPasswordTokenInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    VerificationToken?: VerificationTokenUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutForgotPasswordTokenInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    VerificationToken?: VerificationTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type AccountCreateManyUserInput = {
@@ -6008,6 +7746,18 @@ export namespace Prisma {
     identifier: string
     token: string
     expires: Date | string
+    used?: boolean
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type ForgotPasswordTokenCreateManyUserInput = {
+    id?: string
+    identifier: string
+    token: string
+    expires: Date | string
+    used?: boolean
+    usedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -6058,6 +7808,8 @@ export namespace Prisma {
     identifier?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -6066,6 +7818,8 @@ export namespace Prisma {
     identifier?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -6074,6 +7828,38 @@ export namespace Prisma {
     identifier?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ForgotPasswordTokenUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    identifier?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ForgotPasswordTokenUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    identifier?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ForgotPasswordTokenUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    identifier?: StringFieldUpdateOperationsInput | string
+    token?: StringFieldUpdateOperationsInput | string
+    expires?: DateTimeFieldUpdateOperationsInput | Date | string
+    used?: BoolFieldUpdateOperationsInput | boolean
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

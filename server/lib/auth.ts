@@ -2,15 +2,177 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
+import DiscordProvider from "next-auth/providers/discord";
 import prismadb from "./prismadb";
 import * as argon2 from "argon2";
+import { NextResponse } from "next/server";
 
+// Auth Helpers
+async function fetchVerifiedEmail(provider: string, accessToken: string) {
+  try {
+    if (provider === "github") {
+      const res = await fetch("https://api.github.com/user/emails", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/vnd.github+json",
+        },
+      });
+
+      if (!res.ok) throw new Error("GitHub email fetch failed");
+
+      const emails: { email: string; verified: boolean; primary: boolean }[] =
+        await res.json();
+      return emails.find((e) => e.primary && e.verified)?.email || null;
+    }
+
+    return null;
+  } catch (error) {
+    console.error(`${provider} email fetch error:`, error);
+    throw new NextResponse("Error fetching verified email", { status: 500 });
+  }
+}
+
+async function getOrCreateUserFromOAuth({
+  profile,
+  provider,
+  providerAccountId,
+  accessToken,
+}: {
+  profile: any;
+  provider: string;
+  providerAccountId: string;
+  accessToken: string;
+}) {
+  let email = profile.email;
+
+  if (!email && provider === "github") {
+    email = await fetchVerifiedEmail("github", accessToken);
+  }
+
+  if (!email) {
+    throw new Error("No verified email found");
+  }
+
+  let user = await prismadb.user.findUnique({ where: { email } });
+
+  if (!user) {
+    const [firstName, ...lastNameArr] = profile.name?.split(" ") || [];
+    const lastName = lastNameArr.join(" ");
+
+    user = await prismadb.user.create({
+      data: {
+        email,
+        firstName,
+        lastName,
+        image: profile.avatar_url || profile.picture || null,
+      },
+    });
+  }
+
+  await linkOAuthAccountIfNeeded(
+    user.id,
+    provider,
+    providerAccountId,
+    accessToken
+  );
+
+  await updateUserProfileIfChanged(user, profile);
+
+  return {
+    id: user.id,
+    name: `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim(),
+    email: user.email,
+    image: user.image ?? null,
+  };
+}
+
+async function linkOAuthAccountIfNeeded(
+  userId: string,
+  provider: string,
+  providerAccountId: string,
+  accessToken: string
+) {
+  try {
+    await prismadb.account.upsert({
+      where: {
+        provider_providerAccountId: {
+          provider,
+          providerAccountId,
+        },
+      },
+      update: {
+        access_token: accessToken,
+      },
+      create: {
+        userId,
+        provider,
+        providerAccountId,
+        access_token: accessToken,
+        type: "oauth",
+      },
+    });
+  } catch (error) {
+    throw new NextResponse("Error creating/updating account", { status: 500 });
+  }
+}
+
+async function updateUserProfileIfChanged(user: any, profile: any) {
+  const [firstName, ...lastNameArr] = profile.name?.split(" ") || [];
+  const lastName = lastNameArr.join(" ");
+  const image = profile.avatar_url || profile.picture || null;
+
+  if (
+    user.firstName !== firstName ||
+    user.lastName !== lastName ||
+    user.image !== image
+  ) {
+    await prismadb.user.update({
+      where: { id: user.id },
+      data: { firstName, lastName, image },
+    });
+  }
+}
+
+// Auth Config
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prismadb),
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      profile: async (profile, tokens) => {
+        return await getOrCreateUserFromOAuth({
+          profile,
+          provider: "github",
+          providerAccountId: profile.id,
+          accessToken: tokens.access_token!,
+        });
+      },
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      profile: async (profile, tokens) => {
+        return await getOrCreateUserFromOAuth({
+          profile,
+          provider: "google",
+          providerAccountId: profile.id,
+          accessToken: tokens.access_token!,
+        });
+      },
+    }),
+    DiscordProvider({
+      clientId: process.env.DISCORD_CLIENT_ID!,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+      profile: async (profile, tokens) => {
+        return await getOrCreateUserFromOAuth({
+          profile,
+          provider: "discord",
+          providerAccountId: profile.id,
+          accessToken: tokens.access_token!,
+        });
+      },
     }),
     CredentialsProvider({
       credentials: {
@@ -18,35 +180,33 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // Look for user in database
-        const user = await prismadb.user.findUnique({
-          where: {
-            email: credentials!.email,
-          },
-        });
-        const password = credentials?.password;
+        if (
+          typeof credentials?.email !== "string" ||
+          typeof credentials?.password !== "string"
+        ) {
+          return null;
+        }
 
-        // Check for user and password
-        if (!user || !user.password) return null;
-        if (!password || typeof password !== "string") return null;
+        const user = await prismadb.user.findUnique({
+          where: { email: credentials.email },
+        });
+
+        if (!user || !user.password) {
+          throw new Error("User not found or password not set");
+        }
 
         const isValid = await argon2.verify(
           user.password,
-          credentials!.password as string
+          credentials.password
         );
 
-        // If user is not valid, return null
-        if (!isValid) return null;
-
-        // Return user if user is verified
-        return { id: user.id, email: user.email };
+        return isValid ? { id: user.id, email: user.email } : null;
       },
     }),
   ],
   session: { strategy: "jwt" },
   secret: process.env.AUTH_SECRET,
   callbacks: {
-    // Check for session
     async jwt({ token, account, user }) {
       if (user) {
         token.id = user.id;
@@ -57,8 +217,8 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
-    async session({ session, token }: { session: any; token: any }) {
-      if (token) {
+    async session({ session, token }) {
+      if (session?.user && token) {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
       }

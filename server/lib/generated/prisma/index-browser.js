@@ -149,7 +149,20 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
   identifier: 'identifier',
   token: 'token',
   expires: 'expires',
+  used: 'used',
+  usedAt: 'usedAt',
   userId: 'userId',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.ForgotPasswordTokenScalarFieldEnum = {
+  id: 'id',
+  identifier: 'identifier',
+  token: 'token',
+  expires: 'expires',
+  userId: 'userId',
+  used: 'used',
+  usedAt: 'usedAt',
   createdAt: 'createdAt'
 };
 
@@ -172,7 +185,8 @@ exports.Prisma.NullsOrder = {
 exports.Prisma.ModelName = {
   User: 'User',
   Account: 'Account',
-  VerificationToken: 'VerificationToken'
+  VerificationToken: 'VerificationToken',
+  ForgotPasswordToken: 'ForgotPasswordToken'
 };
 
 /**

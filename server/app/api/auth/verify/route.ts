@@ -14,7 +14,11 @@ export async function POST(req: Request) {
       },
     });
 
-    if (!validToken || isBefore(new Date(validToken.expires), new Date())) {
+    if (
+      !validToken ||
+      validToken.used ||
+      isBefore(new Date(validToken.expires), new Date())
+    ) {
       return new NextResponse("Token is expired or invalid", { status: 400 });
     }
 
@@ -23,8 +27,12 @@ export async function POST(req: Request) {
       data: { emailVerified: new Date() },
     });
 
-    await prismadb.verificationToken.delete({
-      where: { token },
+    await prismadb.verificationToken.update({
+      where: { token: token },
+      data: {
+        used: true,
+        usedAt: new Date(),
+      },
     });
 
     return NextResponse.json({ success: true });
