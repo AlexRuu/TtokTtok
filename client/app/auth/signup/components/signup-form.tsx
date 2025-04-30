@@ -19,6 +19,7 @@ import Loader from "@/components/ui/loader";
 import useLoading from "@/hooks/use-loading";
 import PasswordTracker from "./password-checker";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 const passwordSchema = z
   .string()
@@ -34,13 +35,13 @@ const passwordSchema = z
   })
   .refine((password) => /[!@#$%^&*]/.test(password), {
     message:
-      "Password needs to have at least one special character (!@#$%^&*)).",
+      "Password needs to have at least one special character (!@#$%^&*).",
   });
 
 const formSchema = z
   .object({
-    firstName: z.string().min(1, { message: "Please provide a first name." }),
-    lastName: z.string().min(1, { message: "Please provide a last name." }),
+    firstName: z.string().min(1, { message: "First name is required" }),
+    lastName: z.string().min(1, { message: "Last name is required." }),
     email: z
       .string()
       .min(1, { message: "Email is required." })
@@ -131,6 +132,7 @@ const SignUpForm = () => {
       {isLoading && <Loader />}
       <Form {...form}>
         <form
+          noValidate
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto p-8 border border-pink-100 bg-white shadow-sm rounded-2xl"
         >
@@ -145,8 +147,6 @@ const SignUpForm = () => {
                   <FormItem>
                     <FormControl>
                       <Input
-                        aria-invalid={!!form.formState.errors.firstName}
-                        aria-describedby="firstName-error"
                         type="text"
                         onInvalid={(e) => e.preventDefault()}
                         id="firstName"
@@ -155,21 +155,31 @@ const SignUpForm = () => {
                         className="shadow-sm peer w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base placeholder-transparent focus:ring-2 focus:ring-indigo-400"
                       />
                     </FormControl>
-                    {form.formState.errors.firstName && (
-                      <p
-                        id="firstName-error"
-                        className="text-sm text-red-400 -mt-1 flex items-center"
-                        aria-live="polite"
-                      >
-                        <CircleAlert size={15} className="mr-1" />
-                        {form.formState.errors.firstName.message}
-                      </p>
-                    )}
+                    {form.formState.errors.firstName &&
+                      form.formState.isSubmitted && (
+                        <p
+                          id="firstName-error"
+                          className="text-sm text-red-400 -mt-1 flex items-center"
+                          aria-live="polite"
+                        >
+                          <CircleAlert size={15} className="mr-1" />
+                          {form.formState.errors.firstName.message}
+                        </p>
+                      )}
                     <FormLabel
                       htmlFor="firstName"
-                      className="absolute text-sm left-3 top-3 text-gray-500 transition-all duration-200 ease-in-out bg-transparent px-1 
-                    peer-placeholder-shown:top-2 peer-placeholder-shown:text-base cursor-text
-                    peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-[#A1C6EA] peer-not-placeholder-shown:bg-white peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white peer-invalid:text-red-400"
+                      className={cn(
+                        "absolute text-sm left-3 top-3 transition-all duration-200 bg-transparent px-1",
+                        "peer-placeholder-shown:top-2 peer-placeholder-shown:text-base cursor-text ease-in-out",
+                        "peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-[#A1C6EA] peer-not-placeholder-shown:bg-white",
+                        "peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white",
+                        "before:content-['*'] before:text-grey-500 before:peer-not-placeholder-shown:text-[#A1C6EA]  before:text-xs before:relative before:top-[-0.15rem] before:ml-0.5 before:-mr-1.5",
+                        "peer-invalid:before:text-red-500",
+                        form.formState.errors.firstName &&
+                          form.formState.isSubmitted
+                          ? "!text-red-400"
+                          : "text-gray-500"
+                      )}
                     >
                       First Name
                     </FormLabel>
@@ -186,8 +196,6 @@ const SignUpForm = () => {
                   <FormItem>
                     <FormControl>
                       <Input
-                        aria-invalid={!!form.formState.errors.lastName}
-                        aria-describedby="lastName-error"
                         type="text"
                         onInvalid={(e) => e.preventDefault()}
                         id="lastName"
@@ -196,21 +204,31 @@ const SignUpForm = () => {
                         className="shadow-sm peer w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base placeholder-transparent focus:ring-2 focus:ring-indigo-400"
                       />
                     </FormControl>
-                    {form.formState.errors.lastName && (
-                      <p
-                        id="lastName-error"
-                        className="text-sm text-red-400 -mt-1 flex items-center"
-                        aria-live="polite"
-                      >
-                        <CircleAlert size={15} className="mr-1" />
-                        {form.formState.errors.lastName.message}
-                      </p>
-                    )}
+                    {form.formState.errors.lastName &&
+                      form.formState.isSubmitted && (
+                        <p
+                          id="lastName-error"
+                          className="text-sm text-red-400 -mt-1 flex items-center"
+                          aria-live="polite"
+                        >
+                          <CircleAlert size={15} className="mr-1" />
+                          {form.formState.errors.lastName.message}
+                        </p>
+                      )}
                     <FormLabel
                       htmlFor="lastName"
-                      className="absolute text-sm left-3 top-3 text-gray-500 transition-all duration-200 ease-in-out bg-transparent px-1 
-                    peer-placeholder-shown:top-2 peer-placeholder-shown:text-base cursor-text
-                    peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-[#A1C6EA] peer-not-placeholder-shown:bg-white peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white peer-invalid:text-red-400"
+                      className={cn(
+                        "absolute text-sm left-3 top-3 transition-all duration-200 bg-transparent px-1",
+                        "peer-placeholder-shown:top-2 peer-placeholder-shown:text-base cursor-text ease-in-out",
+                        "peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-[#A1C6EA] peer-not-placeholder-shown:bg-white",
+                        "peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white",
+                        "before:content-['*'] before:text-grey-500 before:peer-not-placeholder-shown:text-[#A1C6EA]  before:text-xs before:relative before:top-[-0.15rem] before:ml-0.5 before:-mr-1.5",
+                        "peer-invalid:before:text-red-500",
+                        form.formState.errors.lastName &&
+                          form.formState.isSubmitted
+                          ? "!text-red-400"
+                          : "text-gray-500"
+                      )}
                     >
                       Last Name
                     </FormLabel>
@@ -228,8 +246,6 @@ const SignUpForm = () => {
                 <FormItem>
                   <FormControl>
                     <Input
-                      aria-invalid={!!form.formState.errors.email}
-                      aria-describedby="email-error"
                       type="email"
                       onInvalid={(e) => e.preventDefault()}
                       id="email"
@@ -238,21 +254,30 @@ const SignUpForm = () => {
                       className="shadow-sm peer w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base placeholder-transparent focus:ring-2 focus:ring-indigo-400"
                     />
                   </FormControl>
-                  {form.formState.errors.email && (
-                    <p
-                      id="email-error"
-                      className="text-sm text-red-400 -mt-1 flex items-center"
-                      aria-live="polite"
-                    >
-                      <CircleAlert size={15} className="mr-1" />
-                      {form.formState.errors.email.message}
-                    </p>
-                  )}
+                  {form.formState.errors.email &&
+                    form.formState.isSubmitted && (
+                      <p
+                        id="email-error"
+                        className="text-sm text-red-400 -mt-1 flex items-center"
+                        aria-live="polite"
+                      >
+                        <CircleAlert size={15} className="mr-1" />
+                        {form.formState.errors.email.message}
+                      </p>
+                    )}
                   <FormLabel
                     htmlFor="email"
-                    className="absolute text-sm left-3 top-3 text-gray-500 transition-all duration-200 ease-in-out bg-transparent px-1 
-                    peer-placeholder-shown:top-2 peer-placeholder-shown:text-base cursor-text
-                    peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-[#A1C6EA] peer-not-placeholder-shown:bg-white peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white peer-invalid:text-red-400"
+                    className={cn(
+                      "absolute text-sm left-3 top-3 transition-all duration-200 bg-transparent px-1",
+                      "peer-placeholder-shown:top-2 peer-placeholder-shown:text-base cursor-text ease-in-out",
+                      "peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-[#A1C6EA] peer-not-placeholder-shown:bg-white",
+                      "peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white",
+                      "before:content-['*'] before:text-grey-500 before:peer-not-placeholder-shown:text-[#A1C6EA]  before:text-xs before:relative before:top-[-0.15rem] before:ml-0.5 before:-mr-1.5",
+                      "peer-invalid:before:text-red-500",
+                      form.formState.errors.email && form.formState.isSubmitted
+                        ? "!text-red-400"
+                        : "text-gray-500"
+                    )}
                   >
                     Email
                   </FormLabel>
@@ -269,10 +294,8 @@ const SignUpForm = () => {
                 <FormItem>
                   <FormControl>
                     <Input
-                      aria-invalid={!!form.formState.errors.password}
                       onInvalid={(e) => e.preventDefault()}
                       id="password"
-                      aria-describedby="password-error"
                       type={show ? "text" : "password"}
                       placeholder=" "
                       {...field}
@@ -289,21 +312,31 @@ const SignUpForm = () => {
                   >
                     {show ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
-                  {form.formState.errors.password && (
-                    <p
-                      className="text-sm text-red-400 -mt-1 flex items-center"
-                      aria-live="polite"
-                      id="password-error"
-                    >
-                      <CircleAlert size={15} className="mr-1" />
-                      {form.formState.errors.password.message}
-                    </p>
-                  )}
+                  {form.formState.errors.password &&
+                    form.formState.isSubmitted && (
+                      <p
+                        className="text-sm text-red-400 -mt-1 flex items-center"
+                        aria-live="polite"
+                        id="password-error"
+                      >
+                        <CircleAlert size={15} className="mr-1" />
+                        {form.formState.errors.password.message}
+                      </p>
+                    )}
                   <FormLabel
                     htmlFor="password"
-                    className="absolute left-3 top-3 text-sm text-gray-500 transition-all duration-200 bg-transparent px-1 
-                    peer-placeholder-shown:top-2 peer-placeholder-shown:text-base cursor-text ease-in-out
-                    peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-[#A1C6EA] peer-not-placeholder-shown:bg-white peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white peer-invalid:text-red-400"
+                    className={cn(
+                      "absolute text-sm left-3 top-3 transition-all duration-200 bg-transparent px-1",
+                      "peer-placeholder-shown:top-2 peer-placeholder-shown:text-base cursor-text ease-in-out",
+                      "peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-[#A1C6EA] peer-not-placeholder-shown:bg-white",
+                      "peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white",
+                      "before:content-['*'] before:text-grey-500 before:peer-not-placeholder-shown:text-[#A1C6EA]  before:text-xs before:relative before:top-[-0.15rem] before:ml-0.5 before:-mr-1.5",
+                      "peer-invalid:before:text-red-500",
+                      form.formState.errors.password &&
+                        form.formState.isSubmitted
+                        ? "!text-red-400"
+                        : "text-gray-500"
+                    )}
                   >
                     Password
                   </FormLabel>
@@ -321,10 +354,8 @@ const SignUpForm = () => {
                 <FormItem>
                   <FormControl>
                     <Input
-                      aria-invalid={!!form.formState.errors.confirmPassword}
                       onInvalid={(e) => e.preventDefault()}
                       id="confirmPassword"
-                      aria-describedby="password-error"
                       type={showConfirm ? "text" : "password"}
                       placeholder=" "
                       {...field}
@@ -345,21 +376,31 @@ const SignUpForm = () => {
                   >
                     {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
-                  {form.formState.errors.confirmPassword && (
-                    <p
-                      className="text-sm text-red-400 -mt-1 flex items-center"
-                      aria-live="polite"
-                      id="password-error"
-                    >
-                      <CircleAlert size={15} className="mr-1" />
-                      {form.formState.errors.confirmPassword.message}
-                    </p>
-                  )}
+                  {form.formState.errors.confirmPassword &&
+                    form.formState.isSubmitted && (
+                      <p
+                        className="text-sm text-red-400 -mt-1 flex items-center"
+                        aria-live="polite"
+                        id="password-error"
+                      >
+                        <CircleAlert size={15} className="mr-1" />
+                        {form.formState.errors.confirmPassword.message}
+                      </p>
+                    )}
                   <FormLabel
                     htmlFor="confirmPassword"
-                    className="absolute left-3 top-3 text-sm text-gray-500 transition-all duration-200 bg-transparent px-1 
-                    peer-placeholder-shown:top-2 peer-placeholder-shown:text-base cursor-text ease-in-out
-                    peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-[#A1C6EA] peer-not-placeholder-shown:bg-white peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white peer-invalid:text-red-400"
+                    className={cn(
+                      "absolute text-sm left-3 top-3 transition-all duration-200 bg-transparent px-1",
+                      "peer-placeholder-shown:top-2 peer-placeholder-shown:text-base cursor-text ease-in-out",
+                      "peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-[#A1C6EA] peer-not-placeholder-shown:bg-white",
+                      "peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white",
+                      "before:content-['*'] before:text-grey-500 before:peer-not-placeholder-shown:text-[#A1C6EA]  before:text-xs before:relative before:top-[-0.15rem] before:ml-0.5 before:-mr-1.5",
+                      "peer-invalid:before:text-red-500",
+                      form.formState.errors.confirmPassword &&
+                        form.formState.isSubmitted
+                        ? "!text-red-400"
+                        : "text-gray-500"
+                    )}
                   >
                     Confirm Password
                   </FormLabel>
@@ -367,11 +408,14 @@ const SignUpForm = () => {
               )}
             />
           </div>
+          <p className="text-sm -mt-3 text-gray-500 mb-3">
+            * Indicates a required field
+          </p>
           <Button
             type="submit"
             className="w-full font-semibold bg-indigo-200 hover:bg-indigo-300 text-indigo-900 flex items-center justify-center gap-2 hover:cursor-pointer py-4 sm:py-5 text-base sm:text-md rounded-xl transition-colors shadow-sm hover:scale-[1.01] hover:shadow-md duration-200 ease-in-out focus:ring-2 focus:ring-indigo-300 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400"
             focus-visible="outline"
-            aria-label="Sign in to your account"
+            aria-label="Sign Up"
             aria-busy={form.formState.isSubmitting}
             disabled={form.formState.isSubmitting}
             aria-live="assertive"
