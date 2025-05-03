@@ -9,7 +9,11 @@ import * as argon2 from "argon2";
 import { NextResponse } from "next/server";
 
 // Auth Helpers
-async function fetchVerifiedEmail(provider: string, accessToken: string) {
+async function fetchVerifiedEmail(
+  provider: string,
+  accessToken: string,
+  profile?: any
+): Promise<string | null> {
   try {
     if (provider === "github") {
       const res = await fetch("https://api.github.com/user/emails", {
@@ -24,6 +28,14 @@ async function fetchVerifiedEmail(provider: string, accessToken: string) {
       const emails: { email: string; verified: boolean; primary: boolean }[] =
         await res.json();
       return emails.find((e) => e.primary && e.verified)?.email || null;
+    }
+
+    if (provider === "google" && profile?.email_verified) {
+      return profile.email;
+    }
+
+    if (provider === "discord" && profile?.verified) {
+      return profile.email;
     }
 
     return null;
@@ -44,13 +56,17 @@ async function getOrCreateUserFromOAuth({
   providerAccountId: string;
   accessToken: string;
 }) {
-  let email = profile.email;
-
-  if (!email && provider === "github") {
-    email = await fetchVerifiedEmail("github", accessToken);
-  }
+  let email = await fetchVerifiedEmail(provider, accessToken, profile);
 
   if (!email) {
+    console.warn(`No verified email for ${provider} profile:`, profile);
+    throw new Error("No verified email found");
+  }
+
+  email = email.toLowerCase().trim();
+
+  if (!email) {
+    console.warn(`No verified email found for provider: ${provider}`);
     throw new Error("No verified email found");
   }
 
@@ -94,6 +110,8 @@ async function linkOAuthAccountIfNeeded(
   accessToken: string
 ) {
   try {
+    console.log(`Linking account for userId: ${userId}, provider: ${provider}`);
+
     await prismadb.account.upsert({
       where: {
         provider_providerAccountId: {
@@ -112,7 +130,10 @@ async function linkOAuthAccountIfNeeded(
         type: "oauth",
       },
     });
+
+    console.log(`Successfully linked ${provider} account to user ${userId}`);
   } catch (error) {
+    console.error("Error linking OAuth account:", error);
     throw new NextResponse("Error creating/updating account", { status: 500 });
   }
 }
@@ -186,9 +207,10 @@ export const authOptions: NextAuthOptions = {
         ) {
           return null;
         }
+        const normalizedEmail = credentials.email.toLowerCase().trim();
 
         const user = await prismadb.user.findUnique({
-          where: { email: credentials.email },
+          where: { email: normalizedEmail },
         });
 
         if (!user || !user.password) {
