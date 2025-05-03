@@ -231,7 +231,7 @@ const SignInForm = () => {
           </div>
           <div className="flex justify-end -mt-6 mb-2">
             <Link
-              href="/auth/forgot-password"
+              href="/forgot-password"
               aria-label="Forgot your password?"
               aria-live="assertive"
               className="text-sm text-[#8AA4C1] hover:text-[#8E77A6] transition-colors"
@@ -253,7 +253,7 @@ const SignInForm = () => {
           <p className="text-center">
             Don&apos;t have an account?{" "}
             <Link
-              href="/auth/signup"
+              href="/signup"
               className="text-[#8AA4C1] hover:text-[#8E77A6] transition-colors"
             >
               Sign Up

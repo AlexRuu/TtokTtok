@@ -109,7 +109,7 @@ const SignUpForm = () => {
       }
       localStorage.setItem("pendingEmail", data.email);
       stopLoading();
-      router.push("/auth/verify-email");
+      router.push("/verify-email");
     } catch {
       toast.error("There was an error creating your account", {
         style: {

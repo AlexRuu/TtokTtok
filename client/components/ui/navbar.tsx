@@ -110,7 +110,7 @@ export default function Navbar() {
               </Link>
             ))}
             <Link
-              href="/auth/signin"
+              href="/signin"
               aria-label="Login"
               className="focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] ml-4 px-3 py-1 rounded-full bg-[#FFEFE7] hover:bg-[#f5dbcf] transition text-[#6B4C3B] font-medium"
             >
@@ -167,7 +167,7 @@ export default function Navbar() {
             {/* Full-width Login CTA */}
             <div className="p-3 border-t border-[#EADCD5]">
               <Link
-                href="/auth/signin"
+                href="/signin"
                 onClick={() => setIsOpen(false)}
                 className="block w-full text-center px-4 py-3 font-medium text-[#6B4C3B] bg-[#FFEFE7] hover:bg-[#F5DBCF] rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A65A3A]"
               >

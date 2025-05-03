@@ -152,7 +152,7 @@ const ForgotPasswordForm = () => {
             <Button
               type="button"
               onClick={() => {
-                router.push("/auth/signin");
+                router.push("/signin");
               }}
               className="w-full font-semibold bg-pink-200 hover:bg-pink-300 text-pink-900 flex items-center justify-center gap-2 hover:cursor-pointer py-4 sm:py-5 text-base sm:text-md rounded-xl transition-colors shadow-sm hover:scale-[1.01] hover:shadow-md duration-200 ease-in-out focus:ring-2 focus:ring-pink-300 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-pink-400"
               focus-visible="outline"
