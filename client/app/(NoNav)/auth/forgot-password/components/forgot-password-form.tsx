@@ -85,10 +85,12 @@ const ForgotPasswordForm = () => {
             className="space-y-8 w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto p-8 border border-pink-100 bg-white shadow-sm rounded-2xl"
           >
             <KeyRound size={50} className="mx-auto" color="#7c86ff" />
-            <h1 className="text-center text-2xl">Forgot Password</h1>
-            <p className="text-center">
-              Enter your user account&apos;s verified email address and we will
-              send you a password reset link.
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-center">
+              Forgot Password
+            </h1>
+            <p className="text-base text-center">
+              Enter the email you used to create your account. We&apos;ll send
+              you a link so you can set a new password.
             </p>
             <div className="relative">
               <FormField

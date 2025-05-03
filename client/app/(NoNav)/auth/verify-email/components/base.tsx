@@ -2,9 +2,9 @@
 
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import Verifying from "./components/verifying";
-import Verified from "./components/verified";
-import Invalid from "./components/invalid";
+import Verifying from "./verifying";
+import Verified from "./verified";
+import Invalid from "./invalid";
 import useLoading from "@/hooks/use-loading";
 import Loader from "@/components/ui/loader";
 

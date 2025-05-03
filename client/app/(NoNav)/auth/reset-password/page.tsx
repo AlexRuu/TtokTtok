@@ -5,6 +5,12 @@ import PasswordResetSuccess from "./components/success";
 import FailedPasswordReset from "./components/fail";
 import PendingPasswordResetPage from "./components/pending";
 import { useSearchParams } from "next/navigation";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Reset Password | TtokTtok",
+  description: "Reset your password",
+};
 
 const ResetPasswordPage = () => {
   const searchParams = useSearchParams();

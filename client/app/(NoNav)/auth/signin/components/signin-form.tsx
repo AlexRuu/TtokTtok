@@ -22,6 +22,7 @@ import { CircleAlert } from "lucide-react";
 import Loader from "@/components/ui/loader";
 import useLoading from "@/hooks/use-loading";
 import { cn } from "@/lib/utils";
+import LogoTitle from "../../components/logo";
 
 type ProviderId = "github" | "google" | "discord";
 
@@ -61,13 +62,19 @@ const SignInForm = () => {
   });
 
   useEffect(() => {
-    const fetchProviders = async () => {
+    const debounceFetch = setTimeout(async () => {
       startLoading();
-      const res = await getProviders();
-      setProviders(res);
-      stopLoading();
-    };
-    fetchProviders();
+      try {
+        const res = await getProviders();
+        setProviders(res);
+      } catch (err) {
+        console.error("Failed to fetch providers:", err);
+      } finally {
+        stopLoading();
+      }
+    }, 300);
+
+    return () => clearTimeout(debounceFetch);
   }, [startLoading, stopLoading]);
 
   const onSubmit: SubmitHandler<SignInFormValues> = async (data) => {
@@ -112,9 +119,9 @@ const SignInForm = () => {
         <form
           noValidate
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto p-8 border border-pink-100 bg-white shadow-sm rounded-2xl"
+          className="space-y-8 w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto p-8 border border-pink-100 bg-white shadow-sm rounded-2xl pt-10"
         >
-          <h1 className="text-center text-2xl">Login</h1>
+          <LogoTitle />
           <div className="relative">
             <FormField
               control={form.control}

@@ -128,15 +128,23 @@ const SignUpForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#fdfaf6] p-6 px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#fdfaf6] p-6">
       {isLoading && <Loader />}
       <Form {...form}>
         <form
           noValidate
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto p-8 border border-pink-100 bg-white shadow-sm rounded-2xl"
+          className="w-full max-w-md bg-white border border-pink-100 shadow-sm rounded-2xl p-8 pt-10 space-y-6"
         >
-          <h1 className="text-center text-2xl">Sign Up</h1>
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-[#A1C6EA] sm:text-3xl tracking-tight">
+              Create your <span className="text-[#B75F45]">Ttok</span>
+              <span className="text-[#D69E78]">Ttok</span> account
+            </h1>
+            <p className="mt-2 text-base text-[#8E77A6]">
+              Learn smarter, one tteok at a time!
+            </p>
+          </div>
           <div className="flex space-x-6">
             <div className="relative">
               <FormField
