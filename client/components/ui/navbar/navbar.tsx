@@ -2,18 +2,22 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { CircleUserRound, Menu, X } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { cn } from "../../lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "../../../lib/utils";
+import { signOut, useSession } from "next-auth/react";
+import SearchBar from "./searchBar";
+import MobileNav from "./mobile";
+import Loader from "../loader";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [mounted, setMounted] = useState(false);
+
   const pathName = usePathname();
   const drawerRef = useRef<HTMLDivElement>(null);
+  const { data: session, status } = useSession();
 
   const links = useMemo(
     () => [
@@ -59,6 +63,13 @@ export default function Navbar() {
     };
   }, [isOpen]);
 
+  const handleLogout = () => {
+    signOut({ redirect: false });
+  };
+
+  if (!mounted) {
+    return <Loader />;
+  }
   return (
     <>
       <nav className="sticky top-0 z-40 bg-[#FAF3F0]/80 backdrop-blur-xs px-4 py-3 shadow-sm md:px-8">
@@ -109,18 +120,54 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
-            <Link
-              href="/signin"
-              aria-label="Login"
-              className="focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] ml-4 px-3 py-1 rounded-full bg-[#FFEFE7] hover:bg-[#f5dbcf] transition text-[#6B4C3B] font-medium"
-            >
-              Login
-            </Link>
+            <SearchBar />
+            {status == "authenticated" ? (
+              <div className="relative hidden md:block group">
+                {/* Trigger Button */}
+                <button
+                  className="py-2 px-4 text-sm focus:outline-none"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <CircleUserRound />
+                </button>
+
+                {/* Spacer that is hoverable (bridge) */}
+                <div className="absolute top-full left-0 w-full h-4 z-40" />
+
+                {/* Dropdown */}
+                <div className="min-w-[7rem] absolute top-full mt-4 right-0 -translate-x-1.5 w-20 sm:w-28 bg-[#FBEDE7]/80 backdrop-blur-md border border-[#e8dcd5] shadow-sm rounded-xl transform transition-all duration-200 ease-out opacity-0 -translate-y-1 invisible group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible z-50">
+                  <div className="absolute top-[-6px] right-[1.1rem] w-3 h-3 bg-[#e7dad5d8] rotate-45 border border-[#e8dcd5] z-[60]" />
+                  <div className="flex flex-col py-1">
+                    <Link
+                      href="/profile"
+                      className="block py-2 px-4 text-sm text-[#6B4C3B] hover:bg-[#f2dfd7] rounded-md text-center"
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="block py-2 px-4 text-sm text-[#6B4C3B] hover:bg-[#f2dfd7] rounded-md text-center w-full"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Link
+                href="/signin"
+                aria-label="Login"
+                className="focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] ml-4 px-3 py-1 rounded-full bg-[#FFEFE7] hover:bg-[#f5dbcf] transition text-[#6B4C3B] font-medium"
+              >
+                Login
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu toggle */}
           <button
-            className="md:hidden text-[#6B4C3B] focus-visible:ring-2 focus-visible:ring-[#A65A3A] focus-visible:ring-offset-2]"
+            className="md:hidden text-[#6B4C3B] focus-visible:ring-2 focus-visible:ring-[#A65A3A] focus-visible:ring-offset-2] hover:cursor-pointer"
             aria-label="Toggle navigation menu"
             onClick={() => setIsOpen(!isOpen)}
           >
@@ -130,53 +177,13 @@ export default function Navbar() {
       </nav>
 
       {/* Mobile menu with Framer Motion */}
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            key="drawer"
-            ref={drawerRef}
-            className="md:hidden overflow-hidden bg-[#FAF3F0] shadow-md"
-            initial={{ y: "-100%", opacity: 0 }}
-            animate={{ y: "0%", opacity: 1 }}
-            exit={{ y: "-100%", opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-          >
-            <div className="space-y-2 p-3 pt-0">
-              {links.map((link) => (
-                <Link
-                  href={link.path}
-                  key={link.path}
-                  onClick={() => setIsOpen(false)}
-                  aria-current={pathName === link.path ? "page" : undefined}
-                  className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A65A3A] block px-4 py-3 text-base rounded-md hover:bg-[#FBEDE7] transition-colors"
-                >
-                  <span
-                    className={cn(
-                      "inline-block border-b-2 border-transparent transition-colors",
-                      pathName === link.path
-                        ? "border-[#A65A3A] text-[#A65A3A] font-medium"
-                        : "hover:border-[#E0B9AA]"
-                    )}
-                  >
-                    {link.name}
-                  </span>
-                </Link>
-              ))}
-            </div>
-
-            {/* Full-width Login CTA */}
-            <div className="p-3 border-t border-[#EADCD5]">
-              <Link
-                href="/signin"
-                onClick={() => setIsOpen(false)}
-                className="block w-full text-center px-4 py-3 font-medium text-[#6B4C3B] bg-[#FFEFE7] hover:bg-[#F5DBCF] rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A65A3A]"
-              >
-                Login
-              </Link>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <MobileNav
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        links={links}
+        session={session}
+        status={status}
+      />
     </>
   );
 }
