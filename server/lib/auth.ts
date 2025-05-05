@@ -222,7 +222,13 @@ export const authOptions: NextAuthOptions = {
           credentials.password
         );
 
-        return isValid ? { id: user.id, email: user.email } : null;
+        return isValid
+          ? {
+              id: user.id,
+              email: user.email,
+              name: `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim(),
+            }
+          : null;
       },
     }),
   ],
@@ -233,6 +239,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        token.name = user.name;
       }
       if (account) {
         token.accessToken = account.access_token;
@@ -243,6 +250,7 @@ export const authOptions: NextAuthOptions = {
       if (session?.user && token) {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
+        session.user.name = token.name as string;
       }
       return session;
     },
