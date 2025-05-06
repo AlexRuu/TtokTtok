@@ -5,6 +5,7 @@ import PasswordResetSuccess from "./success";
 import FailedPasswordReset from "./fail";
 import PendingPasswordResetPage from "./pending";
 import { useSearchParams } from "next/navigation";
+import getResetToken from "@/actions/get-reset-token";
 
 const ResetPasswordBasePage = () => {
   const searchParams = useSearchParams();
@@ -20,14 +21,14 @@ const ResetPasswordBasePage = () => {
           return;
         }
         setPassToken(token);
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/auth/reset-password?token=${token}`
-        );
-        if (!res.ok) {
-          setStatus("failed");
-          return;
+        const res = await getResetToken(token);
+        if (res) {
+          if (!res.ok) {
+            setStatus("failed");
+            return;
+          }
+          setStatus("pending");
         }
-        setStatus("pending");
       } catch {
         setStatus("failed");
         return;

@@ -16,6 +16,7 @@ import Loader from "@/components/ui/loader";
 import useLoading from "@/hooks/use-loading";
 import PasswordTracker from "../../signup/components/password-checker";
 import { useState } from "react";
+import postResetToken from "@/actions/post-reset-token";
 
 interface PendingPasswordResetPageProps {
   setStatus: (value: "success" | "failed" | "pending") => void;
@@ -74,35 +75,28 @@ const PendingPasswordResetPage: React.FC<PendingPasswordResetPageProps> = ({
   const onSubmit: SubmitHandler<PasswordResetFormValues> = async (data) => {
     try {
       startLoading();
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/auth/reset-password`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ ...data, token }),
+      const res = await postResetToken(data, token);
+      if (res) {
+        if (!res.ok) {
+          const resError = await res.text();
+          toast.error(resError || "There was an error updating your password", {
+            style: {
+              background: "#ffeef0",
+              color: "#943c5e",
+              borderRadius: "10px",
+              padding: "12px 18px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.08)",
+              fontSize: "16px",
+            },
+            className:
+              "transition-all transform duration-300 ease-in-out font-medium",
+          });
+          stopLoading();
+          return;
         }
-      );
-      if (!res.ok) {
-        const resError = await res.text();
-        toast.error(resError || "There was an error updating your password", {
-          style: {
-            background: "#ffeef0",
-            color: "#943c5e",
-            borderRadius: "10px",
-            padding: "12px 18px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.08)",
-            fontSize: "16px",
-          },
-          className:
-            "transition-all transform duration-300 ease-in-out font-medium",
-        });
+        setStatus("success");
         stopLoading();
-        return;
       }
-      setStatus("success");
-      stopLoading();
     } catch {
       toast.error("There was an error updating your password", {
         style: {

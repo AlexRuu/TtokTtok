@@ -20,6 +20,7 @@ import useLoading from "@/hooks/use-loading";
 import PasswordTracker from "./password-checker";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import postSignUp from "@/actions/post-signup";
 
 const passwordSchema = z
   .string()
@@ -79,37 +80,29 @@ const SignUpForm = () => {
   const onSubmit: SubmitHandler<SignUpFormValues> = async (data) => {
     startLoading();
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/auth/signup`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
+      const res = await postSignUp(data);
+      if (res) {
+        if (!res.ok) {
+          const resError = await res.text();
+          toast.error(resError || "There was an error creating your account", {
+            style: {
+              background: "#ffeef0",
+              color: "#943c5e",
+              borderRadius: "10px",
+              padding: "12px 18px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.08)",
+              fontSize: "16px",
+            },
+            className:
+              "transition-all transform duration-300 ease-in-out font-medium",
+          });
+          stopLoading();
+          return;
         }
-      );
-
-      if (!res.ok) {
-        const resError = await res.text();
-        toast.error(resError || "There was an error creating your account", {
-          style: {
-            background: "#ffeef0",
-            color: "#943c5e",
-            borderRadius: "10px",
-            padding: "12px 18px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.08)",
-            fontSize: "16px",
-          },
-          className:
-            "transition-all transform duration-300 ease-in-out font-medium",
-        });
+        localStorage.setItem("pendingEmail", data.email);
         stopLoading();
-        return;
+        router.push("/verify-email");
       }
-      localStorage.setItem("pendingEmail", data.email);
-      stopLoading();
-      router.push("/verify-email");
     } catch {
       toast.error("There was an error creating your account", {
         style: {

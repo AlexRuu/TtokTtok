@@ -19,6 +19,7 @@ import useLoading from "@/hooks/use-loading";
 import { useState } from "react";
 import EmailSent from "./email-sent";
 import { cn } from "@/lib/utils";
+import postForgotPassword from "@/actions/post-forgot-password";
 
 const formSchema = z.object({
   email: z
@@ -48,16 +49,7 @@ const ForgotPasswordForm = () => {
     startLoading();
 
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/auth/forgot-password`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      await postForgotPassword(data.email);
       stopLoading();
       setSent(true);
     } catch {

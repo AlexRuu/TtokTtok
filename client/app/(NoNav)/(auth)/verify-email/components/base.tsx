@@ -7,6 +7,7 @@ import Verified from "./verified";
 import Invalid from "./invalid";
 import useLoading from "@/hooks/use-loading";
 import Loader from "@/components/ui/loader";
+import postVeriifyEmail from "@/actions/post-verify-email";
 
 const VerificationPage = () => {
   const { isLoading, startLoading, stopLoading } = useLoading();
@@ -32,22 +33,14 @@ const VerificationPage = () => {
 
     const verifyEmail = async () => {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/auth/verify`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ token }),
+        const res = await postVeriifyEmail(token);
+        if (res) {
+          if (!res.ok) {
+            stopLoading();
+            setStatus("invalid");
           }
-        );
-        if (res.ok) {
           stopLoading();
           setStatus("verified");
-        } else {
-          stopLoading();
-          setStatus("invalid");
         }
       } catch {
         stopLoading();
