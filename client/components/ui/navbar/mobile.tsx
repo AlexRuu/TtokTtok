@@ -12,9 +12,16 @@ interface MobileNavProps {
   links: { name: string; path: string }[];
   session: Session | null;
   status: "authenticated" | "unauthenticated" | "loading";
+  navHeight: number;
 }
 
-const MobileNav = ({ isOpen, setIsOpen, links, status }: MobileNavProps) => {
+const MobileNav = ({
+  isOpen,
+  setIsOpen,
+  links,
+  status,
+  navHeight,
+}: MobileNavProps) => {
   const pathName = usePathname();
 
   const handleLogout = () => {
@@ -26,7 +33,8 @@ const MobileNav = ({ isOpen, setIsOpen, links, status }: MobileNavProps) => {
       {isOpen && (
         <motion.div
           key="drawer"
-          className="md:hidden overflow-hidden bg-[#FAF3F0] shadow-md"
+          className="fixed left-0 right-0 z-30 md:hidden bg-[#FAF3F0] shadow-md"
+          style={{ top: `${navHeight || 64}px` }}
           initial={{ y: "-100%", opacity: 0 }}
           animate={{ y: "0%", opacity: 1 }}
           exit={{ y: "-100%", opacity: 0 }}

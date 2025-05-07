@@ -18,6 +18,38 @@ export default function Navbar() {
   const pathName = usePathname();
   const drawerRef = useRef<HTMLDivElement>(null);
   const { data: session, status } = useSession();
+  const navRef = useRef<HTMLDivElement>(null);
+  const [navHeight, setNavHeight] = useState(0);
+
+  useEffect(() => {
+    if (!navRef.current) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentRect) {
+          setNavHeight(entry.contentRect.height);
+        }
+      }
+    });
+
+    observer.observe(navRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   const links = useMemo(
     () => [
@@ -72,14 +104,17 @@ export default function Navbar() {
   }
   return (
     <>
-      <nav className="sticky top-0 z-40 bg-[#FAF3F0]/80 backdrop-blur-xs px-4 py-3 shadow-sm md:px-8">
+      <nav
+        ref={navRef}
+        className="sticky top-0 z-40 bg-[#FAF3F0]/80 backdrop-blur-xs px-4 py-3 shadow-sm md:px-8"
+      >
         <div className="flex justify-between items-center max-w-6xl mx-auto">
           <Link
             href="/"
             className="flex items-center space-x-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded"
           >
             {/* Logo */}
-            <div className="relative w-12 h-12">
+            <div className="relative w-12 h-12 min-h-[48px]">
               <Image
                 src="/tteok.png"
                 alt="Ttok Logo"
@@ -183,6 +218,7 @@ export default function Navbar() {
         links={links}
         session={session}
         status={status}
+        navHeight={navHeight}
       />
     </>
   );

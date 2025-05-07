@@ -58,7 +58,7 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
   return (
     <>
       {variant === "mobile" ? (
-        <div className="pt-4 pb-2 px-6">
+        <div className="pt-7 pb-2 px-6">
           <div className="relative">
             <Input
               ref={inputRef}
