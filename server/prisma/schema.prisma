@@ -27,6 +27,8 @@ model User {
   updatedAt           DateTime              @default(now()) @db.Timestamptz(6)
   createdAt           DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
   ForgotPasswordToken ForgotPasswordToken[]
+  SavedVocabulary     SavedVocabulary[]
+  UserChapterReview   UserChapterReview[]
 }
 
 model Account {
@@ -73,4 +75,79 @@ model ForgotPasswordToken {
   createdAt  DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
 
   @@unique([identifier, token])
+}
+
+model SavedVocabulary {
+  id        String   @id @default(cuid())
+  english   String
+  korean    String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+}
+
+model Lesson {
+  id                String              @id @default(cuid())
+  title             String
+  content           String
+  lessonNumber      Int
+  unitId            String
+  unit              Unit                @relation(fields: [unitId], references: [id])
+  createdAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedAt         DateTime            @default(now()) @db.Timestamptz(6)
+  UserChapterReview UserChapterReview[]
+  Quiz              Quiz[]
+
+  @@index([unitId, lessonNumber])
+}
+
+model Unit {
+  id                String              @id @default(cuid())
+  unitNumber        Int
+  title             String
+  createdAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedAt         DateTime            @default(now()) @db.Timestamptz(6)
+  Lesson            Lesson[]
+  UserChapterReview UserChapterReview[]
+}
+
+model Quiz {
+  id           String         @id @default(cuid())
+  lessonId     String
+  lesson       Lesson         @relation(fields: [lessonId], references: [id])
+  createdAt    DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
+  QuizQuestion QuizQuestion[]
+}
+
+model QuizQuestion {
+  id       String   @id @default(cuid())
+  question String
+  quizId   String
+  quiz     Quiz     @relation(fields: [quizId], references: [id])
+  quizType QuizType
+  options  Json?
+  answer   Json
+
+  config Json?
+}
+
+model UserChapterReview {
+  id        String   @id @default(cuid())
+  lessonId  String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  unitId    String
+  unit      Unit     @relation(fields: [unitId], references: [id])
+  createdAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([userId, lessonId])
+}
+
+enum QuizType {
+  MULTIPLE_CHOICE
+  FILL_IN_THE_BLANK
+  TRUE_FALSE
+  MATCHING
 }
