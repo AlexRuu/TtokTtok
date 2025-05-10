@@ -18,7 +18,7 @@ export const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "TtokTtok",
+  title: "Ttok Ttok",
   description: "Bite Sized Korean Learning",
 };
 
