@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-const URL = `${process.env.NEXTAUTH_URL}/api/profile`;
+const URL = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/profile`;
 
 const getProfile = async () => {
   try {

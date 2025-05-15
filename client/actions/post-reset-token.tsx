@@ -1,4 +1,4 @@
-const URL = `${process.env.NEXTAUTH_URL}/api/auth/reset-password`;
+const URL = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/auth/reset-password`;
 
 interface Data {
   password: string;

@@ -1,4 +1,4 @@
-const URL = `${process.env.NEXTAUTH_URL}/api/profile`;
+const URL = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/profile`;
 
 const postForgotPassword = async (data: string) => {
   try {

@@ -1,4 +1,4 @@
-const URL = `${process.env.NEXTAUTH_URL}/api/auth/reset-password?token=`;
+const URL = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/auth/reset-password?token=`;
 
 const getResetToken = async (token: string) => {
   try {

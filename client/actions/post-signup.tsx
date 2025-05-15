@@ -1,4 +1,4 @@
-const URL = `${process.env.NEXTAUTH_URL}/api/auth/signup`;
+const URL = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/auth/signup`;
 
 interface Data {
   firstName: string;
