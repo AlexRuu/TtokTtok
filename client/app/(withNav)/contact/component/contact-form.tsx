@@ -52,32 +52,31 @@ const ContactForm = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<SignUpFormValues> = async (data) => {
+  const onSubmit: SubmitHandler<ContactFormValues> = async (data) => {
     startLoading();
     try {
       const res = await postContact(data);
-      // if (res) {
-      //   if (!res.ok) {
-      //     const resError = await res.text();
-      //     toast.error(resError || "There was an error submitting your form.", {
-      //       style: {
-      //         background: "#ffeef0",
-      //         color: "#943c5e",
-      //         borderRadius: "10px",
-      //         padding: "12px 18px",
-      //         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.08)",
-      //         fontSize: "16px",
-      //       },
-      //       className:
-      //         "transition-all transform duration-300 ease-in-out font-medium",
-      //     });
-      //     stopLoading();
-      //     return;
-      //   }
-      //   stopLoading();
-      //   router.push("/contact/submitted");
-      // }
-      console.log(res);
+      if (res) {
+        if (!res.ok) {
+          const resError = await res.text();
+          toast.error(resError || "There was an error submitting your form.", {
+            style: {
+              background: "#ffeef0",
+              color: "#943c5e",
+              borderRadius: "10px",
+              padding: "12px 18px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.08)",
+              fontSize: "16px",
+            },
+            className:
+              "transition-all transform duration-300 ease-in-out font-medium",
+          });
+          stopLoading();
+          return;
+        }
+        stopLoading();
+        router.push("/contact/submitted");
+      }
     } catch {
       toast.error("There was an error submitting your form.", {
         style: {
@@ -96,23 +95,14 @@ const ContactForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#fdfaf6] p-6">
+    <div className="w-full md:w-1/2 h-full flex flex-col items-center justify-center bg-[#fdfaf6]">
       {isLoading && <Loader />}
       <Form {...form}>
         <form
           noValidate
           onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full max-w-md bg-white border border-pink-100 shadow-sm rounded-2xl p-8 pt-10 space-y-6"
+          className="max-w-md bg-white border border-pink-100 shadow-sm rounded-2xl p-8 py-10 space-y-8"
         >
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-[#A1C6EA] sm:text-3xl tracking-tight">
-              Create your <span className="text-[#B75F45]">Ttok</span>
-              <span className="text-[#D69E78]">Ttok</span> account
-            </h1>
-            <p className="mt-2 text-base text-[#8E77A6]">
-              Learn smarter, one tteok at a time!
-            </p>
-          </div>
           <div className="flex space-x-6">
             <div className="relative">
               <FormField
