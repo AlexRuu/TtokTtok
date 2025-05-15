@@ -28,7 +28,7 @@ const formSchema = z.object({
     .email({ message: "Invalid Email Address" }),
 });
 
-type SignInFormValues = z.infer<typeof formSchema>;
+type ForgotPasswordFormValues = z.infer<typeof formSchema>;
 
 const ForgotPasswordForm = () => {
   const { isLoading, startLoading, stopLoading } = useLoading();
@@ -36,7 +36,7 @@ const ForgotPasswordForm = () => {
 
   const router = useRouter();
 
-  const form = useForm<SignInFormValues>({
+  const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -45,7 +45,7 @@ const ForgotPasswordForm = () => {
     reValidateMode: "onChange",
   });
 
-  const onSubmit: SubmitHandler<SignInFormValues> = async (data) => {
+  const onSubmit: SubmitHandler<ForgotPasswordFormValues> = async (data) => {
     startLoading();
 
     try {
