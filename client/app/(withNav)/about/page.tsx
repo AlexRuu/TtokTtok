@@ -1,6 +1,12 @@
 import SummaryComponent from "./components/summary";
 import TimelineComponent from "./components/timeline";
 import BottomLogo from "./components/bottomLogo";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description: "Sign in to your Ttok Ttok account",
+};
 
 const AboutPage = () => {
   return (
