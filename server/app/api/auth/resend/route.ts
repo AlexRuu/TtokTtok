@@ -1,5 +1,6 @@
 import prismadb from "@/lib/prismadb";
 import { sendVerificationEmail } from "@/lib/verificationEmail";
+import { forgotPasswordFormSchema } from "@/schemas/form-schemas";
 import { addMinutes } from "date-fns";
 import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
@@ -7,7 +8,13 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { email } = body;
+    const parsed = forgotPasswordFormSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return new NextResponse("Invalid input", { status: 400 });
+    }
+
+    const { email } = parsed.data;
 
     if (!email) {
       return new NextResponse("No Email", { status: 404 });

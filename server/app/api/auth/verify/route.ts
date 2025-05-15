@@ -1,12 +1,18 @@
 import prismadb from "@/lib/prismadb";
+import { verifySchema } from "@/schemas/form-schemas";
 import { isBefore } from "date-fns";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    const parsed = verifySchema.safeParse(body);
 
-    const { token } = body;
+    if (!parsed.success) {
+      return new NextResponse("Invalid input", { status: 400 });
+    }
+
+    const { token } = parsed.data;
 
     const validToken = await prismadb.verificationToken.findUnique({
       where: {

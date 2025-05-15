@@ -4,12 +4,19 @@ import { nanoid } from "nanoid";
 import { addMinutes } from "date-fns";
 import { NextResponse } from "next/server";
 import { sendVerificationEmail } from "@/lib/verificationEmail";
+import { signUpFormSchema } from "@/schemas/form-schemas";
 
 export async function POST(req: Request) {
   try {
     // Retrieve data and deconstruct it
     const body = await req.json();
-    const { firstName, lastName, email, password, confirmPassword } = body;
+    const parsed = signUpFormSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return new NextResponse("Invalid input", { status: 400 });
+    }
+    const { firstName, lastName, email, password, confirmPassword } =
+      parsed.data;
 
     // Check for user data
     if (!body) {

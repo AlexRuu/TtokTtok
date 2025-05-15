@@ -1,4 +1,5 @@
 import prismadb from "@/lib/prismadb";
+import { resetPasswordSchema } from "@/schemas/form-schemas";
 import { hash } from "argon2";
 import { isBefore } from "date-fns";
 import { NextResponse } from "next/server";
@@ -8,7 +9,13 @@ export async function POST(req: Request) {
     // Retrieve data sent from client
     const body = await req.json();
 
-    const { token, password, confirmPassword } = body;
+    const parsed = resetPasswordSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return new NextResponse("Invalid input", { status: 400 });
+    }
+
+    const { token, password, confirmPassword } = parsed.data;
 
     const strongEnough =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
