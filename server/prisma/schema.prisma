@@ -145,6 +145,17 @@ model UserChapterReview {
   @@index([userId, lessonId])
 }
 
+model ContactMessage {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String
+  subject   String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+}
+
 enum QuizType {
   MULTIPLE_CHOICE
   FILL_IN_THE_BLANK
