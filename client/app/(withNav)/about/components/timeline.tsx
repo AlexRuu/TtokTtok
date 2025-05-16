@@ -39,13 +39,13 @@ const timelineData = [
     date: "January 2025",
   },
   {
-    title: "The Birth of TtokTtok",
+    title: "The Birth of Ttok Ttok",
     description:
       "I tried many apps or online resources, but none of them were quite right. So why not create my own little thing to help those who are trying to learn as well? Ttok Ttok - helping others learn while trying to reinfoce my own understanding.",
     date: "April 2025",
   },
   {
-    title: "Continuing to grow",
+    title: "Continuing to Grow",
     description:
       "TtokTtok is still expanding — with more features and lessons on the way! Follow along and let's learn Korean together, one bite size lesson at a time!",
     date: "Now",
