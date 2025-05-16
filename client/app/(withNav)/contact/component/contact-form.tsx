@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 import { CircleAlert } from "lucide-react";
 import Loader from "@/components/ui/loader";
 import useLoading from "@/hooks/use-loading";
@@ -35,10 +34,12 @@ const formSchema = z.object({
 
 type ContactFormValues = z.infer<typeof formSchema>;
 
-const ContactForm = () => {
-  const { isLoading, startLoading, stopLoading } = useLoading();
+interface ContactFormProps {
+  setSubmitted: (value: boolean) => void;
+}
 
-  const router = useRouter();
+const ContactForm: React.FC<ContactFormProps> = ({ setSubmitted }) => {
+  const { isLoading, startLoading, stopLoading } = useLoading();
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(formSchema),
@@ -75,7 +76,7 @@ const ContactForm = () => {
           return;
         }
         stopLoading();
-        router.push("/contact/submitted");
+        setSubmitted(true);
       }
     } catch {
       toast.error("There was an error submitting your form.", {
@@ -95,7 +96,7 @@ const ContactForm = () => {
   };
 
   return (
-    <div className="w-full md:w-1/2 h-full flex flex-col items-center justify-center bg-[#fdfaf6]">
+    <div className="w-full lg:w-1/2 h-full flex flex-col items-center justify-center bg-[#fdfaf6]">
       {isLoading && <Loader />}
       <Form {...form}>
         <form
@@ -135,8 +136,8 @@ const ContactForm = () => {
                     <FormLabel
                       htmlFor="firstName"
                       className={cn(
-                        "absolute text-sm left-3 top-3 transition-all duration-200 bg-transparent px-1",
-                        "peer-placeholder-shown:top-2 peer-placeholder-shown:text-base cursor-text ease-in-out",
+                        "text-xs absolute md:text-sm left-3 top-3 transition-all duration-200 bg-transparent px-1",
+                        "peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm  sm:peer-placeholder-shown:text-base cursor-text ease-in-out",
                         "peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-[#A1C6EA] peer-not-placeholder-shown:bg-white",
                         "peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white",
                         "before:content-['*'] before:text-grey-500 before:peer-not-placeholder-shown:text-[#A1C6EA]  before:text-xs before:relative before:top-[-0.15rem] before:ml-0.5 before:-mr-1.5",
@@ -184,8 +185,8 @@ const ContactForm = () => {
                     <FormLabel
                       htmlFor="lastName"
                       className={cn(
-                        "absolute text-sm left-3 top-3 transition-all duration-200 bg-transparent px-1",
-                        "peer-placeholder-shown:top-2 peer-placeholder-shown:text-base cursor-text ease-in-out",
+                        "text-xs absolute md:text-sm left-3 top-3 transition-all duration-200 bg-transparent px-1",
+                        "peer-placeholder-shown:top-2 peer-placeholder-shown:text-sm  sm:peer-placeholder-shown:text-base cursor-text ease-in-out",
                         "peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-[#A1C6EA] peer-not-placeholder-shown:bg-white",
                         "peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white",
                         "before:content-['*'] before:text-grey-500 before:peer-not-placeholder-shown:text-[#A1C6EA]  before:text-xs before:relative before:top-[-0.15rem] before:ml-0.5 before:-mr-1.5",
