@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Role } from "@/lib/generated/prisma";
 
 const forgotPasswordFormSchema = z.object({
   email: z
@@ -71,11 +72,22 @@ const verifySchema = z.object({
   token: z.string().min(1),
 });
 
+const editUserSchema = z.object({
+  firstName: z.string().min(1, { message: "First name is required" }),
+  lastName: z.string().min(1, { message: "Last name is required." }),
+  email: z
+    .string()
+    .min(1, { message: "Email is required." })
+    .email({ message: "Invalid Email Address" }),
+  role: z.enum([Role.ADMIN, Role.USER]),
+});
+
 export type ForgotPasswordFormSchema = z.infer<typeof forgotPasswordFormSchema>;
 export type SignUpFormSchema = z.infer<typeof signUpFormSchema>;
 export type ContactFormSchema = z.infer<typeof contactFormSchema>;
 export type ResetPasswordFormSchema = z.infer<typeof resetPasswordSchema>;
 export type verifySchema = z.infer<typeof verifySchema>;
+export type EditUserValues = z.infer<typeof editUserSchema>;
 
 export {
   forgotPasswordFormSchema,
@@ -84,4 +96,5 @@ export {
   contactFormSchema,
   resetPasswordSchema,
   verifySchema,
+  editUserSchema,
 };
