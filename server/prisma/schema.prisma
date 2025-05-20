@@ -22,6 +22,8 @@ model User {
   password            String?
   emailVerified       DateTime?
   image               String?
+  role                Role                  @default(USER)
+  status              Status                @default(ACTIVE)
   accounts            Account[]
   VerificationToken   VerificationToken[]
   updatedAt           DateTime              @default(now()) @db.Timestamptz(6)
@@ -161,4 +163,14 @@ enum QuizType {
   FILL_IN_THE_BLANK
   TRUE_FALSE
   MATCHING
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
 }
