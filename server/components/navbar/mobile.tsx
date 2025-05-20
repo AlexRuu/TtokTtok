@@ -34,7 +34,7 @@ const MobileNav = ({ isOpen, setIsOpen, links, navHeight }: MobileNavProps) => {
                 key={link.path}
                 onClick={() => setIsOpen(false)}
                 aria-current={pathName === link.path ? "page" : undefined}
-                className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A65A3A] block px-4 py-3 text-base rounded-md hover:bg-[#FBEDE7] transition-colors"
+                className="focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-[#A65A3A] block px-4 py-3 text-base rounded-md hover:bg-[#FBEDE7] transition-colors"
               >
                 <span
                   className={cn(

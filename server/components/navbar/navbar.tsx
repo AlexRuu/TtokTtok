@@ -99,12 +99,12 @@ export default function Navbar() {
     <>
       <nav
         ref={navRef}
-        className="sticky top-0 z-40 bg-[#FAF3F0]/80 backdrop-blur-xs px-4 py-3 shadow-sm md:px-8"
+        className="sticky top-0 z-40 bg-[#FAF3F0]/80 backdrop-blur-xs px-4 py-3 shadow-xs md:px-8"
       >
         <div className="flex justify-between items-center max-w-6xl mx-auto">
           <Link
             href="/"
-            className="flex items-center space-x-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded"
+            className="flex items-center space-x-1 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded"
           >
             {/* Logo */}
             <div className="relative w-12 h-12 min-h-[48px]">
@@ -139,7 +139,7 @@ export default function Navbar() {
                 key={link.name}
                 aria-current={pathName === link.path ? "page" : undefined}
                 className={cn(
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded px-2 py-1 hover:text-[#A65A3A] transition-colors border-b-2 border-transparent focus-visible:text-[#A65A3A]",
+                  "focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded px-2 py-1 hover:text-[#A65A3A] transition-colors border-b-2 border-transparent focus-visible:text-[#A65A3A]",
                   pathName === link.path
                     ? "border-[#A65A3A] text-[#A65A3A] font-medium"
                     : ""

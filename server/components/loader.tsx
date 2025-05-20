@@ -6,7 +6,7 @@ const Loader = () => {
   const dots = ["로", "딩", ".", ".", "."];
 
   return (
-    <div className="fixed inset-0 bg-white backdrop-blur-sm backdrop-opacity-50 z-50 flex justify-center items-center opacity-80">
+    <div className="fixed inset-0 bg-white backdrop-blur-xs backdrop-opacity-50 z-50 flex justify-center items-center opacity-80">
       <div className="p-4 rounded-lg flex space-x-2 text-4xl font-bold text-[#2D3A45]">
         {dots.map((char, index) => (
           <motion.span

@@ -91,7 +91,7 @@ const SignInForm = () => {
         <form
           noValidate
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto p-8 border border-pink-100 bg-white shadow-sm rounded-2xl pt-10"
+          className="space-y-8 w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto p-8 border border-pink-100 bg-white shadow-xs rounded-2xl pt-10"
         >
           <div className="flex items-baseline space-x-1 leading-none justify-center">
             {/* Main text */}
@@ -150,7 +150,7 @@ const SignInForm = () => {
                       "peer-not-placeholder-shown:-top-2 peer-not-placeholder-shown:text-[#A1C6EA] peer-not-placeholder-shown:bg-white",
                       "peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white",
                       form.formState.errors.email && form.formState.isSubmitted
-                        ? "!text-red-400"
+                        ? "text-red-400!"
                         : "text-gray-500"
                     )}
                   >
@@ -204,7 +204,7 @@ const SignInForm = () => {
                       "peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white",
                       form.formState.errors.password &&
                         form.formState.isSubmitted
-                        ? "!text-red-400"
+                        ? "text-red-400!"
                         : "text-gray-500"
                     )}
                   >
@@ -216,7 +216,7 @@ const SignInForm = () => {
           </div>
           <Button
             type="submit"
-            className="w-full font-semibold bg-indigo-200 hover:bg-indigo-300 text-indigo-900 flex items-center justify-center gap-2 hover:cursor-pointer py-4 sm:py-5 text-base sm:text-md rounded-xl transition-colors shadow-sm hover:scale-[1.01] hover:shadow-md duration-200 ease-in-out focus:ring-2 focus:ring-indigo-300 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400"
+            className="w-full font-semibold bg-indigo-200 hover:bg-indigo-300 text-indigo-900 flex items-center justify-center gap-2 hover:cursor-pointer py-4 sm:py-5 text-base sm:text-md rounded-xl transition-colors shadow-xs hover:scale-[1.01] hover:shadow-md duration-200 ease-in-out focus:ring-2 focus:ring-indigo-300 active:scale-[0.99] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400"
             focus-visible="outline"
             aria-label="Sign in to your account"
             disabled={isLoading || form.formState.isSubmitting}

@@ -61,7 +61,7 @@ const AdminUsersPage = async () => {
         {users.map((user) => (
           <div
             key={user.id}
-            className="border rounded-lg p-4 shadow-sm bg-white dark:bg-background"
+            className="border rounded-lg p-4 shadow-xs bg-white dark:bg-background"
           >
             <div className="text-lg font-medium mb-1">
               {user.firstName} {user.lastName}

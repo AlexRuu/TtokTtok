@@ -96,7 +96,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
         <form
           noValidate
           onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full max-w-md bg-white border border-pink-100 shadow-sm rounded-2xl p-8 pt-10 space-y-6"
+          className="w-full max-w-md bg-white border border-pink-100 shadow-xs rounded-2xl p-8 pt-10 space-y-6"
         >
           <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-6 sm:space-y-0">
             {["firstName", "lastName"].map((fieldName) => (
@@ -113,7 +113,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                           form.formState.errors[
                             fieldName as keyof EditUserValues
                           ] && form.formState.isSubmitted
-                            ? "!text-red-400 before:text-red-400"
+                            ? "text-red-400! before:text-red-400"
                             : ""
                         )}
                       >
@@ -128,7 +128,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                           placeholder=" "
                           value={field.value ?? ""}
                           onChange={field.onChange}
-                          className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-sm placeholder-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                          className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
                         />
                       </FormControl>
                       {form.formState.isSubmitted &&
@@ -155,7 +155,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                     htmlFor="email"
                     className={cn(
                       form.formState.errors.email && form.formState.isSubmitted
-                        ? "!text-red-400 before:text-red-400"
+                        ? "text-red-400! before:text-red-400"
                         : ""
                     )}
                   >
@@ -168,7 +168,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                       placeholder=" "
                       type="email"
                       onInvalid={(e) => e.preventDefault()}
-                      className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-sm placeholder-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
+                      className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
                     />
                   </FormControl>
                   {form.formState.isSubmitted &&
@@ -189,7 +189,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                     htmlFor="role"
                     className={cn(
                       form.formState.errors.role && form.formState.isSubmitted
-                        ? "!text-red-400 before:text-red-400"
+                        ? "text-red-400! before:text-red-400"
                         : ""
                     )}
                   >
@@ -198,7 +198,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                   {form.formState.isSubmitted &&
                     renderError(form.formState.errors.role)}
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="w-full border border-gray-300 rounded-md py-3 px-3 text-base shadow-sm focus:ring-2 focus:ring-indigo-300">
+                    <SelectTrigger className="w-full border border-gray-300 rounded-md py-3 px-3 text-base shadow-xs focus:ring-2 focus:ring-indigo-300">
                       {field.value}
                     </SelectTrigger>
                     <SelectContent>
@@ -219,7 +219,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
           </p>
           <div className="flex space-x-1">
             <Button
-              className="w-full font-semibold bg-pink-200 hover:bg-pink-300 text-pink-900 flex items-center justify-center gap-2 hover:cursor-pointer py-4 sm:py-5 text-base sm:text-md rounded-xl transition-colors shadow-sm hover:scale-[1.01] hover:shadow-md duration-200 ease-in-out focus:ring-2 focus:ring-pink-300 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-pink-400"
+              className="w-full font-semibold bg-pink-200 hover:bg-pink-300 text-pink-900 flex items-center justify-center gap-2 hover:cursor-pointer py-4 sm:py-5 text-base sm:text-md rounded-xl transition-colors shadow-xs hover:scale-[1.01] hover:shadow-md duration-200 ease-in-out focus:ring-2 focus:ring-pink-300 active:scale-[0.99] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-pink-400"
               aria-label="Cancel"
               onClick={() => router.push("/users")}
               disabled={form.formState.isSubmitting}
@@ -229,7 +229,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
             </Button>
             <Button
               type="submit"
-              className="w-full font-semibold bg-indigo-200 hover:bg-indigo-300 text-indigo-900 flex items-center justify-center gap-2 py-4 sm:py-5 text-base rounded-xl transition-all duration-200 shadow-sm hover:scale-[1.01] hover:shadow-md active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-indigo-300 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400"
+              className="w-full font-semibold bg-indigo-200 hover:bg-indigo-300 text-indigo-900 flex items-center justify-center gap-2 py-4 sm:py-5 text-base rounded-xl transition-all duration-200 shadow-xs hover:scale-[1.01] hover:shadow-md active:scale-[0.99] focus:outline-hidden focus:ring-2 focus:ring-indigo-300 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400"
               aria-label="Submit"
               aria-busy={form.formState.isSubmitting}
               disabled={form.formState.isSubmitting}
