@@ -82,12 +82,17 @@ const editUserSchema = z.object({
   role: z.enum([Role.ADMIN, Role.USER]),
 });
 
+const unitsSchema = z.object({
+  title: z.string().min(1, { message: "Unit title is requird" }),
+});
+
 export type ForgotPasswordFormSchema = z.infer<typeof forgotPasswordFormSchema>;
 export type SignUpFormSchema = z.infer<typeof signUpFormSchema>;
 export type ContactFormSchema = z.infer<typeof contactFormSchema>;
 export type ResetPasswordFormSchema = z.infer<typeof resetPasswordSchema>;
 export type verifySchema = z.infer<typeof verifySchema>;
 export type EditUserValues = z.infer<typeof editUserSchema>;
+export type UnitsSchemaValues = z.infer<typeof unitsSchema>;
 
 export {
   forgotPasswordFormSchema,
@@ -97,4 +102,5 @@ export {
   resetPasswordSchema,
   verifySchema,
   editUserSchema,
+  unitsSchema,
 };
