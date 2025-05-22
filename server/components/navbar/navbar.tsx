@@ -8,6 +8,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import MobileNav from "./mobile";
 import Loader from "../loader";
+import { Button } from "../ui/button";
+import { signOut } from "next-auth/react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -54,6 +56,7 @@ export default function Navbar() {
         name: "Home",
         path: "/",
       },
+      { name: "Units", path: "/units" },
       {
         name: "Lessons",
         path: "/lessons",
@@ -148,6 +151,13 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
+            <Button
+              variant="ghost"
+              className="hover:cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded px-2 py-1 hover:text-[#A65A3A] transition-colors border-b-2 border-transparent focus-visible:text-[#A65A3A]"
+              onClick={() => signOut()}
+            >
+              Logout
+            </Button>
           </div>
 
           {/* Mobile menu toggle */}
