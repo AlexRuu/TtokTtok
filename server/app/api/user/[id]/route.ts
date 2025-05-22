@@ -1,4 +1,5 @@
 import { authOptions } from "@/lib/auth";
+import prismadb from "@/lib/prismadb";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -8,13 +9,29 @@ export async function PATCH(
 ) {
   try {
     const session = await getServerSession(authOptions);
-
-    if (!session || !session.user || session.user.role !== "admin") {
+    if (!session || !session.user || session.user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const body = await req.json();
-    console.log(body, params.id);
+    if (!body) {
+      return new NextResponse("Insufficient data required", { status: 400 });
+    }
+
+    const { firstName, lastName, email, role } = body;
+    const { id } = await params;
+    await prismadb.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        role: role,
+      },
+    });
+
     return NextResponse.json({
       message: "Successfully updated user",
       status: 200,
