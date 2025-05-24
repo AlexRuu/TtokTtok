@@ -97,7 +97,7 @@ model Lesson {
   unit              Unit                @relation(fields: [unitId], references: [id])
   createdAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
   updatedAt         DateTime            @default(now()) @db.Timestamptz(6)
-  UserChapterReview UserChapterReview[]
+  userChapterReview UserChapterReview[]
   Quiz              Quiz[]
 
   @@index([unitId, lessonNumber])
@@ -109,8 +109,8 @@ model Unit {
   title             String
   createdAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
   updatedAt         DateTime            @default(now()) @db.Timestamptz(6)
-  Lesson            Lesson[]
-  UserChapterReview UserChapterReview[]
+  lesson            Lesson[]
+  userChapterReview UserChapterReview[]
 }
 
 model Quiz {
@@ -129,8 +129,7 @@ model QuizQuestion {
   quizType QuizType
   options  Json?
   answer   Json
-
-  config Json?
+  config   Json?
 }
 
 model UserChapterReview {
