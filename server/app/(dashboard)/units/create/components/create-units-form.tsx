@@ -35,7 +35,7 @@ const CreateUnitsForm = () => {
   const onSubmit: SubmitHandler<UnitsSchemaValues> = async (data) => {
     startLoading();
     try {
-      await fetch("/api/unit", {
+      await fetch("/api/units", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
