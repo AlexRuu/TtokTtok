@@ -144,7 +144,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ setSubmitted }) => {
                         "peer-invalid:before:text-red-500",
                         form.formState.errors.firstName &&
                           form.formState.isSubmitted
-                          ? "!text-red-400"
+                          ? "text-red-400!"
                           : "text-gray-500"
                       )}
                     >
@@ -193,7 +193,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ setSubmitted }) => {
                         "peer-invalid:before:text-red-500",
                         form.formState.errors.lastName &&
                           form.formState.isSubmitted
-                          ? "!text-red-400"
+                          ? "text-red-400!"
                           : "text-gray-500"
                       )}
                     >
@@ -242,7 +242,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ setSubmitted }) => {
                       "before:content-['*'] before:text-grey-500 before:peer-not-placeholder-shown:text-[#A1C6EA]  before:text-xs before:relative before:top-[-0.15rem] before:ml-0.5 before:-mr-1.5",
                       "peer-invalid:before:text-red-500",
                       form.formState.errors.email && form.formState.isSubmitted
-                        ? "!text-red-400"
+                        ? "text-red-400!"
                         : "text-gray-500"
                     )}
                   >
@@ -291,7 +291,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ setSubmitted }) => {
                       "peer-invalid:before:text-red-500",
                       form.formState.errors.subject &&
                         form.formState.isSubmitted
-                        ? "!text-red-400"
+                        ? "text-red-400!"
                         : "text-gray-500"
                     )}
                   >
@@ -339,7 +339,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ setSubmitted }) => {
                       "peer-invalid:before:text-red-500",
                       form.formState.errors.message &&
                         form.formState.isSubmitted
-                        ? "!text-red-400"
+                        ? "text-red-400!"
                         : "text-gray-500"
                     )}
                   >

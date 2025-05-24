@@ -171,8 +171,8 @@ export default function Navbar() {
                 <div className="absolute top-full left-0 w-full h-4 z-40" />
 
                 {/* Dropdown */}
-                <div className="min-w-[7rem] absolute top-full mt-4 right-0 -translate-x-1.5 w-20 sm:w-28 bg-[#FBEDE7]/80 backdrop-blur-md border border-[#e8dcd5] shadow-sm rounded-xl transform transition-all duration-200 ease-out opacity-0 -translate-y-1 invisible group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible z-50">
-                  <div className="absolute top-[-6px] right-[1.1rem] w-3 h-3 bg-[#e7dad5d8] rotate-45 border border-[#e8dcd5] z-[60]" />
+                <div className="min-w-28 absolute top-full mt-4 right-0 -translate-x-1.5 w-20 sm:w-28 bg-[#FBEDE7]/80 backdrop-blur-md border border-[#e8dcd5] shadow-sm rounded-xl transform transition-all duration-200 ease-out opacity-0 -translate-y-1 invisible group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible z-50">
+                  <div className="absolute top-[-6px] right-[1.1rem] w-3 h-3 bg-[#e7dad5d8] rotate-45 border border-[#e8dcd5] z-60" />
                   <div className="flex flex-col py-1">
                     <Link
                       href="/profile"

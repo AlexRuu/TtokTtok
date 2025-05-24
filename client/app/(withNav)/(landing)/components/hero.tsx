@@ -60,7 +60,7 @@ const HeroComponent: React.FC<HeroComponentProps> = ({ fadeInUp }) => {
 
         <motion.h1
           variants={fadeInUp}
-          className="text-5xl font-bold tracking-tight mt-[-1.5rem]"
+          className="text-5xl font-bold tracking-tight -mt-6"
         >
           <span className="text-[#B75F45]">Ttok</span>
           <span className="text-[#D69E78]">Ttok</span>

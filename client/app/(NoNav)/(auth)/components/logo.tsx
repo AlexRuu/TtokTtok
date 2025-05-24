@@ -12,7 +12,7 @@ const LogoTitle = () => {
           className="object-contain"
         />
       </div>
-      <div className="flex text-[2.5rem] sm:text-[2.75rem] font-semibold tracking-tight leading-none mt-[-0.25rem]">
+      <div className="flex text-[2.5rem] sm:text-[2.75rem] font-semibold tracking-tight leading-none -mt-1">
         <h1 className="text-[#B75F45]">Ttok</h1>
         <h1 className="text-[#D69E78]">Ttok</h1>
       </div>
