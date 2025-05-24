@@ -3,7 +3,14 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Table, TableHead, TableHeader } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const AdminUsersPage = async () => {
   const users = await prismadb.user.findMany({
@@ -18,52 +25,43 @@ const AdminUsersPage = async () => {
       <div className="hidden md:block overflow-auto border rounded-lg">
         <Table>
           <TableHeader>
-            <TableHead className="px-4 py-2">Name</TableHead>
-            <TableHead className="px-4 py-2">Email</TableHead>
-            <TableHead className="px-4 py-2">Role</TableHead>
-            <TableHead className="px-4 py-2">Status</TableHead>
-            <TableHead className="px-4 py-2">Actions</TableHead>
+            <TableRow>
+              <TableHead className="px-4 py-2">Name</TableHead>
+              <TableHead className="px-4 py-2">Email</TableHead>
+              <TableHead className="px-4 py-2">Role</TableHead>
+              <TableHead className="px-4 py-2">Status</TableHead>
+              <TableHead className="px-4 py-2">Actions</TableHead>
+            </TableRow>
           </TableHeader>
-        </Table>
-        <table className="min-w-full text-sm text-left">
-          <thead className="bg-muted text-muted-foreground">
-            <tr>
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Email</th>
-              <th className="px-4 py-2">Role</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-background divide-y">
+          <TableBody className="bg-background divide-y">
             {users.map((user) => (
-              <tr key={user.id}>
-                <td className="px-4 py-2">
+              <TableRow key={user.id}>
+                <TableCell className="px-4 py-2">
                   {user.firstName} {user.lastName}
-                </td>
-                <td className="px-4 py-2">{user.email}</td>
-                <td className="px-4 py-2 capitalize">
+                </TableCell>
+                <TableCell className="px-4 py-2">{user.email}</TableCell>
+                <TableCell className="px-4 py-2 capitalize">
                   <Badge variant="outline">{user.role || "user"}</Badge>
-                </td>
-                <td className="px-4 py-2">
+                </TableCell>
+                <TableCell className="px-4 py-2">
                   {user.status === "ACTIVE" ? (
                     <Badge variant="success">Active</Badge>
                   ) : (
                     <Badge variant="destructive">Inactive</Badge>
                   )}
-                </td>
-                <td className="px-4 py-2 space-x-2">
+                </TableCell>
+                <TableCell className="px-4 py-2 space-x-2">
                   <Button size="sm" variant="outline">
                     <Link href={`/users/${user.id}`}>Edit</Link>
                   </Button>
                   <Button size="sm" variant="destructive">
                     Deactivate
                   </Button>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {/* Mobile stacked cards */}
