@@ -3,6 +3,20 @@ import prismadb from "@/lib/prismadb";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
+export async function GET(req: Request) {
+  try {
+    const units = await prismadb.unit.findMany({
+      include: { lesson: true },
+      orderBy: { unitNumber: "asc" },
+    });
+
+    return NextResponse.json(units);
+  } catch (error) {
+    console.log("Error fetching units.", error);
+    return new NextResponse("Error fetching units", { status: 500 });
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
