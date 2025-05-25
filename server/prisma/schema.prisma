@@ -14,6 +14,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Auth Models
 model User {
   id                  String                @id @default(cuid())
   firstName           String
@@ -26,8 +27,8 @@ model User {
   status              Status                @default(ACTIVE)
   accounts            Account[]
   VerificationToken   VerificationToken[]
-  updatedAt           DateTime              @default(now()) @db.Timestamptz(6)
-  createdAt           DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt           DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
   ForgotPasswordToken ForgotPasswordToken[]
   SavedVocabulary     SavedVocabulary[]
   UserChapterReview   UserChapterReview[]
@@ -60,7 +61,7 @@ model VerificationToken {
   usedAt     DateTime?
   userId     String
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt  DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(6)
 
   @@unique([identifier, token])
 }
@@ -74,62 +75,21 @@ model ForgotPasswordToken {
   used       Boolean   @default(false)
   usedAt     DateTime?
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt  DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(6)
 
   @@unique([identifier, token])
 }
 
+// User Profile Models
 model SavedVocabulary {
-  id        String   @id @default(cuid())
-  english   String
-  korean    String
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
-}
+  id           String     @id @default(cuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  vocabularyId String
+  vocabulary   Vocabulary @relation(fields: [vocabularyId], references: [id])
+  createdAt    DateTime   @default(now()) @db.Timestamptz(6)
 
-model Lesson {
-  id                String              @id @default(cuid())
-  title             String
-  content           String
-  lessonNumber      Int
-  unitId            String
-  unit              Unit                @relation(fields: [unitId], references: [id])
-  createdAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedAt         DateTime            @default(now()) @db.Timestamptz(6)
-  userChapterReview UserChapterReview[]
-  Quiz              Quiz[]
-
-  @@index([unitId, lessonNumber])
-}
-
-model Unit {
-  id                String              @id @default(cuid())
-  unitNumber        Int                 @default(autoincrement())
-  title             String
-  createdAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedAt         DateTime            @default(now()) @db.Timestamptz(6)
-  lesson            Lesson[]
-  userChapterReview UserChapterReview[]
-}
-
-model Quiz {
-  id           String         @id @default(cuid())
-  lessonId     String
-  lesson       Lesson         @relation(fields: [lessonId], references: [id])
-  createdAt    DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
-  QuizQuestion QuizQuestion[]
-}
-
-model QuizQuestion {
-  id       String   @id @default(cuid())
-  question String
-  quizId   String
-  quiz     Quiz     @relation(fields: [quizId], references: [id])
-  quizType QuizType
-  options  Json?
-  answer   Json
-  config   Json?
+  @@unique([userId, vocabularyId])
 }
 
 model UserChapterReview {
@@ -140,12 +100,100 @@ model UserChapterReview {
   user      User     @relation(fields: [userId], references: [id])
   unitId    String
   unit      Unit     @relation(fields: [unitId], references: [id])
-  createdAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
   @@index([userId, lessonId])
 }
 
+// Lessons and Content Models
+model Unit {
+  id                String              @id @default(cuid())
+  unitNumber        Int                 @default(autoincrement())
+  title             String
+  createdAt         DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
+  lesson            Lesson[]
+  userChapterReview UserChapterReview[]
+}
+
+model Lesson {
+  id                String              @id @default(cuid())
+  title             String
+  lessonNumber      Int
+  content           Json
+  styleVariant      String? // Added in case of styling purposes 
+  unitId            String
+  unit              Unit                @relation(fields: [unitId], references: [id])
+  userChapterReview UserChapterReview[]
+  Quiz              Quiz[]
+  Vocabulary        Vocabulary[]
+  createdAt         DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
+  tag               Tag[]
+  lessonVersion     LessonVersion[]
+
+  @@index([unitId, lessonNumber])
+}
+
+model LessonVersion {
+  id        String   @id @default(cuid())
+  lessonId  String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  version   Int
+  content   Json
+  createdAt DateTime @default(now())
+
+  @@unique([lessonId, version])
+}
+
+model LessonMedia {
+  // Added in case I need to add media, though not sure if I want to use cloud storage or not for media
+  id        String   @id @default(cuid())
+  url       String
+  type      String
+  altText   String?
+  createdAt DateTime @default(now())
+}
+
+model Tag {
+  id       String @id @default(cuid())
+  name     String @unique
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id])
+}
+
+model Quiz {
+  id           String         @id @default(cuid())
+  lessonId     String
+  lesson       Lesson         @relation(fields: [lessonId], references: [id])
+  createdAt    DateTime       @default(now()) @db.Timestamptz(6)
+  QuizQuestion QuizQuestion[]
+}
+
+model QuizQuestion {
+  id       String   @id @default(cuid())
+  question String
+  quizId   String
+  quiz     Quiz     @relation(fields: [quizId], references: [id])
+  quizType QuizType
+  options  Json?
+  answer   String
+}
+
+model Vocabulary {
+  id              String            @id @default(cuid())
+  english         String
+  korean          String
+  definition      String
+  lessonId        String
+  lesson          Lesson            @relation(fields: [lessonId], references: [id])
+  SavedVocabulary SavedVocabulary[]
+  createdAt       DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime          @default(now()) @updatedAt @db.Timestamptz(6)
+}
+
+// Contact Models
 model ContactMessage {
   id        String   @id @default(cuid())
   firstName String
@@ -154,9 +202,10 @@ model ContactMessage {
   subject   String
   message   String
   read      Boolean  @default(false)
-  createdAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
 }
 
+// Enums
 enum QuizType {
   MULTIPLE_CHOICE
   FILL_IN_THE_BLANK
