@@ -102,10 +102,10 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
                       type="text"
                       ref={inputRef}
                       placeholder="Search lessons or units..."
-                      className="w-full pl-10 pr-4 text-[#6B4C3B] placeholder:text-[#B59E90] focus:outline-none focus:ring-0" // Reduced padding-right to ensure no overlap with the input
+                      className="w-full pl-10 pr-4 text-[#6B4C3B] placeholder:text-[#B59E90] focus:outline-none focus:ring-0 focus-visible:ring-1 focus-visible:ring-pink-400"
                     />
                     <Search
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-[#B59E90] pointer-events-none" // Adjusted left positioning to avoid placeholder overlap
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-[#B59E90] pointer-events-none"
                       size={18}
                     />
                   </div>
