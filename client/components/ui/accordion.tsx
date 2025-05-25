@@ -1,57 +1,86 @@
 "use client";
 
-import * as React from "react";
-import * as AccordionPrimitive from "@radix-ui/react-accordion";
+import React from "react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+type AccordionItemProps = {
+  value: string;
+  title: React.ReactNode;
+  children: React.ReactNode;
+  isOpen?: boolean;
+  onToggle?: (value: string) => void;
+};
 
-const Accordion = AccordionPrimitive.Root;
+export function Accordion({
+  children,
+  defaultValue,
+}: {
+  children: React.ReactNode;
+  defaultValue?: string;
+}) {
+  const [openItem, setOpenItem] = useState(defaultValue || "");
 
-const AccordionItem = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
->(({ className, ...props }, ref) => (
-  <AccordionPrimitive.Item
-    ref={ref}
-    className={cn("border-b", className)}
-    {...props}
-  />
-));
-AccordionItem.displayName = "AccordionItem";
+  const toggleItem = (value: string) => {
+    setOpenItem((prev) => (prev === value ? "" : value));
+  };
 
-const AccordionTrigger = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-  <AccordionPrimitive.Header className="flex">
-    <AccordionPrimitive.Trigger
-      ref={ref}
-      className={cn(
-        "flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline text-left [&[data-state=open]>svg]:rotate-180",
-        className
-      )}
-      {...props}
-    >
-      {children}
-      <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
-    </AccordionPrimitive.Trigger>
-  </AccordionPrimitive.Header>
-));
-AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
+  return (
+    <div className="rounded-md divide-y">
+      {React.Children.map(children, (child) => {
+        if (React.isValidElement<AccordionItemProps>(child)) {
+          return React.cloneElement(child, {
+            isOpen: openItem === child.props.value,
+            onToggle: toggleItem,
+          });
+        }
+        return child;
+      })}
+    </div>
+  );
+}
 
-const AccordionContent = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <AccordionPrimitive.Content
-    ref={ref}
-    className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
-    {...props}
-  >
-    <div className={cn("pb-4 pt-0", className)}>{children}</div>
-  </AccordionPrimitive.Content>
-));
-AccordionContent.displayName = AccordionPrimitive.Content.displayName;
+export function AccordionItem({
+  value,
+  title,
+  children,
+  isOpen = false,
+  onToggle = () => {},
+}: AccordionItemProps) {
+  return (
+    <div className="border border-[#F2DFD7] rounded-lg bg-[#FEF4EF]/60 shadow-sm hover:shadow-md transition-all duration-200 ease-in-out mb-4">
+      <button
+        onClick={() => onToggle(value)}
+        className="flex w-full items-center justify-between py-4 px-4 text-left text-sm font-medium hover:underline transition-all hover:cursor-pointer"
+      >
+        {title}
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+        </motion.div>
+      </button>
 
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            key="content"
+            initial="collapsed"
+            animate="open"
+            exit="collapsed"
+            variants={{
+              open: { height: "auto", opacity: 1 },
+              collapsed: { height: 0, opacity: 0 },
+            }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="overflow-hidden px-4 text-sm"
+          >
+            <div className="py-2">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
