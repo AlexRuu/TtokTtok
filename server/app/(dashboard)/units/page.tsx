@@ -13,7 +13,7 @@ import React from "react";
 
 const UnitsPage = async () => {
   const units = await prismadb.unit.findMany({
-    orderBy: { unitNumber: "desc" },
+    orderBy: { unitNumber: "asc" },
   });
 
   if (!units) {
