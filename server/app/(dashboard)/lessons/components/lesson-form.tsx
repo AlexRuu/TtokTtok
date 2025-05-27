@@ -1,0 +1,376 @@
+"use client";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import useLoading from "@/hooks/use-loading";
+import { cn } from "@/lib/utils";
+import { LessonFormSchema, LessonFormType } from "@/schemas/units-schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Trash, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import {
+  useFieldArray,
+  useForm,
+  Controller,
+  SubmitHandler,
+} from "react-hook-form";
+import { TableBlockEditor } from "./table-block";
+import toast from "react-hot-toast";
+
+const formSchema = LessonFormSchema;
+
+interface UnitFormProps {
+  units: { unitNumber: number; title: string }[];
+}
+
+const LessonForm: React.FC<UnitFormProps> = ({ units }) => {
+  const { isLoading, startLoading, stopLoading } = useLoading();
+  const [selectedBlockType, setSelectedBlockType] = useState<
+    "text" | "image" | "note" | "table" | ""
+  >();
+
+  const router = useRouter();
+
+  const handleAddBlock = () => {
+    switch (selectedBlockType) {
+      case "text":
+        blocksArray.append({ type: "text", content: "" });
+        break;
+      case "image":
+        blocksArray.append({ type: "image", url: "", alt: "" });
+        break;
+      case "note":
+        blocksArray.append({ type: "note", content: "", style: "default" });
+        break;
+      case "table":
+        blocksArray.append({ type: "table", headers: [], rows: [] });
+        break;
+    }
+  };
+
+  const form = useForm<LessonFormType>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      lessonNumber: 1,
+      title: "",
+      unitTitle: "",
+      blocks: [],
+    },
+  });
+
+  const blocksArray = useFieldArray({
+    name: "blocks",
+    control: form.control,
+  });
+
+  const onSubmit: SubmitHandler<LessonFormType> = async (data) => {
+    startLoading();
+    try {
+      console.log(data);
+
+      //   await fetch("/api/units", {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify(data),
+      //   });
+      //   stopLoading();
+      //   router.push("/units");
+    } catch (error) {
+      console.log(error);
+      toast.error("There was an error creating lesson.", {
+        style: {
+          background: "#ffeef0",
+          color: "#943c5e",
+          borderRadius: "10px",
+          padding: "12px 18px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.08)",
+          fontSize: "16px",
+        },
+        className:
+          "transition-all transform duration-300 ease-in-out font-medium",
+      });
+      stopLoading();
+    }
+  };
+
+  return (
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#fdfaf6] -mt-10 overflow-auto flex-col">
+      <Form {...form}>
+        <form
+          noValidate
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-full max-w-lg bg-white border border-pink-100 shadow-xs rounded-2xl p-8 pt-10 space-y-6"
+        >
+          <h1 className="text-xl text-center md:text-2xl font-semibold py-2 sm:py-3 md:py-4">
+            Create Lesson
+          </h1>
+          <div className="relative flex space-x-3">
+            <FormField
+              control={form.control}
+              name="lessonNumber"
+              disabled={isLoading}
+              render={({ field }) => (
+                <FormItem className="w-1/3">
+                  <FormLabel
+                    htmlFor="lessonNumber"
+                    className={cn(
+                      form.formState.errors.title && form.formState.isSubmitted
+                        ? "text-red-400! before:text-red-400"
+                        : ""
+                    )}
+                  >
+                    Lesson Number
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="lessonNumber"
+                      {...field}
+                      type="number"
+                      onInvalid={(e) => e.preventDefault()}
+                      className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="title"
+              disabled={isLoading}
+              render={({ field }) => (
+                <FormItem className="w-2/3">
+                  <FormLabel
+                    htmlFor="title"
+                    className={cn(
+                      form.formState.errors.title && form.formState.isSubmitted
+                        ? "text-red-400! before:text-red-400"
+                        : ""
+                    )}
+                  >
+                    Title
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="title"
+                      {...field}
+                      type="text"
+                      onInvalid={(e) => e.preventDefault()}
+                      className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="relative w-full">
+            <FormField
+              control={form.control}
+              name="unitTitle"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Unit</FormLabel>
+                  <Select
+                    disabled={isLoading}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300">
+                        <SelectValue placeholder="Select a Unit" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {units.map((unit) => (
+                        <SelectItem key={unit.unitNumber} value={unit.title}>
+                          {unit.unitNumber}. {unit.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="relative flex-col flex">
+            <Label className="py-2">Lesson Content Blocks</Label>
+            <div className="flex items-center space-x-4">
+              <Select
+                value={selectedBlockType ?? ""}
+                onValueChange={(value) =>
+                  setSelectedBlockType(
+                    value as "text" | "image" | "note" | "table"
+                  )
+                }
+              >
+                <SelectTrigger className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300">
+                  <SelectValue placeholder="Select block type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="text">Text</SelectItem>
+                  <SelectItem value="image">Image</SelectItem>
+                  <SelectItem value="note">Note</SelectItem>
+                  <SelectItem value="table">Table</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                type="button"
+                onClick={handleAddBlock}
+                disabled={!selectedBlockType}
+                className="w-1/4 font-semibold bg-indigo-200 hover:bg-indigo-300 text-indigo-900 flex items-center justify-center gap-2 py-4 sm:py-5 text-base rounded-xl transition-all duration-200 shadow-xs hover:scale-[1.01] hover:shadow-md active:scale-[0.99] focus:outline-hidden focus:ring-2 focus:ring-indigo-300 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400"
+              >
+                Add Block
+              </Button>
+            </div>
+            {blocksArray.fields.map((field, index) => {
+              const blockType = form.watch("blocks")[index]?.type;
+              const isFirst = index === 0;
+              const isLast = index === blocksArray.fields.length - 1;
+              return (
+                <div
+                  key={field.id}
+                  className="border p-4 rounded mb-4 bg-gray-50 my-5"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <FormLabel>
+                      Block #{index + 1} ({blockType})
+                    </FormLabel>
+                    <Button
+                      type="button"
+                      disabled={isFirst}
+                      onClick={() => blocksArray.move(index, index - 1)}
+                      className={`w-10 font-semibold bg-blue-200 hover:bg-blue-300 text-blue-900 rounded-xl transition-colors ${
+                        isFirst ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                      title="Move Up"
+                    >
+                      ↑
+                    </Button>
+
+                    {/* Move Down */}
+                    <Button
+                      type="button"
+                      disabled={isLast}
+                      onClick={() => blocksArray.move(index, index + 1)}
+                      className={`w-10 font-semibold bg-blue-200 hover:bg-blue-300 text-blue-900 rounded-xl transition-colors ${
+                        isLast ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                      title="Move Down"
+                    >
+                      ↓
+                    </Button>
+                    <Button
+                      type="button"
+                      className="w-1/5 font-semibold bg-pink-200 hover:bg-pink-300 text-pink-900 flex items-center justify-center gap-2 hover:cursor-pointer py-4 sm:py-5 text-base sm:text-md rounded-xl transition-colors shadow-xs hover:scale-[1.01] hover:shadow-md duration-200 ease-in-out focus:ring-2 focus:ring-pink-300 active:scale-[0.99] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-pink-400"
+                      onClick={() => blocksArray.remove(index)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+
+                  {blockType === "image" && (
+                    <>
+                      <FormField
+                        control={form.control}
+                        name={`blocks.${index}.url`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Image URL</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="Enter image URL" />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`blocks.${index}.alt`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Alt Text</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="Enter alt text" />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  )}
+                  {blockType === "text" && (
+                    <FormField
+                      control={form.control}
+                      name={`blocks.${index}.content`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Note Text</FormLabel>
+                          <FormControl>
+                            <Textarea {...field} placeholder="Enter text..." />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  {blockType === "note" && (
+                    <FormField
+                      control={form.control}
+                      name={`blocks.${index}.content`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Note Text</FormLabel>
+                          <FormControl>
+                            <Textarea {...field} placeholder="Enter note..." />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  {blockType === "table" && (
+                    <TableBlockEditor name={`blocks.${index}`} index={index} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <div className="relative flex w-full space-x-4">
+            <Button
+              className="w-full font-semibold bg-pink-200 hover:bg-pink-300 text-pink-900 flex items-center justify-center gap-2 hover:cursor-pointer py-4 sm:py-5 text-base sm:text-md rounded-xl transition-colors shadow-xs hover:scale-[1.01] hover:shadow-md duration-200 ease-in-out focus:ring-2 focus:ring-pink-300 active:scale-[0.99] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-pink-400"
+              aria-label="Cancel"
+              onClick={() => router.push("/lessons")}
+              disabled={form.formState.isSubmitting}
+              aria-live="assertive"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="w-full font-semibold bg-indigo-200 hover:bg-indigo-300 text-indigo-900 flex items-center justify-center gap-2 py-4 sm:py-5 text-base rounded-xl transition-all duration-200 shadow-xs hover:scale-[1.01] hover:shadow-md active:scale-[0.99] focus:outline-hidden focus:ring-2 focus:ring-indigo-300 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400"
+              aria-label="Submit"
+              aria-busy={form.formState.isSubmitting}
+              disabled={form.formState.isSubmitting}
+              aria-live="assertive"
+            >
+              {form.formState.isSubmitting ? "Submitting..." : "Submit"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+};
+
+export default LessonForm;
