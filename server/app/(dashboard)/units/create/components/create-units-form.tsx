@@ -63,15 +63,15 @@ const CreateUnitsForm = () => {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#fdfaf6] -mt-10 overflow-auto flex-col">
       {isLoading && <Loader />}
-      <h1 className="text-xl md:text-2xl font-semibold py-2 sm:py-3 md:py-4">
-        Create Unit
-      </h1>
       <Form {...form}>
         <form
           noValidate
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-full max-w-md bg-white border border-pink-100 shadow-xs rounded-2xl p-8 pt-10 space-y-6"
         >
+          <h1 className="text-center text-xl md:text-2xl font-semibold py-2 sm:py-3 md:py-4">
+            Create Unit
+          </h1>
           <div className="flex sm:flex-row sm:space-x-6 space-y-6 sm:space-y-0">
             <div className="relative w-full">
               <FormField
