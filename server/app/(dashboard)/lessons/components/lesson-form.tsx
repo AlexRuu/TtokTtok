@@ -21,15 +21,9 @@ import useLoading from "@/hooks/use-loading";
 import { cn } from "@/lib/utils";
 import { LessonFormSchema, LessonFormType } from "@/schemas/units-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Trash, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-import {
-  useFieldArray,
-  useForm,
-  Controller,
-  SubmitHandler,
-} from "react-hook-form";
+import { useFieldArray, useForm, SubmitHandler } from "react-hook-form";
 import { TableBlockEditor } from "./table-block";
 import toast from "react-hot-toast";
 
@@ -43,7 +37,7 @@ const LessonForm: React.FC<UnitFormProps> = ({ units }) => {
   const { isLoading, startLoading, stopLoading } = useLoading();
   const [selectedBlockType, setSelectedBlockType] = useState<
     "text" | "image" | "note" | "table" | ""
-  >();
+  >("text");
 
   const router = useRouter();
 
@@ -110,7 +104,7 @@ const LessonForm: React.FC<UnitFormProps> = ({ units }) => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#fdfaf6] -mt-10 overflow-auto flex-col">
+    <div className="min-h-screen w-full max-w-screen bg-[#fdfaf6] overflow-x-hidden flex items-center justify-center flex-col py-10 px-4">
       <Form {...form}>
         <form
           noValidate
@@ -317,7 +311,7 @@ const LessonForm: React.FC<UnitFormProps> = ({ units }) => {
                       name={`blocks.${index}.content`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Note Text</FormLabel>
+                          <FormLabel>Text</FormLabel>
                           <FormControl>
                             <Textarea {...field} placeholder="Enter text..." />
                           </FormControl>
@@ -326,18 +320,47 @@ const LessonForm: React.FC<UnitFormProps> = ({ units }) => {
                     />
                   )}
                   {blockType === "note" && (
-                    <FormField
-                      control={form.control}
-                      name={`blocks.${index}.content`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Note Text</FormLabel>
-                          <FormControl>
-                            <Textarea {...field} placeholder="Enter note..." />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
+                    <>
+                      <FormField
+                        control={form.control}
+                        name={`blocks.${index}.content`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Note Content</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                {...field}
+                                placeholder="Enter note..."
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`blocks.${index}.style`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Note Style</FormLabel>
+                            <Select
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Select note style" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="default">Default</SelectItem>
+                                <SelectItem value="tip">Tip</SelectItem>
+                                <SelectItem value="warning">Warning</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+                    </>
                   )}
                   {blockType === "table" && (
                     <TableBlockEditor name={`blocks.${index}`} index={index} />
