@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { CircleUserRound, Menu, X } from "lucide-react";
+import { CircleUserRound, LogOut, Menu, X } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "../../../lib/utils";
@@ -10,9 +10,16 @@ import { signOut, useSession } from "next-auth/react";
 import SearchBar from "./searchBar";
 import MobileNav from "./mobile";
 import Loader from "../loader";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "../dropdown-menu";
+import ProfileAvatar from "../tteok-avatar";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   const pathName = usePathname();
@@ -157,38 +164,47 @@ export default function Navbar() {
             ))}
             <SearchBar />
             {status == "authenticated" ? (
-              <div className="relative hidden md:block group">
-                {/* Trigger Button */}
-                <button
-                  className="py-2 px-4 text-sm focus:outline-none"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  <CircleUserRound />
-                </button>
-
-                {/* Spacer that is hoverable (bridge) */}
-                <div className="absolute top-full left-0 w-full h-4 z-40" />
-
-                {/* Dropdown */}
-                <div className="min-w-28 absolute top-full mt-4 right-0 -translate-x-1.5 w-20 sm:w-28 bg-[#FBEDE7]/80 backdrop-blur-md border border-[#e8dcd5] shadow-sm rounded-xl transform transition-all duration-200 ease-out opacity-0 -translate-y-1 invisible group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible z-50">
-                  <div className="absolute top-[-6px] right-[1.1rem] w-3 h-3 bg-[#e7dad5d8] rotate-45 border border-[#e8dcd5] z-60" />
-                  <div className="flex flex-col py-1">
-                    <Link
-                      href="/profile"
-                      className="block py-2 px-4 text-sm text-[#6B4C3B] hover:bg-[#f2dfd7] rounded-md text-center"
-                    >
-                      Profile
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="block py-2 px-4 text-sm text-[#6B4C3B] hover:bg-[#f2dfd7] rounded-md text-center w-full"
-                    >
-                      Logout
-                    </button>
+              <DropdownMenu
+                open={dropdownOpen}
+                onOpenChange={(isOpen) => setDropdownOpen(isOpen)}
+                modal={false}
+              >
+                <DropdownMenuTrigger>
+                  <div onMouseEnter={() => setDropdownOpen(true)}>
+                    <CircleUserRound />
                   </div>
-                </div>
-              </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  onMouseLeave={() => setDropdownOpen(false)}
+                  onCloseAutoFocus={(e) => {
+                    e.preventDefault();
+                  }}
+                  className="min-w-28 overflow-visible relative flex flex-col px-3 pb-3 pt-1 top-3 bg-[#FBEDE7]/80 backdrop-blur-md border border-[#e8dcd5] shadow-sm rounded-xl"
+                >
+                  <div className="absolute top-[-6px] right-3/7 w-3 h-3 bg-[#e7dad5d8] rotate-45 border border-[#e8dcd5] z-60" />
+                  <Link
+                    href="/profile"
+                    className="flex items-center mt-2 py-2 px-4 text-sm text-[#6B4C3B] hover:bg-[#f2dfd7] rounded-md text-center"
+                  >
+                    <ProfileAvatar
+                      color="#6B4C3B"
+                      size={30}
+                      className="mr-1 text-red-400 rounded p-1"
+                    />
+                    Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="py-2 px-4 text-sm text-red-400 hover:bg-[#f2dfd7] rounded-md text-center w-full flex items-center"
+                  >
+                    <LogOut
+                      size={30}
+                      className="mr-1 text-red-400 rounded p-1"
+                    />
+                    Logout
+                  </button>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Link
                 href="/signin"
