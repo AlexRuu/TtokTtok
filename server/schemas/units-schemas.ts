@@ -14,7 +14,7 @@ const ImageBlock = z.object({
 const NoteBlock = z.object({
   type: z.literal("note"),
   content: z.string().min(1, "Note content is required"),
-  style: z.enum(["default", "highlight", "warning"]).optional(),
+  style: z.enum(["default", "highlight", "warning", "tip"]).optional(),
 });
 
 const TableBlock = z.object({
@@ -31,7 +31,7 @@ const BlockSchema = z.discriminatedUnion("type", [
 ]);
 
 export const LessonFormSchema = z.object({
-  lessonNumber: z.number().min(1, "Lesson number is required"),
+  lessonNumber: z.coerce.number().min(1, "Lesson number is required"),
   title: z.string().min(1, "Title is required"),
   unitTitle: z.string().min(1, "Select a unit"),
   blocks: z.array(BlockSchema).min(1, "Add at least one content block"),
