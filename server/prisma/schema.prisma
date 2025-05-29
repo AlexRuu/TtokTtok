@@ -122,7 +122,6 @@ model Lesson {
   title             String
   lessonNumber      Int
   content           Json
-  styleVariant      String? // Added in case of styling purposes 
   unitId            String
   unit              Unit                @relation(fields: [unitId], references: [id])
   userChapterReview UserChapterReview[]
@@ -130,8 +129,8 @@ model Lesson {
   Vocabulary        Vocabulary[]
   createdAt         DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
-  tag               Tag[]
   lessonVersion     LessonVersion[]
+  tagging           Tagging[]
 
   @@index([unitId, lessonNumber])
 }
@@ -145,10 +144,11 @@ model LessonVersion {
   createdAt DateTime @default(now())
 
   @@unique([lessonId, version])
+  @@index([lessonId])
 }
 
 model LessonMedia {
-  // Added in case I need to add media, though not sure if I want to use cloud storage or not for media
+  // Added in case I need to add media, if needed, will most likely implement with cloudinary
   id        String   @id @default(cuid())
   url       String
   type      String
@@ -157,10 +157,28 @@ model LessonMedia {
 }
 
 model Tag {
-  id       String @id @default(cuid())
-  name     String @unique
-  lessonId String
-  lesson   Lesson @relation(fields: [lessonId], references: [id])
+  id      String    @id @default(cuid())
+  name    String    @unique
+  Tagging Tagging[]
+}
+
+model Tagging {
+  id           String      @id @default(cuid())
+  tagId        String
+  tag          Tag         @relation(fields: [tagId], references: [id])
+  lessonId     String?
+  lesson       Lesson?     @relation(fields: [lessonId], references: [id])
+  quizId       String?
+  quiz         Quiz?       @relation(fields: [quizId], references: [id])
+  vocabularyId String?
+  vocabulary   Vocabulary? @relation(fields: [vocabularyId], references: [id])
+  createdAt    DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@index([tagId])
+  @@index([lessonId])
+  @@index([quizId])
+  @@index([vocabularyId])
 }
 
 model Quiz {
@@ -169,6 +187,7 @@ model Quiz {
   lesson       Lesson         @relation(fields: [lessonId], references: [id])
   createdAt    DateTime       @default(now()) @db.Timestamptz(6)
   QuizQuestion QuizQuestion[]
+  tagging      Tagging[]
 }
 
 model QuizQuestion {
@@ -191,6 +210,7 @@ model Vocabulary {
   SavedVocabulary SavedVocabulary[]
   createdAt       DateTime          @default(now()) @db.Timestamptz(6)
   updatedAt       DateTime          @default(now()) @updatedAt @db.Timestamptz(6)
+  tagging         Tagging[]
 }
 
 // Contact Models
