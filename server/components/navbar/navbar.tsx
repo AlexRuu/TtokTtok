@@ -10,10 +10,16 @@ import MobileNav from "./mobile";
 import Loader from "../loader";
 import { Button } from "../ui/button";
 import { signOut } from "next-auth/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const pathName = usePathname();
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -56,6 +62,15 @@ export default function Navbar() {
         name: "Home",
         path: "/",
       },
+      {
+        name: "Users",
+        path: "/users",
+      },
+    ],
+    []
+  );
+  const dropdownLinks = useMemo(
+    () => [
       { name: "Units", path: "/units" },
       {
         name: "Lessons",
@@ -65,10 +80,8 @@ export default function Navbar() {
         name: "Quizzes",
         path: "/quizzes",
       },
-      {
-        name: "Users",
-        path: "/users",
-      },
+      { name: "Tags", path: "/tags" },
+      { name: "Vocabulary", path: "/vocabulary" },
     ],
     []
   );
@@ -138,8 +151,8 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-6 text-sm font-light text-[#6B4C3B]">
             {links.map((link) => (
               <Link
-                href={link.path}
                 key={link.name}
+                href={link.path}
                 aria-current={pathName === link.path ? "page" : undefined}
                 className={cn(
                   "focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded px-2 py-1 hover:text-[#A65A3A] transition-colors border-b-2 border-transparent focus-visible:text-[#A65A3A]",
@@ -151,6 +164,42 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
+            <DropdownMenu
+              open={dropdownOpen}
+              onOpenChange={(isOpen) => setDropdownOpen(isOpen)}
+              modal={false}
+            >
+              <DropdownMenuTrigger>
+                <div
+                  onMouseEnter={() => setDropdownOpen(true)}
+                  className="hover:cursor-pointer"
+                >
+                  Teaching
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                onMouseLeave={() => setDropdownOpen(false)}
+                onCloseAutoFocus={(e) => {
+                  e.preventDefault();
+                }}
+                className="min-w-28 overflow-visible relative flex flex-col px-3 pb-3 pt-1 top-3 bg-[#FBEDE7]/80 backdrop-blur-md border border-[#e8dcd5] shadow-sm rounded-xl"
+              >
+                <div className="absolute top-[-6px] right-3/7 w-3 h-3 bg-[#e7dad5d8] rotate-45 border border-[#e8dcd5] z-60" />
+                {dropdownLinks.map((link) => (
+                  <Link
+                    href={link.path}
+                    key={link.name}
+                    aria-current={pathName === link.path ? "page" : undefined}
+                    className={cn(
+                      "focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded px-2 py-1 hover:text-[#A65A3A] transition-colors border-b-2 border-transparent focus-visible:text-[#A65A3A]",
+                      pathName === link.path ? "text-[#A65A3A] font-bold" : ""
+                    )}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button
               variant="ghost"
               className="hover:cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded px-2 py-1 hover:text-[#A65A3A] transition-colors border-b-2 border-transparent focus-visible:text-[#A65A3A]"
