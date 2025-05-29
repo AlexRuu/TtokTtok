@@ -86,6 +86,10 @@ const unitsSchema = z.object({
   title: z.string().min(1, { message: "Unit title is requird" }),
 });
 
+const tagSchema = z.object({
+  name: z.string().min(1, { message: "Tag name is required" }),
+});
+
 export type ForgotPasswordFormSchema = z.infer<typeof forgotPasswordFormSchema>;
 export type SignUpFormSchema = z.infer<typeof signUpFormSchema>;
 export type ContactFormSchema = z.infer<typeof contactFormSchema>;
@@ -93,6 +97,7 @@ export type ResetPasswordFormSchema = z.infer<typeof resetPasswordSchema>;
 export type verifySchema = z.infer<typeof verifySchema>;
 export type EditUserValues = z.infer<typeof editUserSchema>;
 export type UnitsSchemaValues = z.infer<typeof unitsSchema>;
+export type tagSchemaValues = z.infer<typeof tagSchema>;
 
 export {
   forgotPasswordFormSchema,
@@ -103,4 +108,5 @@ export {
   verifySchema,
   editUserSchema,
   unitsSchema,
+  tagSchema,
 };
