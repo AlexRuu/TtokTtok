@@ -7,8 +7,8 @@ export default function NotFound() {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <main className="flex-1">
-        <div className="min-h-screen bg-[#FFF9F5] text-[#6B4C3B] mt-8 rounded-xl shadow-md pb-20 flex flex-col items-center justify-center px-4">
-          <div className="w-full max-w-xs sm:max-w-sm md:max-w-2xs mx-auto rounded-2xl overflow-hidden bg-[#FFF9F5] shadow-md">
+        <div className="min-h-screen bg-[#FFF9F5] text-[#6B4C3B] rounded-xl shadow-md pb-20 flex flex-col items-center justify-center px-4">
+          <div className="w-full max-w-xs mt-8 sm:max-w-sm md:max-w-2xs mx-auto rounded-2xl overflow-hidden bg-[#FFF9F5] shadow-md">
             <Image
               src="/not-found.png"
               alt="Lost tteok at the bus stop"
