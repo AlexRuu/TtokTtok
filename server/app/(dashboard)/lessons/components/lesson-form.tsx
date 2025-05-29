@@ -6,6 +6,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -78,13 +79,13 @@ const LessonForm: React.FC<UnitFormProps> = ({ units }) => {
     try {
       console.log(data);
 
-      //   await fetch("/api/units", {
-      //     method: "POST",
-      //     headers: { "Content-Type": "application/json" },
-      //     body: JSON.stringify(data),
-      //   });
-      //   stopLoading();
-      //   router.push("/units");
+      await fetch("/api/lessons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      stopLoading();
+      //   router.push("/lessons");
     } catch (error) {
       console.log(error);
       toast.error("There was an error creating lesson.", {
@@ -140,6 +141,7 @@ const LessonForm: React.FC<UnitFormProps> = ({ units }) => {
                       className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -355,6 +357,9 @@ const LessonForm: React.FC<UnitFormProps> = ({ units }) => {
                                 <SelectItem value="default">Default</SelectItem>
                                 <SelectItem value="tip">Tip</SelectItem>
                                 <SelectItem value="warning">Warning</SelectItem>
+                                <SelectItem value="highlight">
+                                  Highlight
+                                </SelectItem>
                               </SelectContent>
                             </Select>
                           </FormItem>
