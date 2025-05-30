@@ -1,9 +1,9 @@
-import CreateTagForm from "./components/create-tag-form";
+import TagForm from "../components/tag-form";
 
 const CreateUnitPage = () => {
   return (
     <div>
-      <CreateTagForm />
+      <TagForm initialData={null} />
     </div>
   );
 };

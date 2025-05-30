@@ -1,30 +1,18 @@
-import prismadb from "@/lib/prismadb";
-import React from "react";
-import EditUnitsForm from "./components/edit-units-form";
+import { findUniqueTag } from "@/prisma/prismaFetches";
+import TagForm from "../components/tag-form";
 
-type EditUnitsFormProp = {
-  params: {
-    unitId: string;
-  };
-};
+const EditTagPage = async ({ params }: { params: { tagId: string } }) => {
+  const tag = await findUniqueTag(params.tagId);
 
-const EditUnitsFormPage = async ({ params }: EditUnitsFormProp) => {
-  const { unitId } = await params;
-  const unit = await prismadb.unit.findUnique({
-    where: {
-      id: unitId,
-    },
-  });
-
-  if (!unit) {
-    return <div>Unit not found.</div>;
+  if (!tag) {
+    return <div>Tag not found.</div>;
   }
 
   return (
     <div>
-      <EditUnitsForm initialData={unit} />
+      <TagForm initialData={tag} />
     </div>
   );
 };
 
-export default EditUnitsFormPage;
+export default EditTagPage;
