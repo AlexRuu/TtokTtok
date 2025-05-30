@@ -1,18 +1,8 @@
-import prismadb from "@/lib/prismadb";
-import React from "react";
 import EditUserForm from "./components/edit-form";
+import { findUniqueUser } from "@/prisma/prismaFetches";
 
-type UserPageProps = {
-  params: {
-    userId: string;
-  };
-};
-
-const EditUserPage = async ({ params }: UserPageProps) => {
-  const { userId } = await params;
-  const user = await prismadb.user.findUnique({
-    where: { id: userId },
-  });
+const EditUserPage = async ({ params }: { params: { userId: string } }) => {
+  const user = await findUniqueUser(params.userId);
 
   if (!user) {
     return <div>User not found.</div>;

@@ -11,11 +11,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { findUsers } from "@/prisma/prismaFetches";
 
 const AdminUsersPage = async () => {
-  const users = await prismadb.user.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const users = await findUsers();
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
