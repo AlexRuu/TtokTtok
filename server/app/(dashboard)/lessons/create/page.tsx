@@ -6,14 +6,11 @@ const LessonsPage = async () => {
     orderBy: { unitNumber: "asc" },
   });
 
-  const refinedUnits = units.map((unit) => ({
-    unitNumber: unit.unitNumber,
-    title: unit.title,
-  }));
+  const tags = await prismadb.tag.findMany({});
 
   return (
     <div>
-      <LessonForm units={refinedUnits} />
+      <LessonForm units={units} tags={tags} initialData={null} />
     </div>
   );
 };

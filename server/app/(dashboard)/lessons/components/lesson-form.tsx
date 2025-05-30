@@ -23,19 +23,42 @@ import { cn } from "@/lib/utils";
 import { LessonFormSchema, LessonFormType } from "@/schemas/units-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useFieldArray, useForm, SubmitHandler } from "react-hook-form";
 import { TableBlockEditor } from "./table-block";
 import toast from "react-hot-toast";
+import { Lesson, Tag, Tagging, Unit } from "@/lib/generated/prisma";
+import { Badge } from "@/components/ui/badge";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { Command, CommandItem, CommandList } from "@/components/ui/command";
 
 const formSchema = LessonFormSchema;
 
 interface UnitFormProps {
-  units: { unitNumber: number; title: string }[];
+  initialData: (Lesson & { tagging: Tagging[] }) | null;
+  units: Unit[];
+  tags: Tag[];
 }
 
-const LessonForm: React.FC<UnitFormProps> = ({ units }) => {
+const LessonForm: React.FC<UnitFormProps> = ({ initialData, units, tags }) => {
   const { isLoading, startLoading, stopLoading } = useLoading();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [width, setWidth] = useState<number | undefined>();
+
+  useEffect(() => {
+    if (!triggerRef.current) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setWidth(entry.contentRect.width);
+    });
+    observer.observe(triggerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   const [selectedBlockType, setSelectedBlockType] = useState<
     "text" | "image" | "note" | "table" | ""
   >("text");
@@ -61,12 +84,9 @@ const LessonForm: React.FC<UnitFormProps> = ({ units }) => {
 
   const form = useForm<LessonFormType>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      lessonNumber: 1,
-      title: "",
-      unitTitle: "",
-      blocks: [],
-    },
+    defaultValues: initialData
+      ? { ...initialData }
+      : { lessonNumber: 1, title: "", unitTitle: "", tags: [], blocks: [] },
   });
 
   const blocksArray = useFieldArray({
@@ -199,6 +219,88 @@ const LessonForm: React.FC<UnitFormProps> = ({ units }) => {
                       ))}
                     </SelectContent>
                   </Select>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="relative">
+            <FormField
+              control={form.control}
+              name="tags"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Tags</FormLabel>
+                  <Popover>
+                    <PopoverTrigger
+                      asChild
+                      ref={triggerRef}
+                      className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    >
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className={cn(
+                          "w-full justify-between px-4 py-5 text-left font-normal",
+                          !field.value?.length && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value?.length
+                          ? tags
+                              .filter((tag) => field.value.includes(tag.id))
+                              .map((tag) => tag.name)
+                              .join(", ")
+                          : "Select tags"}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="min-w-full p-2"
+                      style={{
+                        width: width ? `${width + 32}px` : "auto",
+                      }}
+                      align="start"
+                    >
+                      <Command className="w-full box-border">
+                        <CommandList>
+                          {tags.map((tag) => (
+                            <CommandItem
+                              key={tag.id}
+                              onSelect={() => {
+                                const selected = field.value || [];
+                                if (selected.includes(tag.id)) {
+                                  field.onChange(
+                                    selected.filter((id) => id !== tag.id)
+                                  );
+                                } else {
+                                  field.onChange([...selected, tag.id]);
+                                }
+                              }}
+                            >
+                              <div className="flex items-center justify-between w-full">
+                                <span>{tag.name}</span>
+                                {field.value?.includes(tag.id) && (
+                                  <Check className="h-4 w-4 text-primary" />
+                                )}
+                              </div>
+                            </CommandItem>
+                          ))}
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+
+                  {/* Optional: show badges of selected tags below */}
+                  {field.value?.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {tags
+                        .filter((tag) => field.value.includes(tag.id))
+                        .map((tag) => (
+                          <Badge key={tag.id} variant="secondary">
+                            {tag.name}
+                          </Badge>
+                        ))}
+                    </div>
+                  )}
                 </FormItem>
               )}
             />
