@@ -29,9 +29,11 @@ model User {
   VerificationToken   VerificationToken[]
   createdAt           DateTime              @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
-  ForgotPasswordToken ForgotPasswordToken[]
-  SavedVocabulary     SavedVocabulary[]
-  UserChapterReview   UserChapterReview[]
+  forgotPasswordToken ForgotPasswordToken[]
+  savedVocabulary     SavedVocabulary[]
+  userChapterReview   UserChapterReview[]
+  userLessonProgress  UserLessonProgress[]
+  userQuizAttempt     UserQuizAttempt[]
 }
 
 model Account {
@@ -106,6 +108,29 @@ model UserChapterReview {
   @@index([userId, lessonId])
 }
 
+model UserLessonProgress {
+  id          String    @id @default(cuid())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  lesson      Lesson    @relation(fields: [lessonId], references: [id])
+  lessonId    String
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  @@unique([userId, lessonId])
+}
+
+model UserQuizAttempt {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id])
+  quizId      String
+  score       Int
+  passed      Boolean
+  attemptedAt DateTime @default(now())
+}
+
 // Lessons and Content Models
 model Unit {
   id                String              @id @default(cuid())
@@ -118,19 +143,20 @@ model Unit {
 }
 
 model Lesson {
-  id                String              @id @default(cuid())
-  title             String
-  lessonNumber      Int
-  content           Json
-  unitId            String
-  unit              Unit                @relation(fields: [unitId], references: [id])
-  userChapterReview UserChapterReview[]
-  Quiz              Quiz[]
-  Vocabulary        Vocabulary[]
-  createdAt         DateTime            @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
-  lessonVersion     LessonVersion[]
-  tagging           Tagging[]
+  id                 String               @id @default(cuid())
+  title              String
+  lessonNumber       Int
+  content            Json
+  unitId             String
+  unit               Unit                 @relation(fields: [unitId], references: [id])
+  userChapterReview  UserChapterReview[]
+  Quiz               Quiz[]
+  Vocabulary         Vocabulary[]
+  createdAt          DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime             @default(now()) @updatedAt @db.Timestamptz(6)
+  lessonVersion      LessonVersion[]
+  tagging            Tagging[]
+  UserLessonProgress UserLessonProgress[]
 
   @@index([unitId, lessonNumber])
 }
@@ -182,12 +208,13 @@ model Tagging {
 }
 
 model Quiz {
-  id           String         @id @default(cuid())
-  lessonId     String
-  lesson       Lesson         @relation(fields: [lessonId], references: [id])
-  createdAt    DateTime       @default(now()) @db.Timestamptz(6)
-  QuizQuestion QuizQuestion[]
-  tagging      Tagging[]
+  id              String            @id @default(cuid())
+  lessonId        String
+  lesson          Lesson            @relation(fields: [lessonId], references: [id])
+  createdAt       DateTime          @default(now()) @db.Timestamptz(6)
+  QuizQuestion    QuizQuestion[]
+  tagging         Tagging[]
+  UserQuizAttempt UserQuizAttempt[]
 }
 
 model QuizQuestion {
