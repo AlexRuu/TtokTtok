@@ -7,14 +7,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import prismadb from "@/lib/prismadb";
+
+import { findAscUnits } from "@/prisma/prismaFetches";
 import Link from "next/link";
 import React from "react";
 
 const UnitsPage = async () => {
-  const units = await prismadb.unit.findMany({
-    orderBy: { unitNumber: "asc" },
-  });
+  const units = await findAscUnits();
 
   if (!units) {
     return <div>No Units Found</div>;

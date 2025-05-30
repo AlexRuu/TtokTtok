@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import useLoading from "@/hooks/use-loading";
+import { Unit } from "@/lib/generated/prisma";
 import { cn } from "@/lib/utils";
 import { unitsSchema, UnitsSchemaValues } from "@/schemas/form-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,22 +22,28 @@ import toast from "react-hot-toast";
 
 const formSchema = unitsSchema;
 
-const CreateUnitsForm = () => {
+interface EditUnitsFormProps {
+  initialData: Unit | null;
+}
+
+const UnitsForm: React.FC<EditUnitsFormProps> = ({ initialData }) => {
   const { isLoading, startLoading, stopLoading } = useLoading();
   const router = useRouter();
 
   const form = useForm<UnitsSchemaValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-    },
+    defaultValues: initialData
+      ? { ...initialData }
+      : {
+          title: "",
+        },
   });
 
   const onSubmit: SubmitHandler<UnitsSchemaValues> = async (data) => {
     startLoading();
     try {
-      await fetch("/api/units", {
-        method: "POST",
+      await fetch(`/api/unit/${initialData?.id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
@@ -44,7 +51,7 @@ const CreateUnitsForm = () => {
       router.push("/units");
     } catch (error) {
       console.log(error);
-      toast.error("There was an error creating unit.", {
+      toast.error("There was an error updating unit.", {
         style: {
           background: "#ffeef0",
           color: "#943c5e",
@@ -63,15 +70,15 @@ const CreateUnitsForm = () => {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#fdfaf6] -mt-10 overflow-auto flex-col">
       {isLoading && <Loader />}
+      <h1 className="text-xl md:text-2xl font-semibold py-2 sm:py-3 md:py-4">
+        {initialData !== null ? "Edit Unit" : "Create Unit"}
+      </h1>
       <Form {...form}>
         <form
           noValidate
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-full max-w-md bg-white border border-pink-100 shadow-xs rounded-2xl p-8 pt-10 space-y-6"
         >
-          <h1 className="text-center text-xl md:text-2xl font-semibold py-2 sm:py-3 md:py-4">
-            Create Unit
-          </h1>
           <div className="flex sm:flex-row sm:space-x-6 space-y-6 sm:space-y-0">
             <div className="relative w-full">
               <FormField
@@ -112,7 +119,6 @@ const CreateUnitsForm = () => {
             <Button
               className="w-full font-semibold bg-pink-200 hover:bg-pink-300 text-pink-900 flex items-center justify-center gap-2 hover:cursor-pointer py-4 sm:py-5 text-base sm:text-md rounded-xl transition-colors shadow-xs hover:scale-[1.01] hover:shadow-md duration-200 ease-in-out focus:ring-2 focus:ring-pink-300 active:scale-[0.99] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-pink-400"
               aria-label="Cancel"
-              type="button"
               onClick={() => router.push("/units")}
               disabled={form.formState.isSubmitting}
               aria-live="assertive"
@@ -136,4 +142,4 @@ const CreateUnitsForm = () => {
   );
 };
 
-export default CreateUnitsForm;
+export default UnitsForm;

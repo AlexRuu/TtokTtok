@@ -1,10 +1,11 @@
 import React from "react";
-import CreateUnitsForm from "./components/create-units-form";
+
+import UnitsForm from "../components/units-form";
 
 const CreateUnitPage = () => {
   return (
     <div>
-      <CreateUnitsForm />
+      <UnitsForm initialData={null} />
     </div>
   );
 };

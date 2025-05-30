@@ -1,6 +1,6 @@
 import prismadb from "@/lib/prismadb";
 import React from "react";
-import EditUnitsForm from "./components/edit-units-form";
+import UnitsForm from "../components/units-form";
 
 type EditUnitsFormProp = {
   params: {
@@ -22,7 +22,7 @@ const EditUnitsFormPage = async ({ params }: EditUnitsFormProp) => {
 
   return (
     <div>
-      <EditUnitsForm initialData={unit} />
+      <UnitsForm initialData={unit} />
     </div>
   );
 };
