@@ -1,23 +1,15 @@
-import prismadb from "@/lib/prismadb";
-import React from "react";
 import UnitsForm from "../components/units-form";
+import { findUniqueUnit } from "@/prisma/prismaFetches";
 
-type EditUnitsFormProp = {
-  params: {
-    unitId: string;
-  };
-};
-
-const EditUnitsFormPage = async ({ params }: EditUnitsFormProp) => {
-  const { unitId } = await params;
-  const unit = await prismadb.unit.findUnique({
-    where: {
-      id: unitId,
-    },
-  });
+const EditUnitsFormPage = async ({
+  params,
+}: {
+  params: { unitId: string };
+}) => {
+  const unit = await findUniqueUnit(params.unitId);
 
   if (!unit) {
-    return <div>User not found.</div>;
+    return <div>Unit not found.</div>;
   }
 
   return (
