@@ -90,6 +90,13 @@ const tagSchema = z.object({
   name: z.string().min(1, { message: "Tag name is required" }),
 });
 
+const vocabularySchema = z.object({
+  english: z.string().min(1, { message: "English word is required" }),
+  korean: z.string().min(1, { message: "Korean word is required" }),
+  definition: z.string().min(1, { message: "Definition is required" }),
+  lessonId: z.string().min(1, { message: "Lesson Id is required" }),
+});
+
 export type ForgotPasswordFormSchema = z.infer<typeof forgotPasswordFormSchema>;
 export type SignUpFormSchema = z.infer<typeof signUpFormSchema>;
 export type ContactFormSchema = z.infer<typeof contactFormSchema>;
@@ -98,6 +105,7 @@ export type verifySchema = z.infer<typeof verifySchema>;
 export type EditUserValues = z.infer<typeof editUserSchema>;
 export type UnitsSchemaValues = z.infer<typeof unitsSchema>;
 export type tagSchemaValues = z.infer<typeof tagSchema>;
+export type vocabularySchemaValues = z.infer<typeof vocabularySchema>;
 
 export {
   forgotPasswordFormSchema,
@@ -109,4 +117,5 @@ export {
   editUserSchema,
   unitsSchema,
   tagSchema,
+  vocabularySchema,
 };

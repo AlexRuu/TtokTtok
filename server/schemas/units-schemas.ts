@@ -33,7 +33,7 @@ const BlockSchema = z.discriminatedUnion("type", [
 export const LessonFormSchema = z.object({
   lessonNumber: z.coerce.number().min(1, "Lesson number is required"),
   title: z.string().min(1, "Title is required"),
-  unitTitle: z.string().min(1, "Select a unit"),
+  unitId: z.string().min(1, "Select a unit"),
   tags: z.array(z.string().min(1, "Need at least one tag")),
   blocks: z.array(BlockSchema).min(1, "Add at least one content block"),
 });
