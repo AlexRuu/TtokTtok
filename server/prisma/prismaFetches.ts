@@ -18,12 +18,41 @@ const findTags = async () => {
   return await prismadb.tag.findMany({});
 };
 
+const findLessons = async () => {
+  return prismadb.lesson.findMany({
+    include: { unit: true, Vocabulary: true },
+    orderBy: [
+      {
+        unit: {
+          unitNumber: "asc",
+        },
+      },
+      {
+        lessonNumber: "asc",
+      },
+    ],
+  });
+};
+
+const findUniqueUnit = async (unitId: string) => {
+  return await prismadb.unit.findFirst({
+    where: { id: unitId },
+  });
+};
+
 // Tags
 const findUniqueTag = async (tagId: string) => {
   return await prismadb.tag.findUnique({
     where: {
       id: tagId,
     },
+  });
+};
+
+// Vocabulary
+const findUniqueVocabulary = async (vocabularyId: string) => {
+  return await prismadb.vocabulary.findUnique({
+    where: { id: vocabularyId },
   });
 };
 
@@ -40,6 +69,29 @@ const findUsers = async () => {
   });
 };
 
+// Admin Dashboard
+const stats = async () => {
+  return await prismadb.userLessonProgress.groupBy({
+    by: ["lessonId"],
+    _count: {
+      _all: true,
+    },
+  });
+};
+const completedCounts = async () => {
+  return await prismadb.userLessonProgress.groupBy({
+    by: ["lessonId"],
+    where: {
+      completedAt: {
+        not: null,
+      },
+    },
+    _count: {
+      _all: true,
+    },
+  });
+};
+
 export {
   findLessonUnique,
   findAscUnits,
@@ -47,4 +99,9 @@ export {
   findUniqueTag,
   findUniqueUser,
   findUsers,
+  stats,
+  completedCounts,
+  findLessons,
+  findUniqueVocabulary,
+  findUniqueUnit,
 };
