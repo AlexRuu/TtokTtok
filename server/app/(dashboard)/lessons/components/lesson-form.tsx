@@ -86,7 +86,7 @@ const LessonForm: React.FC<UnitFormProps> = ({ initialData, units, tags }) => {
     resolver: zodResolver(formSchema),
     defaultValues: initialData
       ? { ...initialData }
-      : { lessonNumber: 1, title: "", unitTitle: "", tags: [], blocks: [] },
+      : { lessonNumber: 1, title: "", unitId: "", tags: [], blocks: [] },
   });
 
   const blocksArray = useFieldArray({
@@ -97,15 +97,30 @@ const LessonForm: React.FC<UnitFormProps> = ({ initialData, units, tags }) => {
   const onSubmit: SubmitHandler<LessonFormType> = async (data) => {
     startLoading();
     try {
-      console.log(data);
-
-      await fetch("/api/lessons", {
+      const res = await fetch("/api/lessons", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+
+      if (!res.ok) {
+        toast.error("There was an error creating lesson.", {
+          style: {
+            background: "#ffeef0",
+            color: "#943c5e",
+            borderRadius: "10px",
+            padding: "12px 18px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.08)",
+            fontSize: "16px",
+          },
+          className:
+            "transition-all transform duration-300 ease-in-out font-medium",
+        });
+        stopLoading();
+        return;
+      }
       stopLoading();
-      //   router.push("/lessons");
+      router.push("/lessons");
     } catch (error) {
       console.log(error);
       toast.error("There was an error creating lesson.", {
@@ -197,7 +212,7 @@ const LessonForm: React.FC<UnitFormProps> = ({ initialData, units, tags }) => {
           <div className="relative w-full">
             <FormField
               control={form.control}
-              name="unitTitle"
+              name="unitId"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Unit</FormLabel>
@@ -213,7 +228,7 @@ const LessonForm: React.FC<UnitFormProps> = ({ initialData, units, tags }) => {
                     </FormControl>
                     <SelectContent>
                       {units.map((unit) => (
-                        <SelectItem key={unit.unitNumber} value={unit.title}>
+                        <SelectItem key={unit.unitNumber} value={unit.id}>
                           {unit.unitNumber}. {unit.title}
                         </SelectItem>
                       ))}
