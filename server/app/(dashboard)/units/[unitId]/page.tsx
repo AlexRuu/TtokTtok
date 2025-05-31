@@ -1,15 +1,15 @@
+import { notFound } from "next/navigation";
 import UnitsForm from "../components/units-form";
 import { findUniqueUnit } from "@/prisma/prismaFetches";
 
-const EditUnitsFormPage = async ({
-  params,
-}: {
-  params: { unitId: string };
+const EditUnitsFormPage = async (props: {
+  params: Promise<{ unitId: string }>;
 }) => {
+  const params = await props.params;
   const unit = await findUniqueUnit(params.unitId);
 
   if (!unit) {
-    return <div>Unit not found.</div>;
+    notFound();
   }
 
   return (

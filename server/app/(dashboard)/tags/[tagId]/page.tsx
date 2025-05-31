@@ -1,11 +1,13 @@
 import { findUniqueTag } from "@/prisma/prismaFetches";
 import TagForm from "../components/tag-form";
+import { notFound } from "next/navigation";
 
-const EditTagPage = async ({ params }: { params: { tagId: string } }) => {
+const EditTagPage = async (props: { params: Promise<{ tagId: string }> }) => {
+  const params = await props.params;
   const tag = await findUniqueTag(params.tagId);
 
   if (!tag) {
-    return <div>Tag not found.</div>;
+    notFound();
   }
 
   return (
