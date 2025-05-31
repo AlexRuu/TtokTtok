@@ -7,15 +7,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import prismadb from "@/lib/prismadb";
+import { findLessons } from "@/prisma/prismaFetches";
 import { format } from "date-fns";
 import Link from "next/link";
 
 const LessonsPage = async () => {
-  const lessons = await prismadb.lesson.findMany({
-    include: { unit: true },
-    orderBy: { createdAt: "asc" },
-  });
+  const lessons = await findLessons();
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
