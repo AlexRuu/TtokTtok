@@ -11,6 +11,7 @@ const findLessonUnique = async (lessonId: string) => {
 const findAscUnits = async () => {
   return await prismadb.unit.findMany({
     orderBy: { unitNumber: "asc" },
+    include: { lesson: true },
   });
 };
 
