@@ -1,4 +1,10 @@
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -7,12 +13,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { findLessons } from "@/prisma/prismaFetches";
+import { findAscUnits } from "@/prisma/prismaFetches";
 import { format } from "date-fns";
+import { Edit, SquarePen, Trash } from "lucide-react";
 import Link from "next/link";
 
 const LessonsPage = async () => {
-  const lessons = await findLessons();
+  const units = await findAscUnits();
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
@@ -21,43 +28,67 @@ const LessonsPage = async () => {
           <Link href={"/lessons/create"}>Create</Link>
         </Button>
       </div>
-      <Table className="min-w-full text-sm text-left">
-        <TableHeader className="bg-muted text-muted-foreground">
-          <TableRow>
-            <TableHead className="px-4 py-2">Unit Number</TableHead>
-            <TableHead className="px-4 py-2">Lesson Number</TableHead>
-            <TableHead className="px-4 py-2">Lesson Title</TableHead>
-            <TableHead className="px-4 py-2">Last Edited</TableHead>
-            <TableHead className="px-4 py-2">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody className="bg-background divide-y">
-          {lessons.map((lesson) => (
-            <TableRow key={lesson.id}>
-              <TableCell className="px-4 py-2">
-                {lesson.unit.unitNumber}. {lesson.unit.title}
-              </TableCell>
-              <TableCell className="px-4 py-2">{lesson.lessonNumber}</TableCell>
-              <TableCell className="px-4 py-2">{lesson.title}</TableCell>
-              <TableCell className="px-4 py-2">
-                {format(lesson.updatedAt, "PPPP")}
-              </TableCell>
-              <TableCell className="px-4 py-2">
-                <Button size="sm" variant="outline">
-                  <Link href={`/lessons/${lesson.id}`}>Edit</Link>
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  className="hover:cursor-pointer"
-                >
-                  Delete
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <div className="flex space-x-4">
+        {units.map((unit) => (
+          <Card key={unit.id} className="w-1/2 shadow-md">
+            <CardHeader>
+              <CardTitle>
+                {unit.unitNumber}. {unit.title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table className="min-w-full text-sm text-left">
+                <TableHeader className="bg-muted text-muted-foreground">
+                  <TableRow>
+                    <TableHead className="px-4 py-2">Lesson </TableHead>
+                    <TableHead className="px-4 py-2">Last Edited</TableHead>
+                    <TableHead className="px-4 py-2">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="bg-background divide-y">
+                  {unit.lesson.map((lesson) => (
+                    <TableRow key={lesson.id}>
+                      <TableCell className="px-4 py-2">
+                        <Link
+                          href={`/lessons/${lesson.id}`}
+                          className="text-blue-500"
+                        >
+                          {lesson.lessonNumber}. {lesson.title}
+                        </Link>
+                      </TableCell>
+                      <TableCell className="px-4 py-2">
+                        {format(lesson.updatedAt, "PPp")}
+                      </TableCell>
+                      <TableCell className="px-4 py-2">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="hover:cursor-pointer w-full flex justify-center ">
+                            <SquarePen />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="flex flex-col p-3 space-y-2 w-10">
+                            <Button size="sm" variant="outline" asChild>
+                              <Link href={`/lessons/${lesson.id}/edit`}>
+                                <Edit /> Edit
+                              </Link>
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="hover:cursor-pointer"
+                            >
+                              <Trash />
+                              Delete
+                            </Button>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };
