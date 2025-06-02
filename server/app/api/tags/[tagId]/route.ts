@@ -1,0 +1,48 @@
+import { authOptions } from "@/lib/auth";
+import prismadb from "@/lib/prismadb";
+import { tagSchema } from "@/schemas/form-schemas";
+import { getServerSession } from "next-auth";
+import { NextResponse } from "next/server";
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: { tagId: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || session.user.role !== "ADMIN") {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const body = await req.json();
+    const tagId = params.tagId;
+    const parsed = tagSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return new NextResponse("Invalid tag data", { status: 400 });
+    }
+
+    const { name } = parsed.data;
+
+    const existingTag = await prismadb.tag.findUnique({
+      where: { id: tagId },
+    });
+
+    if (!existingTag) {
+      return new NextResponse("Tag does not exist", { status: 404 });
+    }
+
+    await prismadb.tag.update({
+      where: { id: tagId },
+      data: {
+        name: name,
+      },
+    });
+
+    return new NextResponse("Successfully updated tag", { status: 200 });
+  } catch (error) {
+    console.error("There was an error updating tag", error);
+    return new NextResponse("There was an error updating tag", { status: 500 });
+  }
+}
