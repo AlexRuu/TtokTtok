@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { vocabularyAction } from "@/formActions/form-actions";
 import useLoading from "@/hooks/use-loading";
 import { Lesson, Unit, Vocabulary } from "@/lib/generated/prisma";
 import { cn } from "@/lib/utils";
@@ -57,27 +58,8 @@ const VocabularyForm: React.FC<VocabularyFormProps> = ({
   const onSubmit: SubmitHandler<vocabularySchemaValues> = async (data) => {
     startLoading();
     try {
-      const res = await fetch("/api/vocabulary", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        stopLoading();
-        toast.error("There was an error creating vocabulary.", {
-          style: {
-            background: "#ffeef0",
-            color: "#943c5e",
-            borderRadius: "10px",
-            padding: "12px 18px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.08)",
-            fontSize: "16px",
-          },
-          className:
-            "transition-all transform duration-300 ease-in-out font-medium",
-        });
-        return;
-      }
+      const action = initialData ? "PATCH" : "POST";
+      vocabularyAction(data, action, stopLoading, initialData?.id);
       stopLoading();
       router.push("/vocabulary");
     } catch (error) {

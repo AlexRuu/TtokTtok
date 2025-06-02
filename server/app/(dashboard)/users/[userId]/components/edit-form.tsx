@@ -64,11 +64,27 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
   const onSubmit: SubmitHandler<EditUserValues> = async (data) => {
     startLoading();
     try {
-      await fetch(`/api/user/${initialData?.id}`, {
+      const res = await fetch(`/api/user/${initialData?.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+      if (!res.ok) {
+        toast.error("There was an error editing user.", {
+          style: {
+            background: "#ffeef0",
+            color: "#943c5e",
+            borderRadius: "10px",
+            padding: "12px 18px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.08)",
+            fontSize: "16px",
+          },
+          className:
+            "transition-all transform duration-300 ease-in-out font-medium",
+        });
+        stopLoading();
+        return;
+      }
       stopLoading();
       router.push("/users");
     } catch (error) {

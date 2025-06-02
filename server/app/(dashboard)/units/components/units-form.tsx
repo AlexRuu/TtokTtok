@@ -10,6 +10,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { unitAction } from "@/formActions/form-actions";
 import useLoading from "@/hooks/use-loading";
 import { Unit } from "@/lib/generated/prisma";
 import { cn } from "@/lib/utils";
@@ -42,11 +43,8 @@ const UnitsForm: React.FC<EditUnitsFormProps> = ({ initialData }) => {
   const onSubmit: SubmitHandler<UnitsSchemaValues> = async (data) => {
     startLoading();
     try {
-      await fetch(`/api/unit/${initialData?.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const action = initialData ? "PATCH" : "POST";
+      unitAction(data, action, stopLoading, initialData?.id);
       stopLoading();
       router.push("/units");
     } catch (error) {

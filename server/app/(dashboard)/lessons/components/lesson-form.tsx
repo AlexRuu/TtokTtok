@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Command, CommandItem, CommandList } from "@/components/ui/command";
+import { lessonAction } from "@/formActions/form-actions";
 
 const formSchema = LessonFormSchema;
 
@@ -85,7 +86,11 @@ const LessonForm: React.FC<UnitFormProps> = ({ initialData, units, tags }) => {
   const form = useForm<LessonFormType>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData
-      ? { ...initialData }
+      ? {
+          ...initialData,
+          tags: initialData.tagging.map((a) => a.tagId),
+          blocks: JSON.parse(JSON.stringify(initialData.content)),
+        }
       : { lessonNumber: 1, title: "", unitId: "", tags: [], blocks: [] },
   });
 
@@ -97,28 +102,8 @@ const LessonForm: React.FC<UnitFormProps> = ({ initialData, units, tags }) => {
   const onSubmit: SubmitHandler<LessonFormType> = async (data) => {
     startLoading();
     try {
-      const res = await fetch("/api/lessons", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!res.ok) {
-        toast.error("There was an error creating lesson.", {
-          style: {
-            background: "#ffeef0",
-            color: "#943c5e",
-            borderRadius: "10px",
-            padding: "12px 18px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.08)",
-            fontSize: "16px",
-          },
-          className:
-            "transition-all transform duration-300 ease-in-out font-medium",
-        });
-        stopLoading();
-        return;
-      }
+      const action = initialData ? "PATCH" : "POST";
+      lessonAction(data, action, stopLoading, initialData?.id);
       stopLoading();
       router.push("/lessons");
     } catch (error) {
@@ -148,7 +133,7 @@ const LessonForm: React.FC<UnitFormProps> = ({ initialData, units, tags }) => {
           className="w-full max-w-lg bg-white border border-pink-100 shadow-xs rounded-2xl p-8 pt-10 space-y-6"
         >
           <h1 className="text-xl text-center md:text-2xl font-semibold py-2 sm:py-3 md:py-4">
-            Create Lesson
+            {initialData ? "Edit Lessons" : "Create Lesson"}
           </h1>
           <div className="relative flex space-x-3">
             <FormField

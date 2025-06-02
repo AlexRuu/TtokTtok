@@ -10,6 +10,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { tagActions } from "@/formActions/form-actions";
 import useLoading from "@/hooks/use-loading";
 import { Tag } from "@/lib/generated/prisma";
 import { cn } from "@/lib/utils";
@@ -42,11 +43,8 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
   const onSubmit: SubmitHandler<tagSchemaValues> = async (data) => {
     startLoading();
     try {
-      await fetch(`/api/tag/${initialData?.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const action = initialData ? "PATCH" : "POST";
+      tagActions(data, action, stopLoading, initialData?.id);
       stopLoading();
       router.push("/tags");
     } catch (error) {
