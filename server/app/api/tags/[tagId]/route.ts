@@ -4,10 +4,8 @@ import { tagSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: { tagId: string } }
-) {
+export async function PATCH(req: Request, props: { params: Promise<{ tagId: string }> }) {
+  const params = await props.params;
   try {
     const session = await getServerSession(authOptions);
 
