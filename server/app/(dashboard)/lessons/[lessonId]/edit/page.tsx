@@ -1,5 +1,5 @@
 import React from "react";
-import LessonForm from "../components/lesson-form";
+import LessonForm from "../../components/lesson-form";
 import {
   findAscUnits,
   findLessonUnique,
