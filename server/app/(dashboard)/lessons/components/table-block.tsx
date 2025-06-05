@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { FormControl, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useFormContext, useFieldArray } from "react-hook-form";
@@ -15,9 +16,11 @@ export const TableBlockEditor = ({ name, index }: TableBlockEditorProps) => {
 
   const headersPath = `${name}.headers` as const;
   const rowsPath = `${name}.rows` as const;
+  const notePath = `${name}.note` as const;
 
   const headers = form.watch(headersPath) || [];
   const rows = form.watch(rowsPath) || [];
+  const note = form.watch(notePath) ?? false;
 
   return (
     <div className="space-y-6 border rounded-xl p-4 bg-muted/50">
@@ -119,6 +122,23 @@ export const TableBlockEditor = ({ name, index }: TableBlockEditorProps) => {
             </Button>
           </div>
         </FormControl>
+      </FormItem>
+
+      <FormItem>
+        <div className="flex items-center justify-center space-x-2">
+          <FormControl>
+            <Checkbox
+              checked={note}
+              onCheckedChange={(value) =>
+                form.setValue(notePath, value === true)
+              }
+              id={`${name}-note`}
+            />
+          </FormControl>
+          <FormLabel htmlFor={`${name}-note`} className="cursor-pointer">
+            Add Note?
+          </FormLabel>
+        </div>
       </FormItem>
     </div>
   );
