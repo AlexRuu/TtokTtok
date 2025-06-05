@@ -1,5 +1,3 @@
-"use client";
-
 import {
   tagSchemaValues,
   UnitsSchemaValues,
@@ -82,6 +80,7 @@ const unitAction = async (
     return;
   }
 };
+
 const vocabularyAction = async (
   data: vocabularySchemaValues,
   action: string,
