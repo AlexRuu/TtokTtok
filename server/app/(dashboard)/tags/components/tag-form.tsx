@@ -37,6 +37,9 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
       ? { ...initialData }
       : {
           name: "",
+          backgroundColour: "",
+          textColour: "",
+          borderColour: "",
         },
   });
 
@@ -86,7 +89,7 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel
-                      htmlFor="Name"
+                      htmlFor="name"
                       className={cn(
                         form.formState.errors.name && form.formState.isSubmitted
                           ? "text-red-400! before:text-red-400"
@@ -108,6 +111,96 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
                 )}
               />
             </div>
+          </div>
+          <div>
+            <FormField
+              control={form.control}
+              name="backgroundColour"
+              disabled={isLoading}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel
+                    htmlFor="backgroundColour"
+                    className={cn(
+                      form.formState.errors.name && form.formState.isSubmitted
+                        ? "text-red-400! before:text-red-400"
+                        : ""
+                    )}
+                  >
+                    Background Colour
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="backgroundColour"
+                      {...field}
+                      type="text"
+                      onInvalid={(e) => e.preventDefault()}
+                      className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div>
+            <FormField
+              control={form.control}
+              name="textColour"
+              disabled={isLoading}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel
+                    htmlFor="textColour"
+                    className={cn(
+                      form.formState.errors.name && form.formState.isSubmitted
+                        ? "text-red-400! before:text-red-400"
+                        : ""
+                    )}
+                  >
+                    Text Colour
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="textColour"
+                      {...field}
+                      type="text"
+                      onInvalid={(e) => e.preventDefault()}
+                      className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div>
+            <FormField
+              control={form.control}
+              name="borderColour"
+              disabled={isLoading}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel
+                    htmlFor="borderColour"
+                    className={cn(
+                      form.formState.errors.name && form.formState.isSubmitted
+                        ? "text-red-400! before:text-red-400"
+                        : ""
+                    )}
+                  >
+                    Border Colour
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      id="borderColour"
+                      {...field}
+                      type="text"
+                      onInvalid={(e) => e.preventDefault()}
+                      className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
           </div>
           <div className="flex space-x-1">
             <Button
