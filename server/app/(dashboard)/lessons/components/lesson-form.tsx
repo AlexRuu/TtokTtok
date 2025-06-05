@@ -78,7 +78,12 @@ const LessonForm: React.FC<UnitFormProps> = ({ initialData, units, tags }) => {
         blocksArray.append({ type: "note", content: "", style: "default" });
         break;
       case "table":
-        blocksArray.append({ type: "table", headers: [], rows: [] });
+        blocksArray.append({
+          type: "table",
+          headers: [],
+          rows: [],
+          note: false,
+        });
         break;
     }
   };
