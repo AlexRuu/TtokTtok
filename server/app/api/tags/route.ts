@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import prismadb from "@/lib/prismadb";
+import { tagSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -16,15 +17,20 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    console.log(body);
-    const { name } = body;
-    if (!name) {
-      return new NextResponse("Name is required", { status: 400 });
+    const parsed = tagSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return new NextResponse("Invalid tag data", { status: 400 });
     }
+
+    const { name, backgroundColour, textColour, borderColour } = parsed.data;
 
     await prismadb.tag.create({
       data: {
         name: capitalizeFirstLetter(name),
+        backgroundColour: backgroundColour,
+        textColour: textColour,
+        borderColour: borderColour,
       },
     });
 
