@@ -4,7 +4,15 @@ import prismadb from "@/lib/prismadb";
 const findLessonUnique = async (lessonId: string) => {
   return await prismadb.lesson.findUnique({
     where: { id: lessonId },
-    include: { unit: true, tagging: true },
+    include: {
+      unit: true,
+      tagging: { include: { tag: true } },
+      quiz: { include: { quizQuestion: true } },
+      vocabulary: true,
+      lessonVersion: true,
+      userLessonProgress: true,
+      userChapterReview: true,
+    },
   });
 };
 
@@ -21,7 +29,7 @@ const findTags = async () => {
 
 const findLessons = async () => {
   return prismadb.lesson.findMany({
-    include: { unit: true, Vocabulary: true },
+    include: { unit: true, vocabulary: true },
     orderBy: [
       {
         unit: {
