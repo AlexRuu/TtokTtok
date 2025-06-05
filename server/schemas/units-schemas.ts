@@ -21,6 +21,7 @@ const TableBlock = z.object({
   type: z.literal("table"),
   headers: z.array(z.string()).min(1),
   rows: z.array(z.array(z.string())),
+  note: z.boolean(),
 });
 
 const BlockSchema = z.discriminatedUnion("type", [
