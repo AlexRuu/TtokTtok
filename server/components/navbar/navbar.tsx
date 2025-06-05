@@ -115,9 +115,9 @@ export default function Navbar() {
     <>
       <nav
         ref={navRef}
-        className="sticky top-0 z-40 bg-[#FAF3F0]/80 backdrop-blur-xs px-4 py-3 shadow-xs md:px-8"
+        className="sticky top-0 z-40 bg-[#FAF3F0]/80 backdrop-blur-sm px-4 sm:px-5 md:px-6 py-2 shadow-sm"
       >
-        <div className="flex justify-between items-center max-w-6xl mx-auto">
+        <div className="flex justify-between items-center mx-auto">
           <Link
             href="/"
             className="flex items-center space-x-1 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded"
