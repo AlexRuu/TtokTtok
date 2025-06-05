@@ -150,13 +150,13 @@ model Lesson {
   unitId             String
   unit               Unit                 @relation(fields: [unitId], references: [id])
   userChapterReview  UserChapterReview[]
-  Quiz               Quiz[]
-  Vocabulary         Vocabulary[]
+  quiz               Quiz[]
+  vocabulary         Vocabulary[]
   createdAt          DateTime             @default(now()) @db.Timestamptz(6)
   updatedAt          DateTime             @default(now()) @updatedAt @db.Timestamptz(6)
   lessonVersion      LessonVersion[]
   tagging            Tagging[]
-  UserLessonProgress UserLessonProgress[]
+  userLessonProgress UserLessonProgress[]
 
   @@index([unitId, lessonNumber])
 }
@@ -183,9 +183,12 @@ model LessonMedia {
 }
 
 model Tag {
-  id      String    @id @default(cuid())
-  name    String    @unique
-  Tagging Tagging[]
+  id               String    @id @default(cuid())
+  name             String    @unique
+  backgroundColour String
+  textColour       String
+  borderColour     String
+  Tagging          Tagging[]
 }
 
 model Tagging {
@@ -212,9 +215,9 @@ model Quiz {
   lessonId        String
   lesson          Lesson            @relation(fields: [lessonId], references: [id])
   createdAt       DateTime          @default(now()) @db.Timestamptz(6)
-  QuizQuestion    QuizQuestion[]
+  quizQuestion    QuizQuestion[]
   tagging         Tagging[]
-  UserQuizAttempt UserQuizAttempt[]
+  userQuizAttempt UserQuizAttempt[]
 }
 
 model QuizQuestion {
