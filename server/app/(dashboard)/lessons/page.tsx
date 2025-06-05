@@ -28,9 +28,9 @@ const LessonsPage = async () => {
           <Link href={"/lessons/create"}>Create</Link>
         </Button>
       </div>
-      <div className="flex space-x-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
         {units.map((unit) => (
-          <Card key={unit.id} className="w-1/2 shadow-md">
+          <Card key={unit.id} className="shadow-md">
             <CardHeader>
               <CardTitle>
                 {unit.unitNumber}. {unit.title}
