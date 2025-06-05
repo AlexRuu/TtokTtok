@@ -88,6 +88,13 @@ const unitsSchema = z.object({
 
 const tagSchema = z.object({
   name: z.string().min(1, { message: "Tag name is required" }),
+  backgroundColour: z
+    .string()
+    .min(1, { message: "Please provide a background colour." }),
+  textColour: z.string().min(1, { message: "Please provide a text colour." }),
+  borderColour: z
+    .string()
+    .min(1, { message: "Please provide a border colour." }),
 });
 
 const vocabularySchema = z.object({
