@@ -8,7 +8,7 @@ const findLessonUnique = async (lessonId: string) => {
       unit: true,
       tagging: { include: { tag: true } },
       quiz: { include: { quizQuestion: true } },
-      vocabulary: true,
+      vocabularyList: { include: { vocabulary: true } },
       lessonVersion: true,
       userLessonProgress: true,
       userChapterReview: true,
@@ -29,7 +29,7 @@ const findTags = async () => {
 
 const findLessons = async () => {
   return prismadb.lesson.findMany({
-    include: { unit: true, vocabulary: true },
+    include: { unit: true, vocabularyList: { include: { vocabulary: true } } },
     orderBy: [
       {
         unit: {
@@ -59,9 +59,10 @@ const findUniqueTag = async (tagId: string) => {
 };
 
 // Vocabulary
-const findUniqueVocabulary = async (vocabularyId: string) => {
-  return await prismadb.vocabulary.findUnique({
-    where: { id: vocabularyId },
+const findUniqueVocabulary = async (vocabularyListId: string) => {
+  return await prismadb.vocabularyList.findUnique({
+    where: { id: vocabularyListId },
+    include: { vocabulary: true },
   });
 };
 
