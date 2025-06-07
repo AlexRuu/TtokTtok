@@ -1,8 +1,5 @@
-import React from "react";
 import VocabularyForm from "../components/vocabulary-form";
 import { findLessons, findUniqueVocabulary } from "@/prisma/prismaFetches";
-
-export const revalidate = 0;
 
 const VocabularyEdit = async (props: {
   params: Promise<{ vocabularyListId: string }>;
