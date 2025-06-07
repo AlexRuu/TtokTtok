@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import prismadb from "@/lib/prismadb";
+import { vocabularySchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -12,38 +13,73 @@ export async function POST(req: Request) {
     }
     const body = await req.json();
 
-    const { definition, lessonId } = body;
+    const parsed = vocabularySchema.safeParse(body);
 
-    const english = body.english.trim();
-    const korean = body.korean.trim();
-
-    if (!english || !korean || !definition || !lessonId) {
-      return new NextResponse("Missing one or more values to create", {
-        status: 400,
-      });
+    if (!parsed.success) {
+      return new NextResponse("Missing vocabulary data", { status: 400 });
     }
 
-    const existingVocab = await prismadb.vocabulary.findFirst({
-      where: { lessonId, english, korean },
-    });
+    const { vocabulary, lessonId } = parsed.data;
 
-    if (existingVocab) {
-      return new NextResponse("The vocabulary aready exists", { status: 409 });
+    if (!lessonId) {
+      return new NextResponse("Lesson is required", { status: 400 });
     }
 
-    await prismadb.vocabulary.create({
-      data: {
-        english,
-        korean,
-        definition,
-        lesson: {
-          connect: { id: lessonId },
-        },
+    const existingList = await prismadb.vocabularyList.findFirst({
+      where: {
+        lessonId: lessonId,
       },
     });
 
+    if (existingList) {
+      await prismadb.vocabulary.createMany({
+        data: vocabulary.map((item) => ({
+          english: item.english,
+          korean: item.korean,
+          definition: item.definition,
+          vocabularyListId: existingList.id,
+        })),
+      });
+
+      return new NextResponse("Successfully added new vocabulary to list", {
+        status: 201,
+      });
+    }
+
+    const vocabTag = await prismadb.tag.findUnique({
+      where: { name: "Vocabulary" },
+    });
+
+    if (!vocabTag) {
+      return new NextResponse("Could not find Vocabulary Tag", { status: 409 });
+    }
+
+    await prismadb.$transaction(async (tx) => {
+      const vocabularyList = await tx.vocabularyList.create({
+        data: {
+          lesson: { connect: { id: lessonId } },
+          vocabulary: {
+            createMany: {
+              data: vocabulary.map((item) => ({
+                english: item.english,
+                korean: item.korean,
+                definition: item.definition,
+              })),
+            },
+          },
+        },
+      });
+
+      await tx.tagging.create({
+        data: {
+          tagId: vocabTag.id,
+          vocabularyListId: vocabularyList.id,
+        },
+      });
+    });
+
     return NextResponse.json("Successfully created vocabulary", {
-      status: 200,
+      status: 201,
     });
   } catch (error) {
     console.log("Error creating vocabulary", error);
