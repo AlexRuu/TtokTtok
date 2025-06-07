@@ -22,61 +22,87 @@ const LessonsPage = async () => {
   const units = await findAscUnits();
 
   return (
-    <div className="p-4 sm:p-6 space-y-6">
-      <div className="w-full flex justify-end">
-        <Button className="font-semibold bg-indigo-200 hover:bg-indigo-300 text-indigo-900 flex items-center justify-center gap-2 py-4 sm:py-5 text-base rounded-xl transition-all duration-200 shadow-xs hover:scale-[1.01] hover:shadow-md active:scale-[0.99] focus:outline-hidden focus:ring-2 focus:ring-indigo-300 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400">
-          <Link href={"/lessons/create"}>Create</Link>
+    <div className="p-4 sm:p-6 space-y-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Lessons</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
+            Overview of all your created lessons by unit
+          </p>
+        </div>
+        <Button
+          asChild
+          className="bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-medium px-5 py-3 text-base rounded-xl shadow-sm transition-all hover:scale-[1.01] focus:ring-2 focus:ring-indigo-300"
+        >
+          <Link href="/lessons/create">+ Create Lesson</Link>
         </Button>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
         {units.map((unit) => (
-          <Card key={unit.id} className="shadow-md">
-            <CardHeader>
-              <CardTitle>
-                {unit.unitNumber}. {unit.title}
+          <Card
+            key={unit.id}
+            className="border border-muted bg-background shadow-sm rounded-2xl"
+          >
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-semibold">
+                Unit {unit.unitNumber}: {unit.title}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <Table className="min-w-full text-sm text-left">
-                <TableHeader className="bg-muted text-muted-foreground">
+              <Table className="text-sm">
+                <TableHeader>
                   <TableRow>
-                    <TableHead className="px-4 py-2">Lesson </TableHead>
-                    <TableHead className="px-4 py-2">Last Edited</TableHead>
-                    <TableHead className="px-4 py-2">Actions</TableHead>
+                    <TableHead>Lesson</TableHead>
+                    <TableHead>Last Edited</TableHead>
+                    <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody className="bg-background divide-y">
+                <TableBody>
                   {unit.lesson.map((lesson) => (
-                    <TableRow key={lesson.id}>
-                      <TableCell className="px-4 py-2">
+                    <TableRow key={lesson.id} className="hover:bg-muted/50">
+                      <TableCell>
                         <Link
                           href={`/lessons/${lesson.id}`}
-                          className="text-blue-500"
+                          className="text-blue-600 hover:underline"
                         >
                           {lesson.lessonNumber}. {lesson.title}
                         </Link>
                       </TableCell>
-                      <TableCell className="px-4 py-2">
-                        {format(lesson.updatedAt, "PPp")}
+                      <TableCell>
+                        {format(new Date(lesson.updatedAt), "PPp")}
                       </TableCell>
-                      <TableCell className="px-4 py-2">
+                      <TableCell className="text-center">
                         <DropdownMenu>
-                          <DropdownMenuTrigger className="hover:cursor-pointer w-full flex justify-center ">
-                            <SquarePen />
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="hover:bg-muted"
+                            >
+                              <SquarePen className="w-4 h-4" />
+                            </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent className="flex flex-col p-3 space-y-2 w-10">
-                            <Button size="sm" variant="outline" asChild>
+                          <DropdownMenuContent
+                            align="end"
+                            className="w-32 p-1.5 space-y-1 bg-popover border rounded-md shadow-md"
+                          >
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="w-full justify-start gap-2"
+                              asChild
+                            >
                               <Link href={`/lessons/${lesson.id}/edit`}>
-                                <Edit /> Edit
+                                <Edit className="w-4 h-4" /> Edit
                               </Link>
                             </Button>
                             <Button
                               size="sm"
                               variant="destructive"
-                              className="hover:cursor-pointer"
+                              className="w-full justify-start gap-2"
                             >
-                              <Trash />
-                              Delete
+                              <Trash className="w-4 h-4" /> Delete
                             </Button>
                           </DropdownMenuContent>
                         </DropdownMenu>
