@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../lib/generated/prisma"
@@ -61,8 +58,8 @@ model VerificationToken {
   expires    DateTime
   used       Boolean   @default(false)
   usedAt     DateTime?
-  userId     String
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
   createdAt  DateTime  @default(now()) @db.Timestamptz(6)
 
   @@unique([identifier, token])
@@ -74,9 +71,9 @@ model ForgotPasswordToken {
   token      String    @unique
   expires    DateTime
   userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   used       Boolean   @default(false)
   usedAt     DateTime?
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt  DateTime  @default(now()) @db.Timestamptz(6)
 
   @@unique([identifier, token])
@@ -86,9 +83,9 @@ model ForgotPasswordToken {
 model SavedVocabulary {
   id           String     @id @default(cuid())
   userId       String
-  user         User       @relation(fields: [userId], references: [id])
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   vocabularyId String
-  vocabulary   Vocabulary @relation(fields: [vocabularyId], references: [id])
+  vocabulary   Vocabulary @relation(fields: [vocabularyId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now()) @db.Timestamptz(6)
 
   @@unique([userId, vocabularyId])
@@ -97,11 +94,11 @@ model SavedVocabulary {
 model UserChapterReview {
   id        String   @id @default(cuid())
   lessonId  String
-  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   unitId    String
-  unit      Unit     @relation(fields: [unitId], references: [id])
+  unit      Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
 
@@ -110,10 +107,10 @@ model UserChapterReview {
 
 model UserLessonProgress {
   id          String    @id @default(cuid())
-  user        User      @relation(fields: [userId], references: [id])
   userId      String
-  lesson      Lesson    @relation(fields: [lessonId], references: [id])
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   lessonId    String
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   startedAt   DateTime  @default(now())
   completedAt DateTime?
 
@@ -122,10 +119,10 @@ model UserLessonProgress {
 
 model UserQuizAttempt {
   id          String   @id @default(cuid())
-  user        User     @relation(fields: [userId], references: [id])
   userId      String
-  quiz        Quiz     @relation(fields: [quizId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
   score       Int
   passed      Boolean
   attemptedAt DateTime @default(now())
@@ -148,10 +145,10 @@ model Lesson {
   lessonNumber       Int
   content            Json
   unitId             String
-  unit               Unit                 @relation(fields: [unitId], references: [id])
+  unit               Unit                 @relation(fields: [unitId], references: [id], onDelete: Cascade)
   userChapterReview  UserChapterReview[]
   quiz               Quiz[]
-  vocabulary         Vocabulary[]
+  vocabularyList     VocabularyList?
   createdAt          DateTime             @default(now()) @db.Timestamptz(6)
   updatedAt          DateTime             @default(now()) @updatedAt @db.Timestamptz(6)
   lessonVersion      LessonVersion[]
@@ -164,7 +161,7 @@ model Lesson {
 model LessonVersion {
   id        String   @id @default(cuid())
   lessonId  String
-  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   version   Int
   content   Json
   createdAt DateTime @default(now())
@@ -188,32 +185,32 @@ model Tag {
   backgroundColour String
   textColour       String
   borderColour     String
-  Tagging          Tagging[]
+  tagging          Tagging[]
 }
 
 model Tagging {
-  id           String      @id @default(cuid())
-  tagId        String
-  tag          Tag         @relation(fields: [tagId], references: [id])
-  lessonId     String?
-  lesson       Lesson?     @relation(fields: [lessonId], references: [id])
-  quizId       String?
-  quiz         Quiz?       @relation(fields: [quizId], references: [id])
-  vocabularyId String?
-  vocabulary   Vocabulary? @relation(fields: [vocabularyId], references: [id])
-  createdAt    DateTime    @default(now()) @db.Timestamptz(6)
-  updatedAt    DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
+  id               String          @id @default(cuid())
+  tagId            String
+  tag              Tag             @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  lessonId         String?
+  lesson           Lesson?         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  quizId           String?
+  quiz             Quiz?           @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  createdAt        DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime        @default(now()) @updatedAt @db.Timestamptz(6)
+  vocabularyListId String?
+  vocabularyList   VocabularyList? @relation(fields: [vocabularyListId], references: [id], onDelete: Cascade)
 
   @@index([tagId])
   @@index([lessonId])
   @@index([quizId])
-  @@index([vocabularyId])
+  @@index([vocabularyListId])
 }
 
 model Quiz {
   id              String            @id @default(cuid())
   lessonId        String
-  lesson          Lesson            @relation(fields: [lessonId], references: [id])
+  lesson          Lesson            @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   createdAt       DateTime          @default(now()) @db.Timestamptz(6)
   quizQuestion    QuizQuestion[]
   tagging         Tagging[]
@@ -224,23 +221,32 @@ model QuizQuestion {
   id       String   @id @default(cuid())
   question String
   quizId   String
-  quiz     Quiz     @relation(fields: [quizId], references: [id])
+  quiz     Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
   quizType QuizType
   options  Json?
   answer   String
 }
 
+model VocabularyList {
+  id         String       @id @default(cuid())
+  lessonId   String       @unique
+  lesson     Lesson       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt  DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
+  tagging    Tagging[]
+  vocabulary Vocabulary[]
+}
+
 model Vocabulary {
-  id              String            @id @default(cuid())
-  english         String
-  korean          String
-  definition      String
-  lessonId        String
-  lesson          Lesson            @relation(fields: [lessonId], references: [id])
-  SavedVocabulary SavedVocabulary[]
-  createdAt       DateTime          @default(now()) @db.Timestamptz(6)
-  updatedAt       DateTime          @default(now()) @updatedAt @db.Timestamptz(6)
-  tagging         Tagging[]
+  id               String            @id @default(cuid())
+  english          String
+  korean           String
+  definition       String
+  savedVocabulary  SavedVocabulary[]
+  vocabularyListId String
+  vocabularyList   VocabularyList    @relation(fields: [vocabularyListId], references: [id], onDelete: Cascade)
+  createdAt        DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime          @default(now()) @updatedAt @db.Timestamptz(6)
 }
 
 // Contact Models
