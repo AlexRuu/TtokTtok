@@ -97,10 +97,14 @@ const tagSchema = z.object({
     .min(1, { message: "Please provide a border colour." }),
 });
 
-const vocabularySchema = z.object({
+const vocabDefineSchema = z.object({
   english: z.string().min(1, { message: "English word is required" }),
   korean: z.string().min(1, { message: "Korean word is required" }),
   definition: z.string().min(1, { message: "Definition is required" }),
+});
+
+const vocabularySchema = z.object({
+  vocabulary: z.array(vocabDefineSchema),
   lessonId: z.string().min(1, { message: "Lesson Id is required" }),
 });
 
