@@ -2,9 +2,13 @@ import { authOptions } from "@/lib/auth";
 import prismadb from "@/lib/prismadb";
 import { LessonFormSchema } from "@/schemas/units-schemas";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
-export async function PATCH(req: Request, props: { params: Promise<{ lessonId: string }> }) {
+export async function PATCH(
+  req: Request,
+  props: { params: Promise<{ lessonId: string }> }
+) {
   const params = await props.params;
   try {
     const session = await getServerSession(authOptions);
@@ -82,6 +86,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ lessonId: s
       }
     });
 
+    revalidatePath("/lessons");
     return new NextResponse("Successfully updated lesson", { status: 200 });
   } catch (error) {
     console.log("Error updating lesson", error);

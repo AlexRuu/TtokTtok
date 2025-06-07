@@ -1,12 +1,14 @@
 import { authOptions } from "@/lib/auth";
 import prismadb from "@/lib/prismadb";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ) {
+  const params = await props.params;
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user || session.user.role !== "ADMIN") {
@@ -17,9 +19,9 @@ export async function PATCH(
     if (!body) {
       return new NextResponse("Insufficient data required", { status: 400 });
     }
-
+    const id = params.id;
     const { firstName, lastName, email, role } = body;
-    const { id } = await params;
+
     await prismadb.user.update({
       where: {
         id: id,
@@ -32,6 +34,7 @@ export async function PATCH(
       },
     });
 
+    revalidatePath("/users");
     return NextResponse.json({
       message: "Successfully updated user",
       status: 200,
