@@ -111,7 +111,7 @@ const LessonContent: React.FC<LessonContentProps> = ({ content }) => {
                         {item.headers.map((header: string, idx: number) => (
                           <TableHead
                             key={idx}
-                            className="font-semibold w-[25%] truncate"
+                            className="w-[25%] truncate text-center font-bold"
                           >
                             {header}
                           </TableHead>
@@ -122,7 +122,9 @@ const LessonContent: React.FC<LessonContentProps> = ({ content }) => {
                       {item.rows.map((row: string[], rowIdx: number) => (
                         <TableRow key={rowIdx}>
                           {row.map((cell: string, cellIdx: number) => (
-                            <TableCell key={cellIdx}>{cell}</TableCell>
+                            <TableCell key={cellIdx} className="text-center">
+                              {cell}
+                            </TableCell>
                           ))}
                         </TableRow>
                       ))}
