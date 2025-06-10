@@ -2,13 +2,14 @@ import {
   tagSchemaValues,
   UnitsSchemaValues,
   vocabularySchemaValues,
+  quizSchemaValues,
 } from "@/schemas/form-schemas";
 import { LessonFormType } from "@/schemas/units-schemas";
 import toast from "react-hot-toast";
 
 const toastError = (action: string, path: string) => {
   return toast.error(
-    `There was an error ${action == "POST" ? "creating" : "editing"} ${path}}.`,
+    `There was an error ${action == "POST" ? "creating" : "editing"} ${path}.`,
     {
       style: {
         background: "#ffeef0",
@@ -102,4 +103,23 @@ const vocabularyAction = async (
   }
 };
 
-export { lessonAction, tagActions, unitAction, vocabularyAction };
+const quizActions = async (
+  data: quizSchemaValues,
+  action: string,
+  stopLoading: () => void,
+  quizId?: string
+) => {
+  const URL = quizId ? `/api/quiz/${quizId}` : "/api/quiz";
+  const res = await fetch(URL, {
+    method: action,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    toastError(action, "quiz");
+    stopLoading();
+    return;
+  }
+};
+
+export { lessonAction, tagActions, unitAction, vocabularyAction, quizActions };
