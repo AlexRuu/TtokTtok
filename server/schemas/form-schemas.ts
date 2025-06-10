@@ -108,6 +108,72 @@ const vocabularySchema = z.object({
   lessonId: z.string().min(1, { message: "Lesson Id is required" }),
 });
 
+const multipleChoiceOptionsSchema = z.object({
+  option: z
+    .string()
+    .min(1, { message: "Please include the option letter (ex. A, B, C, D)" }),
+  value: z
+    .string()
+    .min(1, { message: "Please provide a value to the associated option" }),
+});
+
+const baseQuestionSchema = z.object({
+  question: z.string().min(1, { message: "A question is required" }),
+});
+
+const matchingPairSchema = z.object({
+  left: z.string().min(1, { message: "Left item is required" }),
+  right: z.string().min(1, { message: "Right item is required" }),
+});
+
+const matchingAnswerSchema = z.array(
+  z.object({
+    left: z.string().min(1),
+    match: z.string().min(1),
+  })
+);
+
+const quizQuestions = z.discriminatedUnion("type", [
+  baseQuestionSchema.extend({
+    type: z.literal("MULTIPLE_CHOICE"),
+    answer: z.string().min(1, { message: "An answer is required" }),
+    options: z
+      .array(multipleChoiceOptionsSchema)
+      .min(2, { message: "At least two options are required" })
+      .refine(
+        (options) =>
+          new Set(options.map((o) => o.option)).size === options.length,
+        { message: "Options must be unique." }
+      ),
+  }),
+  baseQuestionSchema.extend({
+    type: z.literal("FILL_IN_THE_BLANK"),
+    question: z
+      .string()
+      .min(1, { message: "A question is required" })
+      .refine((val) => val.includes("_"), {
+        message: 'Question must include at least one "_" character',
+      }),
+    answer: z.string().min(1, { message: "An answer is required" }),
+  }),
+  baseQuestionSchema.extend({
+    type: z.literal("TRUE_FALSE"),
+    answer: z.boolean(),
+  }),
+  baseQuestionSchema.extend({
+    type: z.literal("MATCHING"),
+    pairs: z
+      .array(matchingPairSchema)
+      .min(2, { message: "At least two matching pairs are required" }),
+    answer: matchingAnswerSchema,
+  }),
+]);
+
+const quizSchema = z.object({
+  quizQuestion: z.array(quizQuestions),
+  lessonId: z.string().min(1, { message: "Please pick a lesson" }),
+});
+
 export type ForgotPasswordFormSchema = z.infer<typeof forgotPasswordFormSchema>;
 export type SignUpFormSchema = z.infer<typeof signUpFormSchema>;
 export type ContactFormSchema = z.infer<typeof contactFormSchema>;
@@ -117,6 +183,7 @@ export type EditUserValues = z.infer<typeof editUserSchema>;
 export type UnitsSchemaValues = z.infer<typeof unitsSchema>;
 export type tagSchemaValues = z.infer<typeof tagSchema>;
 export type vocabularySchemaValues = z.infer<typeof vocabularySchema>;
+export type quizSchemaValues = z.infer<typeof quizSchema>;
 
 export {
   forgotPasswordFormSchema,
@@ -129,4 +196,5 @@ export {
   unitsSchema,
   tagSchema,
   vocabularySchema,
+  quizSchema,
 };
