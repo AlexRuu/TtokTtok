@@ -24,7 +24,7 @@ const LessonSummaryPage = async (props: {
 
   const lessonUpdateAt = format(lesson.lessonVersion.at(-1)!.createdAt, "PPp");
   const content = JSON.parse(JSON.stringify(lesson.content));
-  const vocabulary = lesson.vocabulary;
+  const vocabulary = lesson.vocabularyList!;
   const quiz = lesson.quiz;
 
   return (
@@ -88,7 +88,7 @@ const LessonSummaryPage = async (props: {
           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <LessonContent content={content} />
             <LessonStatsSummary lesson={lesson} />
-            <VocabularyContent vocabulary={vocabulary} />
+            <VocabularyContent vocabularyList={vocabulary} />
             <QuizContent quiz={quiz} />
           </CardContent>
         </Card>
