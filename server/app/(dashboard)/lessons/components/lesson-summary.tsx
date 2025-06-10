@@ -8,6 +8,7 @@ import {
   UserChapterReview,
   UserLessonProgress,
   Vocabulary,
+  VocabularyList,
 } from "@/lib/generated/prisma";
 import React from "react";
 
@@ -17,7 +18,7 @@ interface LessonStatsSummaryProps {
     lessonVersion: LessonVersion[];
     tagging: Tagging[];
     quiz: Quiz[];
-    vocabulary: Vocabulary[];
+    vocabularyList: (VocabularyList & { vocabulary: Vocabulary[] }) | null;
     userLessonProgress: UserLessonProgress[];
     userChapterReview: UserChapterReview[];
   };
@@ -25,11 +26,12 @@ interface LessonStatsSummaryProps {
 
 const LessonStatsSummary: React.FC<LessonStatsSummaryProps> = ({ lesson }) => {
   let blocks = { text: 0, image: 0, note: 0, table: 0 };
-  const numberOfVocabulary = lesson.vocabulary.length;
+  const numberOfVocabulary = lesson.vocabularyList!.vocabulary.length;
   const numberOfQuizzes = lesson.quiz.length;
   const mappedBlocks = JSON.parse(JSON.stringify(lesson.content));
+
   mappedBlocks.forEach((content: { type: keyof typeof blocks }) => {
-    blocks[content.type] = +1;
+    blocks[content.type] += 1;
   });
 
   const usersStarted = lesson.userLessonProgress.length;
@@ -37,6 +39,9 @@ const LessonStatsSummary: React.FC<LessonStatsSummaryProps> = ({ lesson }) => {
     (item) => item.completedAt !== null
   ).length;
   const savedByUser = lesson.userChapterReview.length;
+  const completionRate = Number(
+    ((usersCompleted / usersStarted) * 100).toFixed(0)
+  );
 
   return (
     <Card>
@@ -100,7 +105,7 @@ const LessonStatsSummary: React.FC<LessonStatsSummaryProps> = ({ lesson }) => {
             <div className="flex justify-between">
               <span>Completion Rate</span>
               <span className="font-semibold text-foreground">
-                {((usersCompleted / usersStarted) * 100).toFixed(0)}%
+                {completionRate >= 0 ? `${completionRate}%` : "0%"}
               </span>
             </div>
             <div className="flex justify-between">
