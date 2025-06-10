@@ -7,13 +7,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Vocabulary } from "@/lib/generated/prisma";
+import { Vocabulary, VocabularyList } from "@/lib/generated/prisma";
 
 interface VocabularyProps {
-  vocabulary: Vocabulary[];
+  vocabularyList: VocabularyList & { vocabulary: Vocabulary[] };
 }
 
-const VocabularyContent: React.FC<VocabularyProps> = ({ vocabulary }) => {
+const VocabularyContent: React.FC<VocabularyProps> = ({ vocabularyList }) => {
   return (
     <Card className="shadow-md">
       <CardHeader>
@@ -25,23 +25,23 @@ const VocabularyContent: React.FC<VocabularyProps> = ({ vocabulary }) => {
         <Table className="table-fixed text-sm border rounded-sm">
           <TableHeader className="bg-muted">
             <TableRow>
-              <TableHead className="font-semibold w-[25%] truncate">
+              <TableHead className="font-semibold w-[25%] truncate text-center">
                 English
               </TableHead>
-              <TableHead className="font-semibold w-[25%] truncate">
+              <TableHead className="font-semibold w-[25%] truncate text-center">
                 Korean
               </TableHead>
-              <TableHead className="font-semibold w-[25%] truncate">
+              <TableHead className="font-semibold w-[25%] truncate text-center">
                 Definition
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {vocabulary.map((item) => (
+            {vocabularyList.vocabulary.map((item) => (
               <TableRow key={item.id}>
-                <TableCell>{item.english}</TableCell>
-                <TableCell>{item.korean}</TableCell>
-                <TableCell>{item.definition}</TableCell>
+                <TableCell className="text-center">{item.english}</TableCell>
+                <TableCell className="text-center">{item.korean}</TableCell>
+                <TableCell className="text-center">{item.definition}</TableCell>
               </TableRow>
             ))}
           </TableBody>
