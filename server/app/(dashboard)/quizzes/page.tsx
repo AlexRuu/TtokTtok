@@ -1,6 +1,8 @@
-import React from "react";
+import { findQuizzes } from "@/prisma/prismaFetches";
 
-const QuizzesPage = () => {
+const QuizzesPage = async () => {
+  const quizzes = await findQuizzes();
+
   return <div>QuizzesPage</div>;
 };
 
