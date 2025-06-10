@@ -66,6 +66,25 @@ const findUniqueVocabulary = async (vocabularyListId: string) => {
   });
 };
 
+// Quiz
+const findQuizzes = async () => {
+  return await prismadb.quiz.findMany({
+    include: { lesson: true, quizQuestion: true },
+    orderBy: {
+      lesson: {
+        lessonNumber: "asc",
+      },
+    },
+  });
+};
+
+const findUniqueQuiz = async (quizId: string) => {
+  return await prismadb.quiz.findUnique({
+    where: { id: quizId },
+    include: { quizQuestion: true },
+  });
+};
+
 // User
 const findUniqueUser = async (userId: string) => {
   return await prismadb.user.findUnique({
@@ -88,6 +107,7 @@ const stats = async () => {
     },
   });
 };
+
 const completedCounts = async () => {
   return await prismadb.userLessonProgress.groupBy({
     by: ["lessonId"],
@@ -114,4 +134,6 @@ export {
   findLessons,
   findUniqueVocabulary,
   findUniqueUnit,
+  findQuizzes,
+  findUniqueQuiz,
 };
