@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -14,14 +14,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { findLessons } from "@/prisma/prismaFetches";
+import { findAscUnits } from "@/prisma/prismaFetches";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 const VocabularyPage = async () => {
-  const lessons = await findLessons();
+  const units = await findAscUnits();
 
-  if (!lessons) {
+  if (!units) {
     notFound();
   }
 
@@ -42,61 +42,73 @@ const VocabularyPage = async () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-        {lessons.map((lesson) => (
-          <Card
-            key={lesson.id}
-            className="rounded-2xl border border-muted bg-background shadow-sm transition hover:shadow-md"
-          >
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base font-semibold leading-tight text-foreground flex justify-between items-center">
-                Lesson {lesson.lessonNumber}: {lesson.title}
-                <Button
-                  asChild
-                  className="bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-medium px-5 py-3 text-base rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.01] focus:ring-2 focus:ring-indigo-300 hover:cursor-pointer"
-                >
-                  <Link href={`/vocabulary/${lesson.vocabularyList!.id}`}>
-                    Edit
-                  </Link>
-                </Button>
-              </CardTitle>
-              <CardDescription>Unit: {lesson.unit.unitNumber}</CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {lesson.vocabularyList ? (
-                <Table className="text-sm">
-                  <TableHeader className="bg-muted">
-                    <TableRow>
-                      <TableHead className="text-muted-foreground">
-                        English
-                      </TableHead>
-                      <TableHead className="text-muted-foreground">
-                        Korean
-                      </TableHead>
-                      <TableHead className="text-muted-foreground">
-                        Definition
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {lesson.vocabularyList.vocabulary.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>{item.english}</TableCell>
-                        <TableCell>{item.korean}</TableCell>
-                        <TableCell>{item.definition}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              ) : (
-                <p className="text-sm text-muted-foreground py-4">
-                  No vocabulary yet.
-                </p>
-              )}
-            </CardContent>
-          </Card>
+      <Accordion type="multiple">
+        {units.map((unit) => (
+          <AccordionItem value={unit.id} key={unit.id}>
+            <AccordionTrigger>
+              Unit {unit.unitNumber} - {unit.title}
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {unit.lesson.map((lesson) => (
+                  <Card
+                    key={lesson.id}
+                    className="rounded-2xl border border-muted bg-background shadow-sm transition hover:shadow-md"
+                  >
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base font-semibold leading-tight text-foreground flex justify-between items-center">
+                        Lesson {lesson.lessonNumber}: {lesson.title}
+                        <Button
+                          asChild
+                          className="bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-medium px-5 py-3 text-base rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.01] focus:ring-2 focus:ring-indigo-300 hover:cursor-pointer"
+                        >
+                          <Link
+                            href={`/vocabulary/${lesson.vocabularyList?.id}`}
+                          >
+                            Edit
+                          </Link>
+                        </Button>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      {lesson.vocabularyList ? (
+                        <Table className="text-sm">
+                          <TableHeader className="bg-muted">
+                            <TableRow>
+                              <TableHead className="text-muted-foreground">
+                                English
+                              </TableHead>
+                              <TableHead className="text-muted-foreground">
+                                Korean
+                              </TableHead>
+                              <TableHead className="text-muted-foreground">
+                                Definition
+                              </TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {lesson.vocabularyList.vocabulary.map((item) => (
+                              <TableRow key={item.id}>
+                                <TableCell>{item.english}</TableCell>
+                                <TableCell>{item.korean}</TableCell>
+                                <TableCell>{item.definition}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      ) : (
+                        <p className="text-sm text-muted-foreground py-4">
+                          No vocabulary yet.
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
         ))}
-      </div>
+      </Accordion>
     </div>
   );
 };
