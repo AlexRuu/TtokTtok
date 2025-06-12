@@ -5,10 +5,6 @@ import { Quiz, QuizQuestion } from "@/lib/generated/prisma";
 interface QuizContentProps {
   quiz: (Quiz & { quizQuestion: QuizQuestion[] })[];
 }
-interface QuizOption {
-  value: string;
-  option: string;
-}
 
 const QuizContent: React.FC<QuizContentProps> = ({ quiz }) => {
   return (
