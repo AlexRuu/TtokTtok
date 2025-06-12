@@ -40,11 +40,69 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
     "MULTIPLE_CHOICE" | "FILL_IN_THE_BLANK" | "TRUE_FALSE" | "MATCHING" | ""
   >("");
 
+  const normalizeQuizQuestions = (questions: any) => {
+    if (!Array.isArray(questions)) {
+      return [];
+    }
+
+    return questions.map((q) => {
+      switch (q.quizType) {
+        case "TRUE_FALSE":
+          return {
+            ...q,
+            answer: q.answer === true || q.answer === "true",
+          };
+        case "MULTIPLE_CHOICE":
+          return {
+            ...q,
+            answer: String(q.answer),
+            options: Array.isArray(q.options) ? q.options : [],
+          };
+        case "FILL_IN_THE_BLANK":
+          return {
+            ...q,
+            question: String(q.question),
+            answer: String(q.answer),
+          };
+        case "MATCHING":
+          let answer = q.answer;
+          if (typeof answer === "string") {
+            try {
+              const parsed = JSON.parse(answer);
+              if (Array.isArray(parsed)) {
+                answer = parsed;
+              } else {
+                answer = [];
+              }
+            } catch {
+              answer = [];
+            }
+          } else if (!Array.isArray(answer)) {
+            answer = [];
+          }
+
+          return {
+            ...q,
+            options: Array.isArray(q.options) ? q.options : [],
+            answer,
+          };
+        default:
+          return q;
+      }
+    });
+  };
+
+  const clonedQuestions =
+    initialData && JSON.parse(JSON.stringify(initialData.quizQuestion));
+
+  const normalizedQuestions = normalizeQuizQuestions(clonedQuestions);
+
   const form = useForm<quizSchemaValues>({
     resolver: zodResolver(quizSchema),
     defaultValues: initialData
       ? {
           ...initialData,
+          quizQuestion: normalizedQuestions,
         }
       : {
           quizQuestion: [],
@@ -61,7 +119,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
     switch (selectedQuizType) {
       case "MULTIPLE_CHOICE":
         questionArray.append({
-          type: "MULTIPLE_CHOICE",
+          quizType: "MULTIPLE_CHOICE",
           question: "",
           answer: "",
           options: [],
@@ -69,24 +127,24 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
         break;
       case "FILL_IN_THE_BLANK":
         questionArray.append({
-          type: "FILL_IN_THE_BLANK",
+          quizType: "FILL_IN_THE_BLANK",
           question: "",
           answer: "",
         });
         break;
       case "TRUE_FALSE":
         questionArray.append({
-          type: "TRUE_FALSE",
+          quizType: "TRUE_FALSE",
           question: "",
           answer: false,
         });
         break;
       case "MATCHING":
         questionArray.append({
-          type: "MATCHING",
+          quizType: "MATCHING",
           question:
             "Match each item on the left with its corresponding item on the right.",
-          pairs: [],
+          options: [],
           answer: [],
         });
         break;
@@ -198,7 +256,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
           </div>
           <div className="space-y-6">
             {questionArray.fields.map((field, index) => {
-              const questionType = form.watch("quizQuestion")[index]?.type;
+              const questionType = form.watch("quizQuestion")[index]?.quizType;
               const isFirst = index === 0;
               const isLast = index === questionArray.fields.length - 1;
               return (
@@ -295,10 +353,13 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
                       />
                       <FormField
                         control={form.control}
-                        name={`quizQuestion.${index}.pairs`}
+                        name={`quizQuestion.${index}.options`}
                         render={({ field }) => {
-                          const pairs = field.value || [];
-
+                          const pairs =
+                            (field.value as {
+                              left: string;
+                              right: string;
+                            }[]) || [];
                           const updatePair = (
                             i: number,
                             key: "left" | "right",
@@ -482,7 +543,11 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
                         control={form.control}
                         name={`quizQuestion.${index}.options`}
                         render={({ field }) => {
-                          const options = field.value || [];
+                          const options =
+                            (field.value as {
+                              option: string;
+                              value: string;
+                            }[]) || [];
 
                           const updateOption = (
                             i: number,
