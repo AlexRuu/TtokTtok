@@ -133,9 +133,9 @@ const matchingAnswerSchema = z.array(
   })
 );
 
-const quizQuestions = z.discriminatedUnion("type", [
+const quizQuestions = z.discriminatedUnion("quizType", [
   baseQuestionSchema.extend({
-    type: z.literal("MULTIPLE_CHOICE"),
+    quizType: z.literal("MULTIPLE_CHOICE"),
     answer: z.string().min(1, { message: "An answer is required" }),
     options: z
       .array(multipleChoiceOptionsSchema)
@@ -147,7 +147,7 @@ const quizQuestions = z.discriminatedUnion("type", [
       ),
   }),
   baseQuestionSchema.extend({
-    type: z.literal("FILL_IN_THE_BLANK"),
+    quizType: z.literal("FILL_IN_THE_BLANK"),
     question: z
       .string()
       .min(1, { message: "A question is required" })
@@ -157,12 +157,12 @@ const quizQuestions = z.discriminatedUnion("type", [
     answer: z.string().min(1, { message: "An answer is required" }),
   }),
   baseQuestionSchema.extend({
-    type: z.literal("TRUE_FALSE"),
+    quizType: z.literal("TRUE_FALSE"),
     answer: z.boolean(),
   }),
   baseQuestionSchema.extend({
-    type: z.literal("MATCHING"),
-    pairs: z
+    quizType: z.literal("MATCHING"),
+    options: z
       .array(matchingPairSchema)
       .min(2, { message: "At least two matching pairs are required" }),
     answer: matchingAnswerSchema,
