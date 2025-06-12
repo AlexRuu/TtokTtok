@@ -19,7 +19,18 @@ const findLessonUnique = async (lessonId: string) => {
 const findAscUnits = async () => {
   return await prismadb.unit.findMany({
     orderBy: { unitNumber: "asc" },
-    include: { lesson: true },
+    include: {
+      lesson: {
+        include: {
+          tagging: { include: { tag: true } },
+          quiz: { include: { quizQuestion: true } },
+          vocabularyList: { include: { vocabulary: true } },
+          lessonVersion: true,
+          userLessonProgress: true,
+          userChapterReview: true,
+        },
+      },
+    },
   });
 };
 
