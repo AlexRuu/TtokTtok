@@ -2,7 +2,7 @@ import { authOptions } from "@/lib/auth";
 import prismadb from "@/lib/prismadb";
 import { LessonFormSchema } from "@/schemas/units-schemas";
 import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
+
 import { NextResponse } from "next/server";
 
 export async function PATCH(
@@ -86,7 +86,6 @@ export async function PATCH(
       }
     });
 
-    revalidatePath("/lessons");
     return new NextResponse("Successfully updated lesson", { status: 200 });
   } catch (error) {
     console.log("Error updating lesson", error);

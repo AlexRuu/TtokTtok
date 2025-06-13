@@ -2,7 +2,6 @@ import { authOptions } from "@/lib/auth";
 import prismadb from "@/lib/prismadb";
 import { unitsSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
@@ -42,7 +41,6 @@ export async function PATCH(
       },
     });
 
-    revalidatePath("/units");
     return new NextResponse("Successfully updated tag", { status: 200 });
   } catch (error) {
     console.error("There was an error updating tag", error);

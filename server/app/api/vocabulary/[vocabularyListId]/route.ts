@@ -2,7 +2,6 @@ import { authOptions } from "@/lib/auth";
 import prismadb from "@/lib/prismadb";
 import { vocabularySchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
@@ -48,7 +47,6 @@ export async function PATCH(
       })),
     });
 
-    revalidatePath("/vocabulary");
     return new NextResponse("Successfully updated vocabulary", { status: 200 });
   } catch (error) {
     console.error("There was an error updating vocabulary", error);

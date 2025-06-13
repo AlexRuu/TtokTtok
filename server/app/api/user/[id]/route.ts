@@ -1,7 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import prismadb from "@/lib/prismadb";
 import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
@@ -34,7 +33,6 @@ export async function PATCH(
       },
     });
 
-    revalidatePath("/users");
     return NextResponse.json({
       message: "Successfully updated user",
       status: 200,
