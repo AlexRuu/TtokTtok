@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { unitsSchema, UnitsSchemaValues } from "@/schemas/form-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { startTransition } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -44,9 +44,12 @@ const UnitsForm: React.FC<EditUnitsFormProps> = ({ initialData }) => {
     startLoading();
     try {
       const action = initialData ? "PATCH" : "POST";
-      unitAction(data, action, stopLoading, initialData?.id);
-      stopLoading();
-      router.push("/units");
+      await unitAction(data, action, stopLoading, initialData?.id);
+      startTransition(() => {
+        router.refresh();
+        stopLoading();
+        router.push("/units");
+      });
     } catch (error) {
       console.log(error);
       toast.error("There was an error updating unit.", {

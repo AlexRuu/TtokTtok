@@ -33,6 +33,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { startTransition } from "react";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -66,9 +67,12 @@ const VocabularyForm: React.FC<VocabularyFormProps> = ({
     startLoading();
     try {
       const action = initialData ? "PATCH" : "POST";
-      vocabularyAction(data, action, stopLoading, initialData?.id);
-      stopLoading();
-      router.push("/vocabulary");
+      await vocabularyAction(data, action, stopLoading, initialData?.id);
+      startTransition(() => {
+        router.refresh();
+        stopLoading();
+        router.push("/vocabulary");
+      });
     } catch (error) {
       console.log(error);
       toast.error("There was an error creating vocabulary.", {

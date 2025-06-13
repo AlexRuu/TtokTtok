@@ -24,7 +24,7 @@ import { quizSchema, quizSchemaValues } from "@/schemas/form-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { startTransition, useState } from "react";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -155,9 +155,12 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
     startLoading();
     try {
       const action = initialData ? "PATCH" : "POST";
-      quizActions(data, action, stopLoading, initialData?.id);
-      stopLoading();
-      router.push("/quizzes");
+      await quizActions(data, action, stopLoading, initialData?.id);
+      startTransition(() => {
+        router.refresh();
+        stopLoading();
+        router.push("/quizzes");
+      });
     } catch (error) {
       console.log(error);
       toast.error("There was an error creating quiz.", {

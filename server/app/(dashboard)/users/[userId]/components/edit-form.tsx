@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectContent,
 } from "@/components/ui/select";
+import { startTransition } from "react";
 
 const formSchema = editUserSchema;
 
@@ -85,8 +86,11 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
         stopLoading();
         return;
       }
-      stopLoading();
-      router.push("/users");
+      startTransition(() => {
+        router.refresh();
+        stopLoading();
+        router.push("/users");
+      });
     } catch (error) {
       console.log(error);
       toast.error("There was an error editing user.", {

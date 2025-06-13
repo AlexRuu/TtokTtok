@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 import { LessonFormSchema, LessonFormType } from "@/schemas/units-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
+import React, { startTransition, useEffect, useRef, useState } from "react";
 import { useFieldArray, useForm, SubmitHandler } from "react-hook-form";
 import { TableBlockEditor } from "./table-block";
 import toast from "react-hot-toast";
@@ -108,9 +108,12 @@ const LessonForm: React.FC<UnitFormProps> = ({ initialData, units, tags }) => {
     startLoading();
     try {
       const action = initialData ? "PATCH" : "POST";
-      lessonAction(data, action, stopLoading, initialData?.id);
-      stopLoading();
-      router.push("/lessons");
+      await lessonAction(data, action, stopLoading, initialData?.id);
+      startTransition(() => {
+        router.refresh();
+        stopLoading();
+        router.push("/lessons");
+      });
     } catch (error) {
       console.log(error);
       toast.error("There was an error creating lesson.", {

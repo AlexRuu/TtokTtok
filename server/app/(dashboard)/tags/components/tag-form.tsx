@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { tagSchema, tagSchemaValues } from "@/schemas/form-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { startTransition } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -48,8 +48,11 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
     try {
       const action = initialData ? "PATCH" : "POST";
       tagActions(data, action, stopLoading, initialData?.id);
-      stopLoading();
-      router.push("/tags");
+      startTransition(() => {
+        router.refresh();
+        stopLoading();
+        router.push("/tags");
+      });
     } catch (error) {
       console.log(error);
       toast.error("There was an error updating unit.", {
