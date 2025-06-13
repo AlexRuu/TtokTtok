@@ -39,15 +39,15 @@ export async function POST(req: Request) {
           create: quizQuestion.map((q) => {
             let optionsOrPairs: any = undefined;
 
-            if (q.type === "MULTIPLE_CHOICE") {
+            if (q.quizType === "MULTIPLE_CHOICE") {
               optionsOrPairs = q.options;
-            } else if (q.type === "MATCHING") {
-              optionsOrPairs = q.pairs;
+            } else if (q.quizType === "MATCHING") {
+              optionsOrPairs = q.options;
             }
 
             return {
               question: q.question,
-              quizType: q.type,
+              quizType: q.quizType,
               options: optionsOrPairs ?? undefined,
               answer:
                 typeof q.answer === "string"
