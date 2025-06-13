@@ -55,3 +55,41 @@ export async function PATCH(
     });
   }
 }
+
+export async function DELETE(
+  _req: Request,
+  props: { params: Promise<{ vocabularyId: string }> }
+) {
+  const params = await props.params;
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || session.user.role !== "ADMIN") {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+    const vocabularyId = params.vocabularyId;
+
+    const existingVocabulary = await prismadb.vocabularyList.findUnique({
+      where: { id: vocabularyId },
+    });
+
+    if (!existingVocabulary) {
+      return new NextResponse("Vocabulary list does not exist", {
+        status: 404,
+      });
+    }
+
+    await prismadb.vocabularyList.delete({
+      where: { id: vocabularyId },
+    });
+
+    return new NextResponse("Vocabulary list was successfully deleted", {
+      status: 200,
+    });
+  } catch (error) {
+    console.error("There was an error deleting vocabulary list", error);
+    return new NextResponse("There was an error deleting vocabulary list", {
+      status: 500,
+    });
+  }
+}

@@ -88,3 +88,37 @@ export async function PATCH(
     });
   }
 }
+
+export async function DELETE(
+  _req: Request,
+  props: { params: Promise<{ quidId: string }> }
+) {
+  const params = await props.params;
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || session.user.role !== "ADMIN") {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+    const quidId = params.quidId;
+
+    const existingQuiz = await prismadb.quiz.findUnique({
+      where: { id: quidId },
+    });
+
+    if (!existingQuiz) {
+      return new NextResponse("Quiz list does not exist", { status: 404 });
+    }
+
+    await prismadb.quiz.delete({
+      where: { id: quidId },
+    });
+
+    return new NextResponse("Quiz was successfully deleted", { status: 200 });
+  } catch (error) {
+    console.error("There was an error deleting quiz", error);
+    return new NextResponse("There was an error deleting quiz", {
+      status: 500,
+    });
+  }
+}

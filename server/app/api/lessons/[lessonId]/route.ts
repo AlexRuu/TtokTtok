@@ -92,3 +92,37 @@ export async function PATCH(
     return new NextResponse("Error patching lesson", { status: 500 });
   }
 }
+
+export async function DELETE(
+  _req: Request,
+  props: { params: Promise<{ lessonId: string }> }
+) {
+  const params = await props.params;
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || session.user.role !== "ADMIN") {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+    const lessonId = params.lessonId;
+
+    const existingLesson = await prismadb.lesson.findUnique({
+      where: { id: lessonId },
+    });
+
+    if (!existingLesson) {
+      return new NextResponse("Lesson does not exist", { status: 404 });
+    }
+
+    await prismadb.lesson.delete({
+      where: { id: lessonId },
+    });
+
+    return new NextResponse("Lesson was successfully deleted", { status: 200 });
+  } catch (error) {
+    console.error("There was an error deleting lesson", error);
+    return new NextResponse("There was an error deleting lesson", {
+      status: 500,
+    });
+  }
+}
