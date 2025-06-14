@@ -37,6 +37,7 @@ import {
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Command, CommandItem, CommandList } from "@/components/ui/command";
 import { lessonAction } from "@/formActions/form-actions";
+import Loader from "@/components/loader";
 
 const formSchema = LessonFormSchema;
 
@@ -134,6 +135,7 @@ const LessonForm: React.FC<UnitFormProps> = ({ initialData, units, tags }) => {
 
   return (
     <div className="min-h-screen w-full max-w-screen bg-[#fdfaf6] overflow-x-hidden flex items-center justify-center flex-col py-10 px-4">
+      {isLoading && <Loader />}
       <Form {...form}>
         <form
           noValidate
