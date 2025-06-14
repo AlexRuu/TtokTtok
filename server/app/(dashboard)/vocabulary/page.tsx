@@ -6,6 +6,12 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import DeleteButton from "@/components/ui/delete-button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -15,6 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { findAscUnits } from "@/prisma/prismaFetches";
+import { Edit, Ellipsis } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -58,16 +65,34 @@ const VocabularyPage = async () => {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base font-semibold leading-tight text-foreground flex justify-between items-center">
                         Lesson {lesson.lessonNumber}: {lesson.title}
-                        <Button
-                          asChild
-                          className="bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-medium px-5 py-3 text-base rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.01] focus:ring-2 focus:ring-indigo-300 hover:cursor-pointer"
-                        >
-                          <Link
-                            href={`/vocabulary/${lesson.vocabularyList?.id}`}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="hover:cursor-pointer">
+                            <Ellipsis />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            className="w-full py-3 px-4 flex-col flex gap-2"
+                            align="end"
                           >
-                            Edit
-                          </Link>
-                        </Button>
+                            <Button
+                              asChild
+                              className="bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-medium px-5 py-3 text-base rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.01] focus:ring-2 focus:ring-indigo-300 hover:cursor-pointer"
+                            >
+                              <Link
+                                href={`/vocabulary/${lesson.vocabularyList?.id}`}
+                              >
+                                <Edit /> Edit
+                              </Link>
+                            </Button>
+                            <DeleteButton
+                              path="vocabulary"
+                              id={
+                                lesson.vocabularyList
+                                  ? lesson.vocabularyList.id
+                                  : ""
+                              }
+                            />
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">

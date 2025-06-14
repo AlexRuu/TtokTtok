@@ -7,8 +7,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import DeleteButton from "@/components/ui/delete-button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { findAscUnits } from "@/prisma/prismaFetches";
-import { Edit } from "lucide-react";
+import { Edit, Ellipsis } from "lucide-react";
 
 import Link from "next/link";
 
@@ -65,14 +71,28 @@ const QuizzesPage = async () => {
                                       <CardTitle className="text-xl">
                                         Quiz Questions
                                       </CardTitle>
-                                      <Button
-                                        asChild
-                                        className="w-1/4 mb-4 bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-medium px-5 py-3 text-base rounded-xl shadow-sm transition-all hover:scale-[1.01] focus:ring-2 focus:ring-indigo-300"
-                                      >
-                                        <Link href={`/quizzes/${item.id}`}>
-                                          <Edit /> Edit Quiz
-                                        </Link>
-                                      </Button>
+                                      <DropdownMenu>
+                                        <DropdownMenuTrigger className="hover:cursor-pointer">
+                                          <Ellipsis />
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                          className="w-full py-3 px-4 flex-col flex gap-2"
+                                          align="end"
+                                        >
+                                          <Button
+                                            asChild
+                                            className="bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-medium px-5 text-base rounded-xl shadow-sm transition-all hover:scale-[1.01] focus:ring-2 focus:ring-indigo-300 hover:cursor-pointer py-4 sm:py-5 sm:text-md hover:shadow-md duration-200 ease-in-out"
+                                          >
+                                            <Link href={`/quizzes/${item.id}`}>
+                                              <Edit /> Edit Quiz
+                                            </Link>
+                                          </Button>
+                                          <DeleteButton
+                                            path="quiz"
+                                            id={item.id}
+                                          />
+                                        </DropdownMenuContent>
+                                      </DropdownMenu>
                                     </CardHeader>
                                     <CardContent>
                                       {item.quizQuestion.map(
