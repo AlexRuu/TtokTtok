@@ -58,7 +58,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  props: { params: Promise<{ vocabularyId: string }> }
+  props: { params: Promise<{ vocabularyListId: string }> }
 ) {
   const params = await props.params;
   try {
@@ -67,10 +67,10 @@ export async function DELETE(
     if (!session || !session.user || session.user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    const vocabularyId = params.vocabularyId;
+    const vocabularyListId = params.vocabularyListId;
 
     const existingVocabulary = await prismadb.vocabularyList.findUnique({
-      where: { id: vocabularyId },
+      where: { id: vocabularyListId },
     });
 
     if (!existingVocabulary) {
@@ -80,7 +80,7 @@ export async function DELETE(
     }
 
     await prismadb.vocabularyList.delete({
-      where: { id: vocabularyId },
+      where: { id: vocabularyListId },
     });
 
     return new NextResponse("Vocabulary list was successfully deleted", {

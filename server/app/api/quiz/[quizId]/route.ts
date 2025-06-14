@@ -91,7 +91,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  props: { params: Promise<{ quidId: string }> }
+  props: { params: Promise<{ quizId: string }> }
 ) {
   const params = await props.params;
   try {
@@ -100,10 +100,10 @@ export async function DELETE(
     if (!session || !session.user || session.user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    const quidId = params.quidId;
+    const quizId = params.quizId;
 
     const existingQuiz = await prismadb.quiz.findUnique({
-      where: { id: quidId },
+      where: { id: quizId },
     });
 
     if (!existingQuiz) {
@@ -111,12 +111,12 @@ export async function DELETE(
     }
 
     await prismadb.quiz.delete({
-      where: { id: quidId },
+      where: { id: quizId },
     });
 
     return new NextResponse("Quiz was successfully deleted", { status: 200 });
   } catch (error) {
-    console.error("There was an error deleting quiz", error);
+    console.log("There was an error deleting quiz", error);
     return new NextResponse("There was an error deleting quiz", {
       status: 500,
     });
