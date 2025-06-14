@@ -97,7 +97,7 @@ const UnitsForm: React.FC<EditUnitsFormProps> = ({ initialData }) => {
                           : ""
                       )}
                     >
-                      * Title
+                      Title
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -113,9 +113,6 @@ const UnitsForm: React.FC<EditUnitsFormProps> = ({ initialData }) => {
               />
             </div>
           </div>
-          <p className="text-sm text-gray-500 -mt-2 mb-3">
-            * Indicates a required field
-          </p>
           <div className="flex space-x-1">
             <Button
               className="w-full font-semibold bg-pink-200 hover:bg-pink-300 text-pink-900 flex items-center justify-center gap-2 hover:cursor-pointer py-4 sm:py-5 text-base sm:text-md rounded-xl transition-colors shadow-xs hover:scale-[1.01] hover:shadow-md duration-200 ease-in-out focus:ring-2 focus:ring-pink-300 active:scale-[0.99] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-pink-400"
