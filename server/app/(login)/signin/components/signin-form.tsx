@@ -14,15 +14,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { CircleAlert } from "lucide-react";
 import Loader from "@/components/loader";
 import useLoading from "@/hooks/use-loading";
 import { cn } from "@/lib/utils";
-
-type ProviderId = "github" | "google" | "discord";
 
 const formSchema = z.object({
   email: z
