@@ -10,7 +10,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { tagActions } from "@/formActions/form-actions";
+import { tagActions } from "@/actions/form-actions";
 import useLoading from "@/hooks/use-loading";
 import { Tag } from "@/lib/generated/prisma";
 import { cn } from "@/lib/utils";

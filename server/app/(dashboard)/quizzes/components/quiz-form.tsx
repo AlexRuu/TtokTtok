@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { quizActions } from "@/formActions/form-actions";
+import { quizActions } from "@/actions/form-actions";
 import useLoading from "@/hooks/use-loading";
 import { Lesson, Quiz, QuizQuestion, Unit } from "@/lib/generated/prisma";
 import { quizSchema, quizSchemaValues } from "@/schemas/form-schemas";

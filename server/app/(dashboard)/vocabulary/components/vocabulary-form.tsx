@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { vocabularyAction } from "@/formActions/form-actions";
+import { vocabularyAction } from "@/actions/form-actions";
 import useLoading from "@/hooks/use-loading";
 import {
   Lesson,
