@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteItem } from "@/formActions/delete-actions";
+import { deleteItem } from "@/actions/delete-actions";
 import { Button } from "./button";
 import { useRouter } from "next/navigation";
 import { Trash } from "lucide-react";
