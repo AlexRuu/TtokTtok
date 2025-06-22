@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   output   = "../lib/generated/prisma"
@@ -11,56 +8,55 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Auth Models
 model User {
   id                  String                @id @default(cuid())
-  firstName           String
-  lastName            String
   email               String                @unique
   password            String?
   emailVerified       DateTime?
   image               String?
+  firstName           String
+  lastName            String
   role                Role                  @default(USER)
   status              Status                @default(ACTIVE)
   accounts            Account[]
-  VerificationToken   VerificationToken[]
-  createdAt           DateTime              @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
   forgotPasswordToken ForgotPasswordToken[]
   savedVocabulary     SavedVocabulary[]
   userChapterReview   UserChapterReview[]
   userLessonProgress  UserLessonProgress[]
   userQuizAttempt     UserQuizAttempt[]
+  verificationToken   VerificationToken[]
+  createdAt           DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
 }
 
 model Account {
   id                String  @id @default(cuid())
   userId            String
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   type              String
   provider          String
   providerAccountId String
-  access_token      String? @db.Text
-  refresh_token     String? @db.Text
+  access_token      String?
   expires_at        Int?
-  token_type        String?
+  id_token          String?
+  refresh_token     String?
   scope             String?
-  id_token          String? @db.Text
   session_state     String?
+  token_type        String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model VerificationToken {
-  id         String    @id @default(cuid())
   identifier String
   token      String    @unique
   expires    DateTime
+  createdAt  DateTime  @default(now()) @db.Timestamptz(6)
+  id         String    @id @default(cuid())
+  userId     String
   used       Boolean   @default(false)
   usedAt     DateTime?
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String
-  createdAt  DateTime  @default(now()) @db.Timestamptz(6)
 
   @@unique([identifier, token])
 }
@@ -71,22 +67,21 @@ model ForgotPasswordToken {
   token      String    @unique
   expires    DateTime
   userId     String
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(6)
   used       Boolean   @default(false)
   usedAt     DateTime?
-  createdAt  DateTime  @default(now()) @db.Timestamptz(6)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([identifier, token])
 }
 
-// User Profile Models
 model SavedVocabulary {
   id           String     @id @default(cuid())
   userId       String
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  vocabularyId String
-  vocabulary   Vocabulary @relation(fields: [vocabularyId], references: [id], onDelete: Cascade)
   createdAt    DateTime   @default(now()) @db.Timestamptz(6)
+  vocabularyId String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vocabulary   Vocabulary @relation(fields: [vocabularyId], references: [id], onDelete: Cascade)
 
   @@unique([userId, vocabularyId])
 }
@@ -94,13 +89,13 @@ model SavedVocabulary {
 model UserChapterReview {
   id        String   @id @default(cuid())
   lessonId  String
-  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   unitId    String
-  unit      Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  unit      Unit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, lessonId])
 }
@@ -108,11 +103,11 @@ model UserChapterReview {
 model UserLessonProgress {
   id          String    @id @default(cuid())
   userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   lessonId    String
-  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   startedAt   DateTime  @default(now())
   completedAt DateTime?
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
 }
@@ -120,15 +115,14 @@ model UserLessonProgress {
 model UserQuizAttempt {
   id          String   @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   quizId      String
-  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
   score       Int
   passed      Boolean
   attemptedAt DateTime @default(now())
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// Lessons and Content Models
 model Unit {
   id                String              @id @default(cuid())
   unitNumber        Int                 @default(autoincrement())
@@ -143,17 +137,17 @@ model Lesson {
   id                 String               @id @default(cuid())
   title              String
   lessonNumber       Int
-  content            Json
   unitId             String
-  unit               Unit                 @relation(fields: [unitId], references: [id], onDelete: Cascade)
-  userChapterReview  UserChapterReview[]
-  quiz               Quiz[]
-  vocabularyList     VocabularyList?
   createdAt          DateTime             @default(now()) @db.Timestamptz(6)
   updatedAt          DateTime             @default(now()) @updatedAt @db.Timestamptz(6)
+  content            Json
+  unit               Unit                 @relation(fields: [unitId], references: [id], onDelete: Cascade)
   lessonVersion      LessonVersion[]
+  quiz               Quiz[]
   tagging            Tagging[]
+  userChapterReview  UserChapterReview[]
   userLessonProgress UserLessonProgress[]
+  vocabularyList     VocabularyList?
 
   @@index([unitId, lessonNumber])
 }
@@ -161,17 +155,16 @@ model Lesson {
 model LessonVersion {
   id        String   @id @default(cuid())
   lessonId  String
-  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   version   Int
   content   Json
   createdAt DateTime @default(now())
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@unique([lessonId, version])
   @@index([lessonId])
 }
 
 model LessonMedia {
-  // Added in case I need to add media, if needed, will most likely implement with cloudinary
   id        String   @id @default(cuid())
   url       String
   type      String
@@ -191,14 +184,14 @@ model Tag {
 model Tagging {
   id               String          @id @default(cuid())
   tagId            String
-  tag              Tag             @relation(fields: [tagId], references: [id], onDelete: Cascade)
   lessonId         String?
-  lesson           Lesson?         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   quizId           String?
-  quiz             Quiz?           @relation(fields: [quizId], references: [id], onDelete: Cascade)
   createdAt        DateTime        @default(now()) @db.Timestamptz(6)
   updatedAt        DateTime        @default(now()) @updatedAt @db.Timestamptz(6)
   vocabularyListId String?
+  lesson           Lesson?         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  quiz             Quiz?           @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  tag              Tag             @relation(fields: [tagId], references: [id], onDelete: Cascade)
   vocabularyList   VocabularyList? @relation(fields: [vocabularyListId], references: [id], onDelete: Cascade)
 
   @@index([tagId])
@@ -210,8 +203,8 @@ model Tagging {
 model Quiz {
   id              String            @id @default(cuid())
   lessonId        String
-  lesson          Lesson            @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   createdAt       DateTime          @default(now()) @db.Timestamptz(6)
+  lesson          Lesson            @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   quizQuestion    QuizQuestion[]
   tagging         Tagging[]
   userQuizAttempt UserQuizAttempt[]
@@ -221,20 +214,20 @@ model QuizQuestion {
   id       String   @id @default(cuid())
   question String
   quizId   String
-  quiz     Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
   quizType QuizType
   options  Json?
   answer   String
+  quiz     Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }
 
 model VocabularyList {
   id         String       @id @default(cuid())
-  lessonId   String       @unique
-  lesson     Lesson       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   createdAt  DateTime     @default(now()) @db.Timestamptz(6)
   updatedAt  DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
+  lessonId   String       @unique
   tagging    Tagging[]
   vocabulary Vocabulary[]
+  lesson     Lesson       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 }
 
 model Vocabulary {
@@ -242,14 +235,13 @@ model Vocabulary {
   english          String
   korean           String
   definition       String
-  savedVocabulary  SavedVocabulary[]
-  vocabularyListId String
-  vocabularyList   VocabularyList    @relation(fields: [vocabularyListId], references: [id], onDelete: Cascade)
   createdAt        DateTime          @default(now()) @db.Timestamptz(6)
   updatedAt        DateTime          @default(now()) @updatedAt @db.Timestamptz(6)
+  vocabularyListId String
+  savedVocabulary  SavedVocabulary[]
+  vocabularyList   VocabularyList    @relation(fields: [vocabularyListId], references: [id], onDelete: Cascade)
 }
 
-// Contact Models
 model ContactMessage {
   id        String   @id @default(cuid())
   firstName String
@@ -261,7 +253,14 @@ model ContactMessage {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
 }
 
-// Enums
+model Todo {
+  id          String    @id @default(cuid())
+  title       String
+  completed   Boolean   @default(false)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+  completedAt DateTime?
+}
+
 enum QuizType {
   MULTIPLE_CHOICE
   FILL_IN_THE_BLANK
