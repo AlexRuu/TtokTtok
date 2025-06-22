@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { Command, CommandItem, CommandList } from "@/components/ui/command";
-import { lessonAction } from "@/formActions/form-actions";
+import { lessonAction } from "@/actions/form-actions";
 import Loader from "@/components/loader";
 
 const formSchema = LessonFormSchema;
