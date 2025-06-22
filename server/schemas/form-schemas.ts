@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { boolean, z } from "zod";
 import { Role } from "@/lib/generated/prisma";
 
 const forgotPasswordFormSchema = z.object({
@@ -174,6 +174,10 @@ const quizSchema = z.object({
   lessonId: z.string().min(1, { message: "Please pick a lesson" }),
 });
 
+const todoSchema = z.object({
+  title: z.string().min(1, { message: "Requires a title" }),
+});
+
 export type ForgotPasswordFormSchema = z.infer<typeof forgotPasswordFormSchema>;
 export type SignUpFormSchema = z.infer<typeof signUpFormSchema>;
 export type ContactFormSchema = z.infer<typeof contactFormSchema>;
@@ -184,6 +188,7 @@ export type UnitsSchemaValues = z.infer<typeof unitsSchema>;
 export type tagSchemaValues = z.infer<typeof tagSchema>;
 export type vocabularySchemaValues = z.infer<typeof vocabularySchema>;
 export type quizSchemaValues = z.infer<typeof quizSchema>;
+export type todoSchemaValues = z.infer<typeof todoSchema>;
 
 export {
   forgotPasswordFormSchema,
@@ -197,4 +202,5 @@ export {
   tagSchema,
   vocabularySchema,
   quizSchema,
+  todoSchema,
 };
