@@ -9,10 +9,12 @@ import Loader from "../loader";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
-const TodoForm = () => {
+const TodoForm = ({ onAdd }: { onAdd: () => void }) => {
   const { isLoading, startLoading, stopLoading } = useLoading();
   const formSchema = todoSchema;
+  const router = useRouter();
 
   const form = useForm<todoSchemaValues>({
     resolver: zodResolver(formSchema),
@@ -43,6 +45,8 @@ const TodoForm = () => {
         stopLoading();
         return;
       }
+      form.reset();
+      onAdd();
       stopLoading();
     } catch (error) {
       console.log(error);
