@@ -53,6 +53,15 @@ export async function GET(_req: Request) {
       orderBy: { createdAt: "asc" },
     });
 
+    await prismadb.todo.deleteMany({
+      where: {
+        completed: true,
+        completedAt: {
+          not: null,
+        },
+      },
+    });
+
     return NextResponse.json(list);
   } catch (error) {
     console.log("Error getting todo list", error);
