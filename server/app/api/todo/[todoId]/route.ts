@@ -30,6 +30,7 @@ export async function PATCH(
       where: { id: todoId },
       data: {
         completed: true,
+        completedAt: new Date(),
       },
     });
 
