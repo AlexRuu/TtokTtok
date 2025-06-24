@@ -31,9 +31,7 @@ const ContentData = async () => {
         {/* Top Started Lessons */}
         <Card className="bg-white dark:bg-background">
           <CardHeader>
-            <CardTitle className="text-base">
-              Top Started Lessons (Completed Or Not)
-            </CardTitle>
+            <CardTitle className="text-base">Top Lessons</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             {topStartedLessons.map((lesson) => (
