@@ -3,14 +3,14 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "Ttok Ttok Terms of Service",
+  description: "TtokTtok Terms of Service",
 };
 
 const TermsOfService = () => {
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 text-gray-800">
       <h1 className="text-3xl md:text-4xl font-bold mb-4 text-center text-pink-600">
-        Terms of Service for Ttok Ttok
+        Terms of Service for TtokTtok
       </h1>
       <p className="text-sm text-center text-gray-500 mb-12">
         Effective Date: June 18, 2025
@@ -41,8 +41,8 @@ const sections = [
     content: (
       <p>
         Welcome to TtokTtok (“we”, “our”, or “us”). These Terms and Conditions
-        (“Terms”) govern your use of the Ttok Ttok app, website, and services.
-        By using the Platform, you (“user”, “you”) agree to be bound by these
+        (“Terms”) govern your use of the TtokTtok app, website, and services. By
+        using the Platform, you (“user”, “you”) agree to be bound by these
         Terms. If you do not agree, please refrain from accessing or using our
         platform.
       </p>
@@ -119,7 +119,7 @@ const sections = [
       <>
         <p>
           All content and data provided on this platform, with the exclusion of
-          user-generated content, are property of Ttok Ttok.
+          user-generated content, are property of TtokTtok.
         </p>
         <p>
           We respect the intellectual property rights of others. If you believe
