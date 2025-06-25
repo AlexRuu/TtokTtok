@@ -250,6 +250,16 @@ const SignInForm = () => {
           >
             {form.formState.isSubmitting ? "Logging in..." : "Login"}
           </Button>
+          <p className="text-xs text-center text-gray-500 mt-2">
+            By logging in, you agree to our{" "}
+            <Link
+              href="/tos"
+              className="text-blue-600 underline hover:text-blue-500"
+            >
+              Terms of Service
+            </Link>
+            .
+          </p>
           <p className="text-center">
             Don&apos;t have an account?
             <Link
@@ -271,6 +281,7 @@ const SignInForm = () => {
                 .map((provider) => (
                   <div key={provider.name} className="text-center my-4">
                     <Button
+                      type="button"
                       disabled={isLoading}
                       focus-visible="outline"
                       aria-live="assertive"
