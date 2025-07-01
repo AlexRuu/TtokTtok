@@ -1,25 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { CircleUserRound, LogOut, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "../../../lib/utils";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import SearchBar from "./searchBar";
 import MobileNav from "./mobile";
 import Loader from "../loader";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "../dropdown-menu";
-import ProfileAvatar from "../tteok-avatar";
+import AuthDropdown from "./auth-dropdown";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   const pathName = usePathname();
@@ -45,18 +39,6 @@ export default function Navbar() {
       observer.disconnect();
     };
   }, []);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
 
   const links = useMemo(
     () => [
@@ -84,27 +66,26 @@ export default function Navbar() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    function handleClickOutside(event: MouseEvent) {
+  const handleClickOutside = useCallback(
+    (event: MouseEvent) => {
       if (
         drawerRef.current &&
         !drawerRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
       }
-    }
+    },
+    [drawerRef]
+  );
+
+  useEffect(() => {
+    if (!isOpen) return;
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen]);
-
-  const handleLogout = () => {
-    signOut({ redirect: false });
-  };
+  }, [isOpen, handleClickOutside]);
 
   if (!mounted) {
     return <Loader />;
@@ -113,9 +94,9 @@ export default function Navbar() {
     <>
       <nav
         ref={navRef}
-        className="sticky top-0 z-40 bg-[#FAF3F0]/80 backdrop-blur-xs px-4 py-3 shadow-sm md:px-8"
+        className="sticky top-0 z-50 bg-[#FAF3F0]/70 backdrop-blur-md shadow-md border-b border-[#f0e1da]"
       >
-        <div className="flex justify-between items-center max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
           <Link
             href="/"
             className="flex items-center space-x-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded"
@@ -146,74 +127,33 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop links */}
-          <div className="hidden md:flex items-center space-x-6 text-sm font-light text-[#6B4C3B]">
+          <div className="hidden md:flex items-center gap-8 text-sm text-[#6B4C3B]">
             {links.map((link) => (
               <Link
-                href={link.path}
                 key={link.name}
-                aria-current={pathName === link.path ? "page" : undefined}
+                href={link.path}
                 className={cn(
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded px-2 py-1 hover:text-[#A65A3A] transition-colors border-b-2 border-transparent focus-visible:text-[#A65A3A]",
-                  pathName === link.path
-                    ? "border-[#A65A3A] text-[#A65A3A] font-medium"
-                    : ""
+                  "transition-all duration-200 px-2 py-1 rounded-md hover:text-[#A65A3A] hover:bg-[#FFF3EC]",
+                  pathName === link.path &&
+                    "text-[#A65A3A] font-medium underline underline-offset-4 decoration-[#D69E78]"
                 )}
               >
                 {link.name}
               </Link>
             ))}
-            <SearchBar />
-            {status == "authenticated" ? (
-              <DropdownMenu
-                open={dropdownOpen}
-                onOpenChange={(isOpen) => setDropdownOpen(isOpen)}
-                modal={false}
-              >
-                <DropdownMenuTrigger>
-                  <div onMouseEnter={() => setDropdownOpen(true)}>
-                    <CircleUserRound />
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  onMouseLeave={() => setDropdownOpen(false)}
-                  onCloseAutoFocus={(e) => {
-                    e.preventDefault();
-                  }}
-                  className="min-w-28 overflow-visible relative flex flex-col px-3 pb-3 pt-1 top-3 bg-[#FBEDE7]/80 backdrop-blur-md border border-[#e8dcd5] shadow-sm rounded-xl"
+            <div className="flex items-center gap-5">
+              <SearchBar />
+              {status == "authenticated" ? (
+                <AuthDropdown />
+              ) : (
+                <Link
+                  href="/signin"
+                  className="ml-2 px-4 py-1.5 text-sm rounded-full bg-[#FFEFE7] hover:bg-[#f5dbcf] text-[#6B4C3B] transition font-medium shadow-sm"
                 >
-                  <div className="absolute top-[-6px] right-3/7 w-3 h-3 bg-[#e7dad5d8] rotate-45 border border-[#e8dcd5] z-60" />
-                  <Link
-                    href="/profile"
-                    className="flex items-center mt-2 py-2 px-4 text-sm text-[#6B4C3B] hover:bg-[#f2dfd7] rounded-md text-center"
-                  >
-                    <ProfileAvatar
-                      color="#6B4C3B"
-                      size={30}
-                      className="mr-1 text-red-400 rounded p-1"
-                    />
-                    Profile
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="py-2 px-4 text-sm text-red-400 hover:bg-[#f2dfd7] rounded-md text-center w-full flex items-center"
-                  >
-                    <LogOut
-                      size={30}
-                      className="mr-1 text-red-400 rounded p-1"
-                    />
-                    Logout
-                  </button>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Link
-                href="/signin"
-                aria-label="Login"
-                className="focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] ml-4 px-3 py-1 rounded-full bg-[#FFEFE7] hover:bg-[#f5dbcf] transition text-[#6B4C3B] font-medium"
-              >
-                Login
-              </Link>
-            )}
+                  Login
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* Mobile menu toggle */}
