@@ -19,7 +19,7 @@ export async function PATCH(
       return new NextResponse("Insufficient data required", { status: 400 });
     }
     const id = params.id;
-    const { firstName, lastName, email, role } = body;
+    const { firstName, lastName, email, role, status } = body;
 
     await prismadb.user.update({
       where: {
@@ -29,6 +29,7 @@ export async function PATCH(
         firstName: firstName,
         lastName: lastName,
         email: email,
+        status: status,
         role: role,
       },
     });
@@ -54,6 +55,7 @@ export async function DELETE(
     if (!session || !session.user || session.user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
+
     const userId = params.id;
 
     const existingUser = await prismadb.user.findUnique({
@@ -64,7 +66,7 @@ export async function DELETE(
       return new NextResponse("User does not exist", { status: 404 });
     }
 
-    await prismadb.unit.delete({
+    await prismadb.user.delete({
       where: { id: userId },
     });
 
