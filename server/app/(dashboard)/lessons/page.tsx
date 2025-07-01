@@ -4,6 +4,7 @@ import DeleteButton from "@/components/ui/delete-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -76,28 +77,45 @@ const LessonsPage = async () => {
                       <TableCell className="text-center">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="hover:bg-muted"
+                            <button
+                              aria-label="Open actions menu"
+                              className="h-8 w-8 p-0 rounded-md flex items-center justify-center text-pink-600 hover:bg-pink-50 transition-colors duration-200"
                             >
-                              <Ellipsis />
-                            </Button>
+                              <Ellipsis className="w-5 h-5" />
+                            </button>
                           </DropdownMenuTrigger>
+
                           <DropdownMenuContent
-                            align="end"
-                            className="w-32 justify-center flex flex-col mx-auto py-2 px-4 space-y-1 bg-popover border rounded-md shadow-md gap-2"
+                            align="center"
+                            sideOffset={4}
+                            className="w-40 bg-white border border-pink-200 rounded-lg shadow-md p-2"
                           >
-                            <Button
-                              variant="ghost"
-                              className="bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-medium px-5 text-base rounded-xl shadow-sm transition-all hover:scale-[1.01] focus:ring-2 focus:ring-indigo-300 hover:cursor-pointer py-4 sm:py-5 sm:text-md hover:shadow-md duration-200 ease-in-out"
+                            {/* EDIT */}
+                            <DropdownMenuItem
                               asChild
+                              className="flex items-center gap-2 px-4 py-2 text-indigo-700 text-sm rounded-md cursor-pointer hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
                             >
-                              <Link href={`/lessons/${lesson.id}/edit`}>
-                                <Edit className="w-4 h-4" /> Edit
+                              <Link
+                                href={`/lessons/${lesson.id}`}
+                                tabIndex={-1}
+                                className="flex items-center gap-2 w-full"
+                              >
+                                <Edit className="w-4 h-4" />
+                                Edit
                               </Link>
-                            </Button>
-                            <DeleteButton path="lessons" id={lesson.id} />
+                            </DropdownMenuItem>
+
+                            {/* DELETE */}
+                            <DropdownMenuItem
+                              asChild
+                              className="flex items-center gap-2 px-4 py-2 text-red-400 text-sm rounded-md cursor-pointer hover:bg-red-100 focus:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-300 transition"
+                            >
+                              <DeleteButton
+                                path="lessons"
+                                id={lesson.id}
+                                minimal
+                              />
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
