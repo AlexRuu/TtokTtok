@@ -19,7 +19,7 @@ import useLoading from "@/hooks/use-loading";
 import { cn } from "@/lib/utils";
 import { editUserSchema } from "@/schemas/form-schemas";
 import { EditUserValues } from "@/schemas/form-schemas";
-import { Role, User } from "@/lib/generated/prisma";
+import { Role, Status, User } from "@/lib/generated/prisma";
 import {
   Select,
   SelectItem,
@@ -58,6 +58,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
           firstName: "",
           lastName: "",
           email: "",
+          status: "ACTIVE",
           role: "USER",
         },
   });
@@ -140,9 +141,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                             : ""
                         )}
                       >
-                        {fieldName === "firstName"
-                          ? "* First Name"
-                          : "* Last Name"}
+                        {fieldName === "firstName" ? "First Name" : "Last Name"}
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -182,7 +181,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                         : ""
                     )}
                   >
-                    * Email
+                    Email
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -204,6 +203,41 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
           <div className="relative">
             <FormField
               control={form.control}
+              name="status"
+              disabled={isLoading}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel
+                    htmlFor="status"
+                    className={cn(
+                      form.formState.errors.role && form.formState.isSubmitted
+                        ? "text-red-400! before:text-red-400"
+                        : ""
+                    )}
+                  >
+                    Status
+                  </FormLabel>
+                  {form.formState.isSubmitted &&
+                    renderError(form.formState.errors.role)}
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="w-full border border-gray-300 rounded-md py-3 px-3 text-base shadow-xs focus:ring-2 focus:ring-indigo-300">
+                      {field.value}
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(Status).map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="relative">
+            <FormField
+              control={form.control}
               name="role"
               disabled={isLoading}
               render={({ field }) => (
@@ -216,7 +250,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                         : ""
                     )}
                   >
-                    * Role
+                    Role
                   </FormLabel>
                   {form.formState.isSubmitted &&
                     renderError(form.formState.errors.role)}
@@ -237,13 +271,11 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
             />
           </div>
 
-          <p className="text-sm text-gray-500 -mt-2 mb-3">
-            * Indicates a required field
-          </p>
           <div className="flex space-x-1">
             <Button
               className="w-full font-semibold bg-pink-200 hover:bg-pink-300 text-pink-900 flex items-center justify-center gap-2 hover:cursor-pointer py-4 sm:py-5 text-base sm:text-md rounded-xl transition-colors shadow-xs hover:scale-[1.01] hover:shadow-md duration-200 ease-in-out focus:ring-2 focus:ring-pink-300 active:scale-[0.99] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-pink-400"
               aria-label="Cancel"
+              type="button"
               onClick={() => router.push("/users")}
               disabled={form.formState.isSubmitting}
               aria-live="assertive"
