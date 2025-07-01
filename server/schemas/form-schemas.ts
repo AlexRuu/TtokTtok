@@ -1,5 +1,5 @@
-import { boolean, z } from "zod";
-import { Role } from "@/lib/generated/prisma";
+import { z } from "zod";
+import { Role, Status } from "@/lib/generated/prisma";
 
 const forgotPasswordFormSchema = z.object({
   email: z
@@ -79,6 +79,7 @@ const editUserSchema = z.object({
     .string()
     .min(1, { message: "Email is required." })
     .email({ message: "Invalid Email Address" }),
+  status: z.enum([Status.ACTIVE, Status.INACTIVE]),
   role: z.enum([Role.ADMIN, Role.USER]),
 });
 
