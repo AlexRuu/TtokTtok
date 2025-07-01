@@ -2,7 +2,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import type { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 
 interface MobileNavProps {
@@ -28,6 +27,23 @@ const MobileNav = ({ isOpen, setIsOpen, links, navHeight }: MobileNavProps) => {
           transition={{ duration: 0.3, ease: "easeInOut" }}
         >
           <div className="space-y-2 p-3 pt-0">
+            <Link
+              href={"/"}
+              onClick={() => setIsOpen(false)}
+              aria-current={pathName === "/" ? "page" : undefined}
+              className="focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-[#A65A3A] block px-4 py-3 text-base rounded-md hover:bg-[#FBEDE7] transition-colors"
+            >
+              <span
+                className={cn(
+                  "inline-block border-b-2 border-transparent transition-colors",
+                  pathName === "/"
+                    ? "border-[#A65A3A] text-[#A65A3A] font-medium"
+                    : "hover:border-[#E0B9AA]"
+                )}
+              >
+                Home
+              </span>
+            </Link>
             {links.map((link) => (
               <Link
                 href={link.path}
@@ -48,6 +64,12 @@ const MobileNav = ({ isOpen, setIsOpen, links, navHeight }: MobileNavProps) => {
                 </span>
               </Link>
             ))}
+            <button
+              onClick={() => signOut()}
+              className="block w-full text-left px-4 py-3 font-medium text-red-400 rounded-md hover:bg-[#FBEDE7] transition-colors hover:cursor-pointer"
+            >
+              Logout
+            </button>
           </div>
         </motion.div>
       )}

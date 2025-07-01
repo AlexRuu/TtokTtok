@@ -224,7 +224,7 @@ export default function Navbar() {
       <MobileNav
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        links={links}
+        links={dropdownLinks}
         navHeight={navHeight}
       />
     </>
