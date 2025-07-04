@@ -79,7 +79,7 @@ const LessonsPage = async () => {
                           <DropdownMenuTrigger asChild>
                             <button
                               aria-label="Open actions menu"
-                              className="h-8 w-8 p-0 rounded-md flex items-center justify-center text-pink-600 hover:bg-pink-50 transition-colors duration-200"
+                              className="w-full p-0 rounded-md flex text-center items-center justify-center text-pink-600 hover:bg-pink-50 transition-colors duration-200 hover:cursor-pointer"
                             >
                               <Ellipsis className="w-5 h-5" />
                             </button>
@@ -111,6 +111,7 @@ const LessonsPage = async () => {
                               className="flex items-center gap-2 px-4 py-2 text-red-400 text-sm rounded-md cursor-pointer hover:bg-red-100 focus:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-300 transition"
                             >
                               <DeleteButton
+                                title="Delete Lesson?"
                                 path="lessons"
                                 id={lesson.id}
                                 minimal
