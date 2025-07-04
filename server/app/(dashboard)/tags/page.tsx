@@ -49,7 +49,7 @@ const TagsPage = async () => {
                         <Edit /> Edit
                       </Link>
                     </Button>
-                    <DeleteButton path="tags" id={tag.id} />
+                    <DeleteButton title="Delete Tag" path="tags" id={tag.id} />
                   </div>
                 </TableCell>
               </TableRow>
@@ -70,9 +70,7 @@ const TagsPage = async () => {
               <Button size="sm" variant="outline" className="w-full">
                 <Link href={`/units/`}>Edit</Link>
               </Button>
-              <Button size="sm" variant="destructive" className="w-full">
-                Delete
-              </Button>
+              <DeleteButton title="Delete Tag?" path="tags" id={tag.id} />
             </div>
           </div>
         ))}
