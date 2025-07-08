@@ -14,6 +14,8 @@ model User {
   password            String?
   emailVerified       DateTime?
   image               String?
+  createdAt           DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
   firstName           String
   lastName            String
   role                Role                  @default(USER)
@@ -25,8 +27,6 @@ model User {
   userLessonProgress  UserLessonProgress[]
   userQuizAttempt     UserQuizAttempt[]
   verificationToken   VerificationToken[]
-  createdAt           DateTime              @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
 }
 
 model Account {
@@ -141,6 +141,7 @@ model Lesson {
   createdAt          DateTime             @default(now()) @db.Timestamptz(6)
   updatedAt          DateTime             @default(now()) @updatedAt @db.Timestamptz(6)
   content            Json
+  slug               String
   unit               Unit                 @relation(fields: [unitId], references: [id], onDelete: Cascade)
   lessonVersion      LessonVersion[]
   quiz               Quiz[]
