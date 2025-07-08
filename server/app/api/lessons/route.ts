@@ -4,6 +4,13 @@ import { LessonFormSchema } from "@/schemas/units-schemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
+const generateSlug = (title: string) =>
+  title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\p{Script=Hangul}a-z0-9\s-]/gu, "")
+    .replace(/\s+/g, "-");
+
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -57,6 +64,7 @@ export async function POST(req: Request) {
           title,
           content: blocks,
           unit: { connect: { id: unitId } },
+          slug: generateSlug(title),
         },
       });
 
