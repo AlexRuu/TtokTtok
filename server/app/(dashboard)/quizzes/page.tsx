@@ -62,47 +62,6 @@ const QuizzesPage = async () => {
                     <CardHeader className="pb-2">
                       <CardTitle className="text-base font-semibold flex justify-between items-center text-foreground">
                         Lesson {lesson.lessonNumber} - {lesson.title}
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button
-                              aria-label="Open actions menu"
-                              className="h-8 w-8 p-0 rounded-md flex items-center justify-center text-pink-600 hover:bg-pink-100 transition-colors duration-200"
-                            >
-                              <Ellipsis className="w-5 h-5" />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="center"
-                            sideOffset={4}
-                            className="w-40 bg-white border border-pink-200 rounded-lg shadow-md p-2"
-                          >
-                            <DropdownMenuItem
-                              asChild
-                              className="flex items-center gap-2 px-4 py-2 text-indigo-700 text-sm rounded-md hover:bg-indigo-100 focus:ring-2 focus:ring-indigo-300"
-                            >
-                              <Link
-                                href={`/quiz/${lesson.quiz[0]?.id || ""}`}
-                                tabIndex={-1}
-                                className="flex items-center gap-2 w-full"
-                              >
-                                <Edit className="w-4 h-4" />
-                                Edit
-                              </Link>
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                              asChild
-                              className="flex items-center gap-2 px-4 py-2 text-red-400 text-sm rounded-md hover:bg-red-100 focus:ring-2 focus:ring-red-300"
-                            >
-                              <DeleteButton
-                                path="quiz"
-                                title="Delete Quiz?"
-                                id={lesson.quiz[0]?.id || ""}
-                                minimal
-                              />
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0">
@@ -123,6 +82,49 @@ const QuizzesPage = async () => {
                                 Quiz #{index + 1}
                               </AccordionTrigger>
                               <AccordionContent className="p-4 space-y-4">
+                                <div className="justify-end w-full flex">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <button
+                                        aria-label="Open actions menu"
+                                        className="h-8 w-8 p-0 rounded-md flex items-center justify-center text-pink-600 hover:bg-pink-100 transition-colors duration-200"
+                                      >
+                                        <Ellipsis className="w-5 h-5" />
+                                      </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent
+                                      align="center"
+                                      sideOffset={4}
+                                      className="w-40 bg-white border border-pink-200 rounded-lg shadow-md p-2"
+                                    >
+                                      <DropdownMenuItem
+                                        asChild
+                                        className="flex items-center gap-2 px-4 py-2 text-indigo-700 text-sm rounded-md hover:bg-indigo-100 focus:ring-2 focus:ring-indigo-300"
+                                      >
+                                        <Link
+                                          href={`/quizzes/${quizItem.id || ""}`}
+                                          tabIndex={-1}
+                                          className="flex items-center gap-2 w-full"
+                                        >
+                                          <Edit className="w-4 h-4" />
+                                          Edit
+                                        </Link>
+                                      </DropdownMenuItem>
+
+                                      <DropdownMenuItem
+                                        asChild
+                                        className="flex items-center gap-2 px-4 py-2 text-red-400 text-sm rounded-md hover:bg-red-100 focus:ring-2 focus:ring-red-300"
+                                      >
+                                        <DeleteButton
+                                          path="quiz"
+                                          title="Delete Quiz?"
+                                          id={lesson.quiz[0]?.id || ""}
+                                          minimal
+                                        />
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
                                 {quizItem.quizQuestion.map((question, idx) => {
                                   let parsedOptions: any[] = [];
 
