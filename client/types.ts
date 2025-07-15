@@ -115,3 +115,38 @@ export interface Tagging {
   quiz: Quiz;
   vocabularyList: VocabularyList;
 }
+
+export type TextBlock = {
+  type: "text";
+  content: string;
+};
+
+export type ImageBlock = {
+  type: "image";
+  url: string;
+  alt?: string;
+};
+
+export type NoteBlock = {
+  type: "note";
+  content: string;
+  style?: "default" | "highlight" | "warning" | "tip";
+};
+
+export type TableBlock = {
+  type: "table";
+  headers: string[];
+  rows: string[][];
+  note?: boolean;
+};
+
+export type LessonBlock = TextBlock | ImageBlock | NoteBlock | TableBlock;
+
+export type SearchResult = {
+  id: string;
+  title: string;
+  subtitle: string;
+  href: string;
+  type: "lesson" | "unit" | "quiz" | "vocabulary" | "tag";
+  score: number;
+};
