@@ -24,7 +24,7 @@ export async function PATCH(
       return new NextResponse("Invalid vocabulary data", { status: 400 });
     }
 
-    const { vocabulary } = parsed.data;
+    const { title, vocabulary } = parsed.data;
 
     const existingVocabulary = await prismadb.vocabularyList.findUnique({
       where: { id: vocabularyId },
@@ -36,6 +36,13 @@ export async function PATCH(
 
     await prismadb.vocabulary.deleteMany({
       where: { vocabularyListId: vocabularyId },
+    });
+
+    await prismadb.vocabularyList.update({
+      where: { id: vocabularyId },
+      data: {
+        title: title,
+      },
     });
 
     await prismadb.vocabulary.createMany({

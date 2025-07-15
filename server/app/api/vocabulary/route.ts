@@ -19,7 +19,7 @@ export async function POST(req: Request) {
       return new NextResponse("Missing vocabulary data", { status: 400 });
     }
 
-    const { vocabulary, lessonId } = parsed.data;
+    const { title, vocabulary, lessonId } = parsed.data;
 
     if (!lessonId) {
       return new NextResponse("Lesson is required", { status: 400 });
@@ -27,6 +27,7 @@ export async function POST(req: Request) {
 
     const existingList = await prismadb.vocabularyList.findFirst({
       where: {
+        title: title,
         lessonId: lessonId,
       },
     });
@@ -57,6 +58,7 @@ export async function POST(req: Request) {
     await prismadb.$transaction(async (tx) => {
       const vocabularyList = await tx.vocabularyList.create({
         data: {
+          title: title,
           lesson: { connect: { id: lessonId } },
           vocabulary: {
             createMany: {
