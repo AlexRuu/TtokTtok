@@ -96,7 +96,7 @@ const LessonsPage = async () => {
                               className="flex items-center gap-2 px-4 py-2 text-indigo-700 text-sm rounded-md cursor-pointer hover:bg-indigo-100 focus:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
                             >
                               <Link
-                                href={`/lessons/${lesson.id}`}
+                                href={`/lessons/${lesson.id}/edit`}
                                 tabIndex={-1}
                                 className="flex items-center gap-2 w-full"
                               >
