@@ -141,7 +141,7 @@ model Lesson {
   createdAt          DateTime             @default(now()) @db.Timestamptz(6)
   updatedAt          DateTime             @default(now()) @updatedAt @db.Timestamptz(6)
   content            Json
-  slug               String
+  slug               String               @unique
   unit               Unit                 @relation(fields: [unitId], references: [id], onDelete: Cascade)
   lessonVersion      LessonVersion[]
   quiz               Quiz[]
@@ -203,6 +203,7 @@ model Tagging {
 
 model Quiz {
   id              String            @id @default(cuid())
+  title           String
   lessonId        String
   createdAt       DateTime          @default(now()) @db.Timestamptz(6)
   lesson          Lesson            @relation(fields: [lessonId], references: [id], onDelete: Cascade)
@@ -223,6 +224,7 @@ model QuizQuestion {
 
 model VocabularyList {
   id         String       @id @default(cuid())
+  title      String
   createdAt  DateTime     @default(now()) @db.Timestamptz(6)
   updatedAt  DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
   lessonId   String       @unique
