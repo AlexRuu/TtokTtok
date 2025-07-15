@@ -23,7 +23,7 @@ export async function PATCH(
       return new NextResponse("Invalid quiz data", { status: 422 });
     }
 
-    const { lessonId, quizQuestion } = parsed.data;
+    const { title, lessonId, quizQuestion } = parsed.data;
 
     if (!lessonId || !Array.isArray(quizQuestion) || quizQuestion.length <= 0) {
       return new NextResponse("Missing one or more fields", { status: 400 });
@@ -44,6 +44,13 @@ export async function PATCH(
     if (!existingQuiz) {
       return new NextResponse("Quiz does not exist", { status: 404 });
     }
+
+    await prismadb.quiz.update({
+      where: { id: quizId },
+      data: {
+        title: title,
+      },
+    });
 
     if (quizQuestion.length === 0) {
       return new NextResponse("Quiz must contain at least one question", {

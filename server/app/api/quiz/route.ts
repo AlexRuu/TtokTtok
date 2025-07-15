@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       return new NextResponse("Invalid quiz data", { status: 400 });
     }
 
-    const { quizQuestion, lessonId } = parsed.data;
+    const { title, quizQuestion, lessonId } = parsed.data;
 
     if (!lessonId || !Array.isArray(quizQuestion) || quizQuestion.length <= 0) {
       return new NextResponse("Missing one or more fields", { status: 400 });
@@ -34,6 +34,7 @@ export async function POST(req: Request) {
 
     await prismadb.quiz.create({
       data: {
+        title: title,
         lesson: { connect: { id: lessonId } },
         quizQuestion: {
           create: quizQuestion.map((q) => {
