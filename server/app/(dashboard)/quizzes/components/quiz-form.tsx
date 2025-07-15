@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 import { startTransition, useState } from "react";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { cn } from "@/lib/utils";
 
 interface QuizFormProps {
   initialData: (Quiz & { quizQuestion: QuizQuestion[] }) | null;
@@ -105,6 +106,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
           quizQuestion: normalizedQuestions,
         }
       : {
+          title: "",
           quizQuestion: [],
           lessonId: "",
         },
@@ -193,7 +195,34 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
           <h1 className="text-center text-xl md:text-2xl font-semibold">
             {initialData ? "Edit Quiz" : "Create Quiz"}
           </h1>
-
+          <FormField
+            control={form.control}
+            name="title"
+            disabled={isLoading}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel
+                  htmlFor="title"
+                  className={cn(
+                    form.formState.errors.title && form.formState.isSubmitted
+                      ? "text-red-400! before:text-red-400"
+                      : ""
+                  )}
+                >
+                  Title
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    id="title"
+                    {...field}
+                    type="text"
+                    onInvalid={(e) => e.preventDefault()}
+                    className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="lessonId"
