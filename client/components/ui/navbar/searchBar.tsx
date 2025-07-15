@@ -21,9 +21,18 @@ interface SearchBarProps {
   variant?: "desktop" | "mobile";
 }
 
+const typeLabels: Record<SearchResult["type"], string> = {
+  lesson: "Lessons",
+  unit: "Units",
+  quiz: "Quizzes",
+  vocabulary: "Vocabulary",
+  tag: "Tags",
+};
+
 const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
   const [isSearchOpen, setIsSearchOpen] = useState(variant === "mobile");
   const [query, setQuery] = useState("");
+  const itemRefs = useRef<Array<HTMLLIElement | null>>([]);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
@@ -35,6 +44,7 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
 
   const { isLoading, startLoading, stopLoading } = useLoading();
 
+  // Reset search bar when closed
   useEffect(() => {
     if (isSearchOpen === false) {
       setQuery("");
@@ -43,6 +53,7 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
     }
   }, [isSearchOpen]);
 
+  // Reset highlight index for keyboard navigation
   useEffect(() => {
     setHighlightedIndex(-1);
   }, [results, query]);
@@ -100,6 +111,21 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
     };
   }, [highlightedIndex, isSearchOpen, query, results, router, variant]);
 
+  // Scroll to highlighted indexed item when navigating with keyboard
+  useEffect(() => {
+    if (highlightedIndex >= 0 && itemRefs.current[highlightedIndex]) {
+      itemRefs.current[highlightedIndex]?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+
+    if (highlightedIndex >= results.length) {
+      setHighlightedIndex(results.length - 1);
+    }
+  }, [highlightedIndex, results.length]);
+
+  // Set search results
   useEffect(() => {
     if (query.trim().length === 0) {
       setResults([]);
@@ -124,6 +150,7 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
     return () => clearTimeout(delay);
   }, [query, startLoading, stopLoading]);
 
+  // Render the results from search
   const renderResults = () => {
     if (isLoading) {
       return <p className="px-4 py-2 text-sm text-[#B59E90]">Loading...</p>;
@@ -139,35 +166,84 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
       );
     }
 
+    const grouped = results.reduce<
+      Record<SearchResult["type"], SearchResult[]>
+    >((acc, result) => {
+      acc[result.type] = acc[result.type] || [];
+      acc[result.type].push(result);
+      return acc;
+    }, {} as Record<SearchResult["type"], SearchResult[]>);
+
+    const order: SearchResult["type"][] = [
+      "lesson",
+      "quiz",
+      "vocabulary",
+      "unit",
+      "tag",
+    ];
+
+    let globalIndex = 0;
+
     return (
-      <ul className="divide-y divide-[#EADCD5]">
-        {results.map((result, index) => (
-          <li
-            key={result.id}
-            className={`px-4 py-2 transition-colors duration-150 hover:bg-[#F9EDEB] cursor-pointer active:bg-[#F3D9D2] ${
-              index === highlightedIndex ? "bg-[#F9EDEB]" : ""
-            }`}
-            onMouseEnter={() => setHighlightedIndex(index)}
-          >
-            <Link href={result.href} className="flex items-start gap-3">
-              <div className="pt-1 text-[#B59E90]">
-                {result.type === "lesson" && <Book size={18} />}
-                {result.type === "unit" && <Layers size={18} />}
-                {result.type === "quiz" && <PenTool size={18} />}
-                {result.type === "vocabulary" && <BookOpen size={18} />}
-                {result.type === "tag" && <Tag size={18} />}
+      <div className="space-y-3">
+        {order.map((type) => {
+          const items = grouped[type];
+          if (!items || items.length === 0) return null;
+
+          return (
+            <div key={type}>
+              <div className="px-4 pt-2 pb-1 text-xs font-semibold text-[#B59E90] uppercase tracking-wider">
+                {typeLabels[type]}
               </div>
-              <div>
-                <p className="font-semibold text-[#6B4C3B]">{result.title}</p>
-                <p className="text-sm text-[#B59E90]">{result.subtitle}</p>
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ul>
+              <ul className="divide-y divide-[#EADCD5]">
+                {items.map((result) => {
+                  const currentIndex = globalIndex++; // advance the global index
+
+                  return (
+                    <li
+                      ref={(el) => {
+                        itemRefs.current[currentIndex] = el;
+                      }}
+                      key={result.id}
+                      className={`px-4 py-2 transition-colors duration-150 hover:bg-[#F9EDEB] cursor-pointer active:bg-[#F3D9D2] ${
+                        currentIndex === highlightedIndex ? "bg-[#F9EDEB]" : ""
+                      }`}
+                      onMouseEnter={() => setHighlightedIndex(currentIndex)}
+                    >
+                      <Link
+                        href={result.href}
+                        className="flex items-start gap-3"
+                      >
+                        <div className="pt-1 text-[#B59E90]">
+                          {result.type === "lesson" && <Book size={18} />}
+                          {result.type === "unit" && <Layers size={18} />}
+                          {result.type === "quiz" && <PenTool size={18} />}
+                          {result.type === "vocabulary" && (
+                            <BookOpen size={18} />
+                          )}
+                          {result.type === "tag" && <Tag size={18} />}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-[#6B4C3B]">
+                            {result.title}
+                          </p>
+                          <p className="text-sm text-[#B59E90]">
+                            {result.subtitle}
+                          </p>
+                        </div>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
     );
   };
 
+  // Actual component render
   return (
     <>
       {variant === "mobile" ? (
