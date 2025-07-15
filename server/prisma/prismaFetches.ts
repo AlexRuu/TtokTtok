@@ -29,6 +29,7 @@ const findAscUnits = async () => {
           userLessonProgress: true,
           userChapterReview: true,
         },
+        orderBy: { lessonNumber: "asc" },
       },
     },
   });
