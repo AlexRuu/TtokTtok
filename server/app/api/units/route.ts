@@ -1,12 +1,13 @@
 import { authOptions } from "@/lib/auth";
 import prismadb from "@/lib/prismadb";
+import { unitsSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   try {
     const units = await prismadb.unit.findMany({
-      include: { lesson: true },
+      include: { lesson: { orderBy: { lessonNumber: "asc" } } },
       orderBy: { unitNumber: "asc" },
     });
 
@@ -26,10 +27,13 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { title } = body;
-    if (!title) {
-      return new NextResponse("Title is required", { status: 400 });
+    const parsed = unitsSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return new NextResponse("Invalid tag data", { status: 400 });
     }
+
+    const { title } = parsed.data;
 
     await prismadb.unit.create({
       data: {
