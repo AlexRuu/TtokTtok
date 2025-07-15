@@ -106,6 +106,7 @@ const vocabDefineSchema = z.object({
 
 const vocabularySchema = z.object({
   vocabulary: z.array(vocabDefineSchema),
+  title: z.string().min(1, { message: "Title is required" }),
   lessonId: z.string().min(1, { message: "Lesson Id is required" }),
 });
 
@@ -172,6 +173,7 @@ const quizQuestions = z.discriminatedUnion("quizType", [
 
 const quizSchema = z.object({
   quizQuestion: z.array(quizQuestions),
+  title: z.string().min(1, { message: "A title is required" }),
   lessonId: z.string().min(1, { message: "Please pick a lesson" }),
 });
 
