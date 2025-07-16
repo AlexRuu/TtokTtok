@@ -16,6 +16,7 @@ import useLoading from "@/hooks/use-loading";
 import { SearchResult } from "@/types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import ScrollableResults from "./scrollable-results";
 
 interface SearchBarProps {
   variant?: "desktop" | "mobile";
@@ -36,8 +37,8 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
-  const router = useRouter();
 
+  const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -195,9 +196,9 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
               <div className="px-4 pt-2 pb-1 text-xs font-semibold text-[#B59E90] uppercase tracking-wider">
                 {typeLabels[type]}
               </div>
-              <ul className="divide-y divide-[#EADCD5]">
+              <ul>
                 {items.map((result) => {
-                  const currentIndex = globalIndex++; // advance the global index
+                  const currentIndex = globalIndex++;
 
                   return (
                     <li
@@ -283,11 +284,10 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
               size={18}
             />
 
-            {/* Suggestions dropdown: absolute positioning */}
             {query.trim().length > 0 && (
-              <div className="absolute z-50 left-0 right-0 mt-3 max-h-64 overflow-y-auto rounded-md border border-[#EADCD5] bg-white shadow-sm divide-y divide-[#EADCD5]">
+              <ScrollableResults className="absolute z-50 left-0 right-0 mt-3 rounded-md border border-[#EADCD5] bg-white shadow-sm divide-y divide-[#EADCD5]">
                 {renderResults()}
-              </div>
+              </ScrollableResults>
             )}
           </div>
         </div>
@@ -365,9 +365,9 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
                     </button>
 
                     {query.trim().length > 0 && (
-                      <div className="absolute left-0 right-0 mt-2 z-50 max-h-64 overflow-y-auto rounded-md border border-[#EADCD5] bg-white shadow-sm divide-y divide-[#EADCD5]">
+                      <ScrollableResults className="absolute left-0 right-0 mt-2 z-50 rounded-md border border-[#EADCD5] bg-white shadow-sm divide-y divide-[#EADCD5]">
                         {renderResults()}
-                      </div>
+                      </ScrollableResults>
                     )}
                   </div>
                 </div>
