@@ -10,7 +10,6 @@ export async function GET(req: Request) {
       return NextResponse.json({ results: [] });
     }
 
-    // Full-text search using raw SQL with relevance scoring
     const lessons = await prismadb.$queryRaw<
       Array<{
         id: string;
@@ -21,16 +20,17 @@ export async function GET(req: Request) {
         score: number;
       }>
     >`
-  SELECT l.id, l.title, l."lessonNumber", l.slug, u."unitNumber",
-    ts_rank(to_tsvector('english', l.title || ' lesson ' || l."lessonNumber"), plainto_tsquery('english', ${query})) AS score
-  FROM public."Lesson" l
-  JOIN public."Unit" u ON l."unitId" = u.id
-  WHERE to_tsvector('english', l.title || ' lesson ' || l."lessonNumber") @@ plainto_tsquery('english', ${query})
-     OR l.title ILIKE '%' || ${query} || '%'
-     OR CAST(l."lessonNumber" AS TEXT) ILIKE '%' || ${query} || '%'
-  ORDER BY score DESC
-  LIMIT 10;
-`;
+      SELECT l.id, l.title, l."lessonNumber", l.slug, u."unitNumber",
+        ts_rank(to_tsvector('english', l.title || ' lesson ' || l."lessonNumber"), plainto_tsquery('english', ${query})) AS score
+      FROM public."Lesson" l
+      JOIN public."Unit" u ON l."unitId" = u.id
+      WHERE
+        to_tsvector('english', l.title || ' lesson ' || l."lessonNumber") @@ plainto_tsquery('english', ${query})
+        OR l.title ILIKE '%' || ${query} || '%'
+        OR CAST(l."lessonNumber" AS TEXT) ILIKE '%' || ${query} || '%'
+      ORDER BY score DESC
+      LIMIT 10;
+    `;
 
     const units = await prismadb.$queryRaw<
       Array<{ id: string; title: string; unitNumber: number; score: number }>
@@ -38,7 +38,10 @@ export async function GET(req: Request) {
       SELECT id, title, "unitNumber",
         ts_rank(to_tsvector('english', title), plainto_tsquery('english', ${query})) AS score
       FROM public."Unit"
-      WHERE to_tsvector('english', title) @@ plainto_tsquery('english', ${query})
+      WHERE
+        to_tsvector('english', title) @@ plainto_tsquery('english', ${query})
+        OR title ILIKE '%' || ${query} || '%'
+        OR CAST("unitNumber" AS TEXT) ILIKE '%' || ${query} || '%'
       ORDER BY score DESC
       LIMIT 10;
     `;
@@ -56,7 +59,9 @@ export async function GET(req: Request) {
         ts_rank(to_tsvector('english', q.title), plainto_tsquery('english', ${query})) AS score
       FROM public."Quiz" q
       JOIN public."Lesson" l ON q."lessonId" = l.id
-      WHERE to_tsvector('english', q.title) @@ plainto_tsquery('english', ${query})
+      WHERE
+        to_tsvector('english', q.title) @@ plainto_tsquery('english', ${query})
+        OR q.title ILIKE '%' || ${query} || '%'
       ORDER BY score DESC
       LIMIT 10;
     `;
@@ -74,7 +79,9 @@ export async function GET(req: Request) {
         ts_rank(to_tsvector('english', v.title), plainto_tsquery('english', ${query})) AS score
       FROM public."VocabularyList" v
       JOIN public."Lesson" l ON v."lessonId" = l.id
-      WHERE to_tsvector('english', v.title) @@ plainto_tsquery('english', ${query})
+      WHERE
+        to_tsvector('english', v.title) @@ plainto_tsquery('english', ${query})
+        OR v.title ILIKE '%' || ${query} || '%'
       ORDER BY score DESC
       LIMIT 10;
     `;
@@ -85,12 +92,13 @@ export async function GET(req: Request) {
       SELECT id, name,
         ts_rank(to_tsvector('english', name), plainto_tsquery('english', ${query})) AS score
       FROM public."Tag"
-      WHERE to_tsvector('english', name) @@ plainto_tsquery('english', ${query})
+      WHERE
+        to_tsvector('english', name) @@ plainto_tsquery('english', ${query})
+        OR name ILIKE '%' || ${query} || '%'
       ORDER BY score DESC
       LIMIT 10;
     `;
 
-    // Standardize results
     const results = [
       ...lessons
         .sort((a, b) => b.score - a.score)
@@ -147,7 +155,9 @@ export async function GET(req: Request) {
     );
     return new NextResponse(
       "There was an error with searching for related queries.",
-      { status: 500 }
+      {
+        status: 500,
+      }
     );
   }
 }
