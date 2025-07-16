@@ -150,3 +150,8 @@ export type SearchResult = {
   type: "lesson" | "unit" | "quiz" | "vocabulary" | "tag";
   score: number;
 };
+
+export type ScrollableResultsProps = {
+  children: React.ReactNode;
+  className?: string;
+};
