@@ -17,7 +17,7 @@ import { SearchResult } from "@/types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ScrollableResults from "./scrollable-results";
-
+import getSearchResults from "@/actions/get-search-results";
 interface SearchBarProps {
   variant?: "desktop" | "mobile";
 }
@@ -135,10 +135,10 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
 
     const delay = setTimeout(() => {
       startLoading();
-      fetch(`/api/search?q=${encodeURIComponent(query)}`)
-        .then((res) => res.json())
+
+      getSearchResults(query)
         .then((data) => {
-          setResults(data.results || []);
+          setResults(data || []);
           setError(null);
         })
         .catch(() => {
@@ -209,7 +209,11 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
                       className={`px-4 py-2 transition-colors duration-150 hover:bg-[#F9EDEB] cursor-pointer active:bg-[#F3D9D2] ${
                         currentIndex === highlightedIndex ? "bg-[#F9EDEB]" : ""
                       }`}
-                      onMouseEnter={() => setHighlightedIndex(currentIndex)}
+                      onMouseMove={() => {
+                        if (highlightedIndex !== currentIndex) {
+                          setHighlightedIndex(currentIndex);
+                        }
+                      }}
                     >
                       <Link
                         href={result.href}
