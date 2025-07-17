@@ -63,7 +63,7 @@ const TableBlock = ({ headers, rows, note }: TableBlockProps) => {
 
       {note && (
         <p className="text-xs mt-2 text-[#A67C66] italic text-center">
-          * This table includes important note information
+          * Ireggular form
         </p>
       )}
     </div>
