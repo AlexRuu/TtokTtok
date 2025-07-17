@@ -5,6 +5,12 @@ import { Book, BookOpen, Layers, PenTool, Tag } from "lucide-react";
 import SearchInput from "./components/search-input";
 import SearchPageWrapper from "./components/search-page-wrapper";
 import { LoadingProvider } from "@/hooks/loading-context";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Search",
+  description: "Search Ttok Ttok",
+};
 
 interface SearchPageProps {
   searchParams?: Promise<{ q?: string }>;
