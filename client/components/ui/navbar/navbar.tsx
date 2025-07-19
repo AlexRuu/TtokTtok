@@ -55,7 +55,6 @@ export default function Navbar() {
     }
   }, [isOpen, handleClickOutside]);
 
-  // Mounting flag (optional if you rely on session status)
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -63,9 +62,10 @@ export default function Navbar() {
   const links = useMemo(
     () => [
       { name: "Home", path: "/" },
+      { name: "About", path: "/about" },
       { name: "Lessons", path: "/lessons" },
       { name: "Quizzes", path: "/quizzes" },
-      { name: "About", path: "/about" },
+      { name: "Tags", path: "/tags" },
     ],
     []
   );
