@@ -155,3 +155,9 @@ export type ScrollableResultsProps = {
   children: React.ReactNode;
   className?: string;
 };
+
+export type GroupedSearchResults = {
+  lessons: SearchResult[];
+  quizzes: SearchResult[];
+  vocabulary: SearchResult[];
+};
