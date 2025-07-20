@@ -39,7 +39,22 @@ export async function POST(req: Request) {
       status: 200,
     });
   } catch (error) {
-    console.log("Error creating unit", error);
+    console.error("Error creating unit", error);
     return new NextResponse("Error creating unit", { status: 500 });
+  }
+}
+
+export async function GET(_req: Request) {
+  try {
+    const tags = await prismadb.tag.findMany({});
+
+    if (!tags) {
+      return new NextResponse("There are no tags available", { status: 400 });
+    }
+
+    return NextResponse.json(tags);
+  } catch (error) {
+    console.error("Error fetching all tags", error);
+    return new NextResponse("Error fetching all tags", { status: 500 });
   }
 }
