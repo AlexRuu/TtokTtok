@@ -6,6 +6,7 @@ import SearchInput from "./components/search-input";
 import SearchPageWrapper from "./components/search-page-wrapper";
 import { LoadingProvider } from "@/hooks/loading-context";
 import { Metadata } from "next";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Search",
@@ -67,8 +68,17 @@ const SearchPage = async (props: SearchPageProps) => {
 
           {/* No Query */}
           {!hasQuery && (
-            <div className="text-center text-[#B59E90]">
-              <p className="text-sm">Please enter a search query.</p>
+            <div className="text-center text-[#B59E90] flex flex-col items-center justify-center px-6 space-y-4">
+              <p className="text-sm italic">
+                Start typing to find lessons, quizzes, and more!
+              </p>
+              <Image
+                src="/searching-tteok.png"
+                alt="Searching Tteok"
+                width={400}
+                height={400}
+                className="mb-4 rounded-2xl border border-[#F3E7DF] shadow-sm w-full max-w-[300px]"
+              />
             </div>
           )}
 
