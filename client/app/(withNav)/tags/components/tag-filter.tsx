@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import Loader from "@/components/ui/loader";
 import Link from "next/link";
 import useDebounce from "@/hooks/debounce";
+import Image from "next/image";
 
 interface Tag {
   id: string;
@@ -130,6 +131,21 @@ const TagFilterClient = ({ allTags }: Props) => {
             </p>
           </div>
         )}
+
+      {!loading && !results && (
+        <div className="flex flex-col items-center justify-center py-14 px-6 space-y-4 text-center">
+          <Image
+            src="/searching-tteok.png"
+            alt="Searching Tteok"
+            width={400}
+            height={400}
+            className="mb-4 rounded-2xl border border-[#F3E7DF] shadow-sm"
+          />
+          <p className="text-[#6B4C3B]/70 text-sm italic">
+            Select some tags to begin your search.
+          </p>
+        </div>
+      )}
 
       {!loading &&
         results &&
