@@ -1,5 +1,5 @@
 import { authOptions } from "@/lib/auth";
-import prismadb from "@/lib/prismadb";
+import { withRls } from "@/lib/withRLS";
 import { tagSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
@@ -26,25 +26,27 @@ export async function PATCH(
 
     const { name, backgroundColour, textColour, borderColour } = parsed.data;
 
-    const existingTag = await prismadb.tag.findUnique({
-      where: { id: tagId },
+    return await withRls(session, async (tx) => {
+      const existingTag = await tx.tag.findUnique({
+        where: { id: tagId },
+      });
+
+      if (!existingTag) {
+        return new NextResponse("Tag does not exist", { status: 404 });
+      }
+
+      await tx.tag.update({
+        where: { id: tagId },
+        data: {
+          name: name,
+          backgroundColour: backgroundColour,
+          textColour: textColour,
+          borderColour: borderColour,
+        },
+      });
+
+      return new NextResponse("Successfully updated tag", { status: 200 });
     });
-
-    if (!existingTag) {
-      return new NextResponse("Tag does not exist", { status: 404 });
-    }
-
-    await prismadb.tag.update({
-      where: { id: tagId },
-      data: {
-        name: name,
-        backgroundColour: backgroundColour,
-        textColour: textColour,
-        borderColour: borderColour,
-      },
-    });
-
-    return new NextResponse("Successfully updated tag", { status: 200 });
   } catch (error) {
     console.error("There was an error updating tag", error);
     return new NextResponse("There was an error updating tag", { status: 500 });
@@ -64,19 +66,21 @@ export async function DELETE(
     }
     const tagId = params.tagId;
 
-    const existingTag = await prismadb.tag.findUnique({
-      where: { id: tagId },
+    return await withRls(session, async (tx) => {
+      const existingTag = await tx.tag.findUnique({
+        where: { id: tagId },
+      });
+
+      if (!existingTag) {
+        return new NextResponse("Tag does not exist", { status: 404 });
+      }
+
+      await tx.tag.delete({
+        where: { id: tagId },
+      });
+
+      return new NextResponse("Tag was successfully deleted", { status: 200 });
     });
-
-    if (!existingTag) {
-      return new NextResponse("Tag does not exist", { status: 404 });
-    }
-
-    await prismadb.tag.delete({
-      where: { id: tagId },
-    });
-
-    return new NextResponse("Tag was successfully deleted", { status: 200 });
   } catch (error) {
     console.error("There was an error deleting tag", error);
     return new NextResponse("There was an error deleting tag", {

@@ -7,6 +7,8 @@ import DiscordProvider from "next-auth/providers/discord";
 import prismadb from "./prismadb";
 import * as argon2 from "argon2";
 import { NextResponse } from "next/server";
+import { getClientIp } from "./getIP";
+import { rateLimit } from "./rateLimit";
 
 // Auth Helpers
 async function fetchVerifiedEmail(
@@ -196,13 +198,28 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
+        const ip = getClientIp(req);
+        const email = credentials?.email?.toLowerCase().trim();
+
+        if (!ip || !email) {
+          return null;
+        }
+
+        const allowedByIp = await rateLimit(`ip:${ip}`, 10, 900);
+        const allowedByEmail = await rateLimit(`signin_email:${email}`, 5, 900);
+
+        if (!allowedByIp || !allowedByEmail) {
+          throw new Error("Too many login attempts. Please try again later.");
+        }
+
         if (
           typeof credentials?.email !== "string" ||
           typeof credentials?.password !== "string"
         ) {
           return null;
         }
+
         const normalizedEmail = credentials.email.toLowerCase().trim();
 
         const user = await prismadb.user.findUnique({
@@ -210,9 +227,7 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user || !user.password) {
-          throw new NextResponse("User not found or password not set", {
-            status: 401,
-          });
+          throw new Error("User not found or password not set");
         }
 
         const isValid = await argon2.verify(

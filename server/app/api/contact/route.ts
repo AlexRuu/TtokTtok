@@ -1,9 +1,21 @@
-import prismadb from "@/lib/prismadb";
+import { authOptions } from "@/lib/auth";
+import { getClientIp } from "@/lib/getIP";
+import { rateLimit } from "@/lib/rateLimit";
+import { withRls } from "@/lib/withRLS";
 import { contactFormSchema } from "@/schemas/form-schemas";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
+    const ip = getClientIp(req);
+
+    const allowed = await rateLimit(ip, 1, 60);
+
+    if (!allowed) {
+      return new Response("Too many requests", { status: 429 });
+    }
+    const session = await getServerSession(authOptions);
     const body = await req.json();
     const parsed = contactFormSchema.safeParse(body);
 
@@ -19,18 +31,19 @@ export async function POST(req: Request) {
       });
       return new NextResponse("Bot detected", { status: 400 });
     }
+    return await withRls(session, async (tx) => {
+      await tx.contactMessage.create({
+        data: {
+          firstName,
+          lastName,
+          email,
+          subject,
+          message,
+        },
+      });
 
-    await prismadb.contactMessage.create({
-      data: {
-        firstName,
-        lastName,
-        email,
-        subject,
-        message,
-      },
+      return NextResponse.json({ message: "Success" });
     });
-
-    return NextResponse.json({ message: "Success" });
   } catch (error) {
     console.error("Contact form error:", error);
     return new NextResponse("There was an error submitting contact form.", {

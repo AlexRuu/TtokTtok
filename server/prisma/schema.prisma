@@ -203,9 +203,9 @@ model Tagging {
 
 model Quiz {
   id              String            @id @default(cuid())
-  title           String
   lessonId        String
   createdAt       DateTime          @default(now()) @db.Timestamptz(6)
+  title           String
   lesson          Lesson            @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   quizQuestion    QuizQuestion[]
   tagging         Tagging[]
@@ -224,10 +224,10 @@ model QuizQuestion {
 
 model VocabularyList {
   id         String       @id @default(cuid())
-  title      String
   createdAt  DateTime     @default(now()) @db.Timestamptz(6)
   updatedAt  DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
   lessonId   String       @unique
+  title      String
   tagging    Tagging[]
   vocabulary Vocabulary[]
   lesson     Lesson       @relation(fields: [lessonId], references: [id], onDelete: Cascade)

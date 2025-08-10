@@ -1,6 +1,7 @@
 import { authOptions } from "@/lib/auth";
-import prismadb from "@/lib/prismadb";
+import { withRls } from "@/lib/withRLS";
 import { quizSchema } from "@/schemas/form-schemas";
+import { Prisma } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -19,6 +20,7 @@ export async function PATCH(
     const body = await req.json();
     const quizId = params.quizId;
     const parsed = quizSchema.safeParse(body);
+
     if (!parsed.success) {
       return new NextResponse("Invalid quiz data", { status: 422 });
     }
@@ -29,64 +31,51 @@ export async function PATCH(
       return new NextResponse("Missing one or more fields", { status: 400 });
     }
 
-    const existingLesson = await prismadb.lesson.findUnique({
-      where: { id: lessonId },
-    });
-
-    if (!existingLesson) {
-      return new NextResponse("Lesson does not exist", { status: 404 });
-    }
-
-    const existingQuiz = await prismadb.quiz.findUnique({
-      where: { id: quizId },
-    });
-
-    if (!existingQuiz) {
-      return new NextResponse("Quiz does not exist", { status: 404 });
-    }
-
-    await prismadb.quiz.update({
-      where: { id: quizId },
-      data: {
-        title: title,
-      },
-    });
-
-    if (quizQuestion.length === 0) {
-      return new NextResponse("Quiz must contain at least one question", {
-        status: 400,
+    await withRls(session, async (tx) => {
+      const existingLesson = await tx.lesson.findUnique({
+        where: { id: lessonId },
       });
-    }
+      if (!existingLesson) {
+        return new NextResponse("Lesson does not exist", { status: 404 });
+      }
 
-    await prismadb.$transaction(async (tx) => {
-      await tx.quizQuestion.deleteMany({
-        where: { quizId: quizId },
+      const existingQuiz = await tx.quiz.findUnique({
+        where: { id: quizId },
       });
+      if (!existingQuiz) {
+        return new NextResponse("Quiz does not exist", { status: 404 });
+      }
 
-      await tx.quizQuestion.createMany({
-        data: quizQuestion.map((q) => {
-          let options: any = undefined;
+      await tx.$transaction(async (trx: Prisma.TransactionClient) => {
+        await trx.quiz.update({
+          where: { id: quizId },
+          data: { title },
+        });
 
-          if (q.quizType === "MULTIPLE_CHOICE" || q.quizType === "MATCHING") {
-            options = q.options;
-          }
+        await trx.quizQuestion.deleteMany({
+          where: { quizId },
+        });
 
-          return {
-            quizId: quizId,
+        await trx.quizQuestion.createMany({
+          data: quizQuestion.map((q) => ({
+            quizId,
             question: q.question,
             quizType: q.quizType,
-            options: options,
+            options:
+              q.quizType === "MULTIPLE_CHOICE" || q.quizType === "MATCHING"
+                ? q.options
+                : undefined,
             answer:
               typeof q.answer === "string"
                 ? q.answer
                 : JSON.stringify(q.answer),
-          };
-        }),
+          })),
+        });
       });
-    });
 
-    return new NextResponse("Quiz has been updated successfully", {
-      status: 200,
+      return new NextResponse("Quiz has been updated successfully", {
+        status: 200,
+      });
     });
   } catch (error) {
     console.error("There was an error updating quiz", error);
@@ -109,19 +98,20 @@ export async function DELETE(
     }
     const quizId = params.quizId;
 
-    const existingQuiz = await prismadb.quiz.findUnique({
-      where: { id: quizId },
+    return await withRls(session, async (tx) => {
+      const existingQuiz = await tx.quiz.findUnique({
+        where: { id: quizId },
+      });
+
+      if (!existingQuiz) {
+        return new NextResponse("Quiz list does not exist", { status: 404 });
+      }
+      await tx.quiz.delete({
+        where: { id: quizId },
+      });
+
+      return new NextResponse("Quiz was successfully deleted", { status: 200 });
     });
-
-    if (!existingQuiz) {
-      return new NextResponse("Quiz list does not exist", { status: 404 });
-    }
-
-    await prismadb.quiz.delete({
-      where: { id: quizId },
-    });
-
-    return new NextResponse("Quiz was successfully deleted", { status: 200 });
   } catch (error) {
     console.log("There was an error deleting quiz", error);
     return new NextResponse("There was an error deleting quiz", {

@@ -1,14 +1,26 @@
-import prismadb from "@/lib/prismadb";
+import { authOptions } from "@/lib/auth";
+import { getClientIp } from "@/lib/getIP";
+import { rateLimit } from "@/lib/rateLimit";
+import { withRls } from "@/lib/withRLS";
 import { resetPasswordSchema } from "@/schemas/form-schemas";
-import { hash } from "argon2";
-import { isBefore } from "date-fns";
+import { Prisma } from "@prisma/client";
+import { hash, verify } from "argon2";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    // Retrieve data sent from client
-    const body = await req.json();
+    const ip = getClientIp(req);
 
+    const allowed = await rateLimit(ip, 5, 60);
+
+    if (!allowed) {
+      return new Response("Too many requests", { status: 429 });
+    }
+
+    const session = await getServerSession(authOptions);
+
+    const body = await req.json();
     const parsed = resetPasswordSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -17,95 +29,85 @@ export async function POST(req: Request) {
 
     const { token, password, confirmPassword } = parsed.data;
 
-    const strongEnough =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
-
-    // Check if token is passed
-    if (!token) {
-      return new NextResponse("No token provided", { status: 401 });
-    }
-
-    // Check if there is such token
-    const resetToken = await prismadb.forgotPasswordToken.findFirst({
-      where: {
-        token: token,
-      },
-    });
-
-    // Stop function if token is not valid/found/
-    if (
-      !resetToken ||
-      resetToken.used ||
-      isBefore(new Date(resetToken.expires), new Date())
-    ) {
-      return new NextResponse("Token is expired or is not valid", {
-        status: 401,
-      });
-    }
-
-    const user = await prismadb.user.findUnique({
-      where: { email: resetToken.identifier },
-    });
-
-    if (!user) {
-      return new NextResponse("Invalid or expired reset link", { status: 401 });
-    }
-
     if (!password || !confirmPassword) {
       return new NextResponse("Missing password or confirmed password", {
         status: 400,
       });
     }
 
-    // Check if incoming passwords match
     if (password !== confirmPassword) {
       return new NextResponse("Password does not match", { status: 400 });
     }
 
-    if (!strongEnough.test(password)) {
+    const strongPasswordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
+    if (!strongPasswordRegex.test(password)) {
       return new NextResponse("Password does not meet security requirements", {
         status: 400,
       });
     }
 
-    // Hash password and update database
-    const hashedNewPassword = await hash(password);
-
-    await prismadb.$transaction([
-      prismadb.user.update({
-        where: { email: resetToken.identifier },
-        data: {
-          password: hashedNewPassword,
+    // Fetch tokens that are not used and not expired
+    return await withRls(session, async (tx) => {
+      const potentialTokens = await tx.forgotPasswordToken.findMany({
+        where: {
+          used: false,
+          expires: { gt: new Date() },
         },
-      }),
-      prismadb.forgotPasswordToken.update({
-        where: { token: token },
-        data: {
-          used: true,
-          usedAt: new Date(),
-        },
-      }),
-    ]);
-
-    const tokens = await prismadb.verificationToken.findMany({
-      where: {
-        identifier: user.email,
-      },
-      orderBy: {
-        expires: "desc",
-      },
-      skip: 5,
-    });
-
-    if (tokens.length > 0) {
-      const toDelete = tokens.map((t) => t.id);
-      await prismadb.verificationToken.deleteMany({
-        where: { id: { in: toDelete } },
       });
-    }
 
-    return NextResponse.json({ success: true });
+      let validToken = null;
+      for (const t of potentialTokens) {
+        const isMatch = await verify(t.token, token);
+        if (isMatch) {
+          validToken = t;
+          break;
+        }
+      }
+
+      if (!validToken) {
+        return new NextResponse("Token is expired or invalid", { status: 400 });
+      }
+
+      const user = await tx.user.findUnique({
+        where: { email: validToken.identifier },
+      });
+
+      if (!user) {
+        return new NextResponse("Invalid or expired reset link", {
+          status: 401,
+        });
+      }
+
+      const hashedNewPassword = await hash(password);
+
+      await tx.$transaction(async (trx: Prisma.TransactionClient) => {
+        await trx.user.update({
+          where: { email: validToken.identifier },
+          data: {
+            password: hashedNewPassword,
+          },
+        });
+
+        await trx.forgotPasswordToken.update({
+          where: { id: validToken.id },
+          data: {
+            used: true,
+            usedAt: new Date(),
+          },
+        });
+      });
+
+      await tx.forgotPasswordToken.deleteMany({
+        where: {
+          OR: [{ expires: { lt: new Date() } }, { used: true }],
+        },
+      });
+
+      return NextResponse.json({ success: true });
+    });
   } catch (error) {
+    console.error("Internal server error during password reset:", error);
     return new NextResponse("Internal server error during password reset", {
       status: 500,
     });
@@ -114,6 +116,14 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
+    const ip = getClientIp(req);
+    const allowed = await rateLimit(ip, 5, 60);
+
+    if (!allowed) {
+      return new Response("Too many requests", { status: 429 });
+    }
+
+    const session = await getServerSession(authOptions);
     const { searchParams } = new URL(req.url);
     const token = searchParams.get("token");
 
@@ -122,24 +132,29 @@ export async function GET(req: Request) {
         status: 404,
       });
     }
-
-    const validToken = await prismadb.forgotPasswordToken.findFirst({
-      where: {
-        token: token,
-      },
-    });
-
-    if (
-      !validToken ||
-      validToken.used ||
-      isBefore(new Date(validToken.expires), new Date())
-    ) {
-      return new NextResponse("Token is expired or is not valid", {
-        status: 401,
+    return await withRls(session, async (tx) => {
+      const potentialTokens = await tx.forgotPasswordToken.findMany({
+        where: {
+          used: false,
+          expires: { gt: new Date() },
+        },
       });
-    }
+      let validToken = null;
 
-    return NextResponse.json({ success: true });
+      for (const t of potentialTokens) {
+        const isMatch = await verify(t.token, token);
+        if (isMatch) {
+          validToken = t;
+          break;
+        }
+      }
+
+      if (!validToken) {
+        return new NextResponse("Token is expired or invalid", { status: 400 });
+      }
+
+      return NextResponse.json({ success: true });
+    });
   } catch (error) {
     return new NextResponse("Internal server error during password reset", {
       status: 500,

@@ -1,5 +1,5 @@
 import { authOptions } from "@/lib/auth";
-import prismadb from "@/lib/prismadb";
+import { withRls } from "@/lib/withRLS";
 import { tagSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
@@ -25,18 +25,20 @@ export async function POST(req: Request) {
 
     const { name, backgroundColour, textColour, borderColour } = parsed.data;
 
-    await prismadb.tag.create({
-      data: {
-        name: capitalizeFirstLetter(name),
-        backgroundColour: backgroundColour,
-        textColour: textColour,
-        borderColour: borderColour,
-      },
-    });
+    return await withRls(session, async (tx) => {
+      await tx.tag.create({
+        data: {
+          name: capitalizeFirstLetter(name),
+          backgroundColour: backgroundColour,
+          textColour: textColour,
+          borderColour: borderColour,
+        },
+      });
 
-    return NextResponse.json({
-      message: "Successfully created unit",
-      status: 200,
+      return NextResponse.json({
+        message: "Successfully created unit",
+        status: 200,
+      });
     });
   } catch (error) {
     console.error("Error creating unit", error);
@@ -46,13 +48,16 @@ export async function POST(req: Request) {
 
 export async function GET(_req: Request) {
   try {
-    const tags = await prismadb.tag.findMany({});
+    const session = await getServerSession(authOptions);
+    return await withRls(session, async (tx) => {
+      const tags = await tx.tag.findMany({});
 
-    if (!tags) {
-      return new NextResponse("There are no tags available", { status: 400 });
-    }
+      if (!tags) {
+        return new NextResponse("There are no tags available", { status: 400 });
+      }
 
-    return NextResponse.json(tags);
+      return NextResponse.json(tags);
+    });
   } catch (error) {
     console.error("Error fetching all tags", error);
     return new NextResponse("Error fetching all tags", { status: 500 });

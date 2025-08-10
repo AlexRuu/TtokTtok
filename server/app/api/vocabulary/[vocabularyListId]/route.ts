@@ -1,5 +1,5 @@
 import { authOptions } from "@/lib/auth";
-import prismadb from "@/lib/prismadb";
+import { withRls } from "@/lib/withRLS";
 import { vocabularySchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
@@ -26,35 +26,39 @@ export async function PATCH(
 
     const { title, vocabulary } = parsed.data;
 
-    const existingVocabulary = await prismadb.vocabularyList.findUnique({
-      where: { id: vocabularyId },
+    return await withRls(session, async (tx) => {
+      const existingVocabulary = await tx.vocabularyList.findUnique({
+        where: { id: vocabularyId },
+      });
+
+      if (!existingVocabulary) {
+        return new NextResponse("Vocabulary does not exist", { status: 404 });
+      }
+
+      await tx.vocabulary.deleteMany({
+        where: { vocabularyListId: vocabularyId },
+      });
+
+      await tx.vocabularyList.update({
+        where: { id: vocabularyId },
+        data: {
+          title: title,
+        },
+      });
+
+      await tx.vocabulary.createMany({
+        data: vocabulary.map((item) => ({
+          english: item.english,
+          korean: item.korean,
+          definition: item.definition,
+          vocabularyListId: vocabularyId,
+        })),
+      });
+
+      return new NextResponse("Successfully updated vocabulary", {
+        status: 200,
+      });
     });
-
-    if (!existingVocabulary) {
-      return new NextResponse("Vocabulary does not exist", { status: 404 });
-    }
-
-    await prismadb.vocabulary.deleteMany({
-      where: { vocabularyListId: vocabularyId },
-    });
-
-    await prismadb.vocabularyList.update({
-      where: { id: vocabularyId },
-      data: {
-        title: title,
-      },
-    });
-
-    await prismadb.vocabulary.createMany({
-      data: vocabulary.map((item) => ({
-        english: item.english,
-        korean: item.korean,
-        definition: item.definition,
-        vocabularyListId: vocabularyId,
-      })),
-    });
-
-    return new NextResponse("Successfully updated vocabulary", { status: 200 });
   } catch (error) {
     console.error("There was an error updating vocabulary", error);
     return new NextResponse("There was an error updating vocabulary", {
@@ -76,22 +80,24 @@ export async function DELETE(
     }
     const vocabularyListId = params.vocabularyListId;
 
-    const existingVocabulary = await prismadb.vocabularyList.findUnique({
-      where: { id: vocabularyListId },
-    });
-
-    if (!existingVocabulary) {
-      return new NextResponse("Vocabulary list does not exist", {
-        status: 404,
+    return await withRls(session, async (tx) => {
+      const existingVocabulary = await tx.vocabularyList.findUnique({
+        where: { id: vocabularyListId },
       });
-    }
 
-    await prismadb.vocabularyList.delete({
-      where: { id: vocabularyListId },
-    });
+      if (!existingVocabulary) {
+        return new NextResponse("Vocabulary list does not exist", {
+          status: 404,
+        });
+      }
 
-    return new NextResponse("Vocabulary list was successfully deleted", {
-      status: 200,
+      await tx.vocabularyList.delete({
+        where: { id: vocabularyListId },
+      });
+
+      return new NextResponse("Vocabulary list was successfully deleted", {
+        status: 200,
+      });
     });
   } catch (error) {
     console.error("There was an error deleting vocabulary list", error);

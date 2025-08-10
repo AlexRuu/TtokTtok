@@ -1,5 +1,5 @@
 import { authOptions } from "@/lib/auth";
-import prismadb from "@/lib/prismadb";
+import { withRls } from "@/lib/withRLS";
 import { LessonFormSchema } from "@/schemas/units-schemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
@@ -39,25 +39,25 @@ export async function POST(req: Request) {
       return new NextResponse("Missing one or more fields", { status: 400 });
     }
 
-    const existingUnit = await prismadb.unit.findFirst({
-      where: { id: unitId },
-    });
-
-    if (!existingUnit) {
-      return new NextResponse("Unit does not exist", { status: 409 });
-    }
-
-    const existingLesson = await prismadb.lesson.findFirst({
-      where: { lessonNumber, title, unitId },
-    });
-
-    if (existingLesson) {
-      return new NextResponse("Lesson already exists in this unit", {
-        status: 409,
+    return await withRls(session, async (tx) => {
+      const existingUnit = await tx.unit.findFirst({
+        where: { id: unitId },
       });
-    }
 
-    await prismadb.$transaction(async (tx) => {
+      if (!existingUnit) {
+        return new NextResponse("Unit does not exist", { status: 409 });
+      }
+
+      const existingLesson = await tx.lesson.findFirst({
+        where: { lessonNumber, title, unitId },
+      });
+
+      if (existingLesson) {
+        return new NextResponse("Lesson already exists in this unit", {
+          status: 409,
+        });
+      }
+
       const lesson = await tx.lesson.create({
         data: {
           lessonNumber,
@@ -84,9 +84,9 @@ export async function POST(req: Request) {
           })),
         });
       }
-    });
 
-    return new NextResponse("Successfully added lesson", { status: 201 });
+      return new NextResponse("Successfully added lesson", { status: 201 });
+    });
   } catch (error) {
     console.error("Error creating lesson:", error);
     return new NextResponse("There was an error posting lesson", {

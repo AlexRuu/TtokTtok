@@ -1,8 +1,7 @@
 import { authOptions } from "@/lib/auth";
-import prismadb from "@/lib/prismadb";
+import { withRls } from "@/lib/withRLS";
 import { LessonFormSchema } from "@/schemas/units-schemas";
 import { getServerSession } from "next-auth";
-
 import { NextResponse } from "next/server";
 
 export async function PATCH(
@@ -16,6 +15,7 @@ export async function PATCH(
     if (!session || !session.user || session.user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
+
     const body = await req.json();
     const lessonId = params.lessonId;
     const parsed = LessonFormSchema.safeParse(body);
@@ -38,25 +38,26 @@ export async function PATCH(
       return new NextResponse("Missing one or more fields", { status: 400 });
     }
 
-    const existingLesson = await prismadb.lesson.findFirst({
-      where: { id: lessonId },
-      include: {
-        lessonVersion: {
-          where: { lessonId: lessonId },
-          orderBy: { createdAt: "desc" },
-          take: 1,
+    // Run the entire update inside withRls so RLS policies apply
+    return await withRls(session, async (tx) => {
+      const existingLesson = await tx.lesson.findFirst({
+        where: { id: lessonId },
+        include: {
+          lessonVersion: {
+            where: { lessonId },
+            orderBy: { createdAt: "desc" },
+            take: 1,
+          },
         },
-      },
-    });
+      });
 
-    if (!existingLesson) {
-      return new NextResponse("Lesson does not exist", { status: 409 });
-    }
+      if (!existingLesson) {
+        return new NextResponse("Lesson does not exist", { status: 409 });
+      }
 
-    const nextLesson = existingLesson.lessonVersion[0].version + 1;
+      const nextLesson = existingLesson.lessonVersion[0].version + 1;
 
-    await prismadb.$transaction(async (tx) => {
-      const lesson = await tx.lesson.update({
+      await tx.lesson.update({
         where: { id: lessonId },
         data: {
           lessonNumber,
@@ -68,7 +69,7 @@ export async function PATCH(
 
       await tx.lessonVersion.create({
         data: {
-          lessonId: lesson.id,
+          lessonId,
           version: nextLesson,
           content: blocks,
         },
@@ -80,15 +81,15 @@ export async function PATCH(
         await tx.tagging.createMany({
           data: tags.map((tagId: string) => ({
             tagId,
-            lessonId: lesson.id,
+            lessonId,
           })),
         });
       }
-    });
 
-    return new NextResponse("Successfully updated lesson", { status: 200 });
+      return new NextResponse("Successfully updated lesson", { status: 200 });
+    });
   } catch (error) {
-    console.log("Error updating lesson", error);
+    console.error("Error updating lesson", error);
     return new NextResponse("Error patching lesson", { status: 500 });
   }
 }
@@ -106,19 +107,23 @@ export async function DELETE(
     }
     const lessonId = params.lessonId;
 
-    const existingLesson = await prismadb.lesson.findUnique({
-      where: { id: lessonId },
+    return await withRls(session, async (tx) => {
+      const existingLesson = await tx.lesson.findUnique({
+        where: { id: lessonId },
+      });
+
+      if (!existingLesson) {
+        return new NextResponse("Lesson does not exist", { status: 404 });
+      }
+
+      await tx.lesson.delete({
+        where: { id: lessonId },
+      });
+
+      return new NextResponse("Lesson was successfully deleted", {
+        status: 200,
+      });
     });
-
-    if (!existingLesson) {
-      return new NextResponse("Lesson does not exist", { status: 404 });
-    }
-
-    await prismadb.lesson.delete({
-      where: { id: lessonId },
-    });
-
-    return new NextResponse("Lesson was successfully deleted", { status: 200 });
   } catch (error) {
     console.error("There was an error deleting lesson", error);
     return new NextResponse("There was an error deleting lesson", {

@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import prismadb from "@/lib/prismadb";
+import { withRls } from "@/lib/withRLS";
 import { unitsSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
@@ -26,22 +27,24 @@ export async function PATCH(
 
     const { title } = parsed.data;
 
-    const existingUnit = await prismadb.unit.findUnique({
-      where: { id: unitId },
+    return await withRls(session, async (tx) => {
+      const existingUnit = await tx.unit.findUnique({
+        where: { id: unitId },
+      });
+
+      if (!existingUnit) {
+        return new NextResponse("Unit does not exist", { status: 404 });
+      }
+
+      await tx.unit.update({
+        where: { id: unitId },
+        data: {
+          title: title,
+        },
+      });
+
+      return new NextResponse("Successfully updated unit", { status: 200 });
     });
-
-    if (!existingUnit) {
-      return new NextResponse("Unit does not exist", { status: 404 });
-    }
-
-    await prismadb.unit.update({
-      where: { id: unitId },
-      data: {
-        title: title,
-      },
-    });
-
-    return new NextResponse("Successfully updated unit", { status: 200 });
   } catch (error) {
     console.error("There was an error updating unit", error);
     return new NextResponse("There was an error updating unit", {
@@ -63,19 +66,21 @@ export async function DELETE(
     }
     const unitId = params.unitId;
 
-    const existingUnit = await prismadb.unit.findUnique({
-      where: { id: unitId },
+    return await withRls(session, async (tx) => {
+      const existingUnit = await tx.unit.findUnique({
+        where: { id: unitId },
+      });
+
+      if (!existingUnit) {
+        return new NextResponse("Unit does not exist", { status: 404 });
+      }
+
+      await tx.unit.delete({
+        where: { id: unitId },
+      });
+
+      return new NextResponse("Unit was successfully deleted", { status: 200 });
     });
-
-    if (!existingUnit) {
-      return new NextResponse("Unit does not exist", { status: 404 });
-    }
-
-    await prismadb.unit.delete({
-      where: { id: unitId },
-    });
-
-    return new NextResponse("Unit was successfully deleted", { status: 200 });
   } catch (error) {
     console.error("There was an error deleting unit", error);
     return new NextResponse("There was an error deleting unit", {

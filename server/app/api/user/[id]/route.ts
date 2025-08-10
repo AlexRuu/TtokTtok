@@ -1,5 +1,5 @@
 import { authOptions } from "@/lib/auth";
-import prismadb from "@/lib/prismadb";
+import { withRls } from "@/lib/withRLS";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -15,31 +15,36 @@ export async function PATCH(
     }
 
     const body = await req.json();
+
     if (!body) {
       return new NextResponse("Insufficient data required", { status: 400 });
     }
+
     const id = params.id;
+
     const { firstName, lastName, email, role, status } = body;
 
-    await prismadb.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        status: status,
-        role: role,
-      },
-    });
+    return await withRls(session, async (tx) => {
+      await tx.user.update({
+        where: {
+          id: id,
+        },
+        data: {
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          status: status,
+          role: role,
+        },
+      });
 
-    return NextResponse.json({
-      message: "Successfully updated user",
-      status: 200,
+      return NextResponse.json({
+        message: "Successfully updated user",
+        status: 200,
+      });
     });
   } catch (error) {
-    console.log("Error updating user", error);
+    console.error("Error updating user", error);
     return new NextResponse("Error updating user", { status: 500 });
   }
 }
@@ -58,19 +63,21 @@ export async function DELETE(
 
     const userId = params.id;
 
-    const existingUser = await prismadb.user.findUnique({
-      where: { id: userId },
+    return await withRls(session, async (tx) => {
+      const existingUser = await tx.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!existingUser) {
+        return new NextResponse("User does not exist", { status: 404 });
+      }
+
+      await tx.user.delete({
+        where: { id: userId },
+      });
+
+      return new NextResponse("User was successfully deleted", { status: 200 });
     });
-
-    if (!existingUser) {
-      return new NextResponse("User does not exist", { status: 404 });
-    }
-
-    await prismadb.user.delete({
-      where: { id: userId },
-    });
-
-    return new NextResponse("User was successfully deleted", { status: 200 });
   } catch (error) {
     console.error("There was an error deleting user", error);
     return new NextResponse("There was an error deleting user", {
