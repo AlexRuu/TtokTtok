@@ -10,9 +10,13 @@ export default async function WithNavLayout({
   children: React.ReactNode;
 }>) {
   const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "ADMIN") {
+  if (!session) {
     redirect("/signin");
   }
+  if (session.user.role !== "ADMIN") {
+    redirect("/unauthorized");
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
