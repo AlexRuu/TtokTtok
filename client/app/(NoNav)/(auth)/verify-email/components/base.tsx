@@ -49,6 +49,7 @@ const VerificationPage = () => {
     };
 
     verifyEmail();
+    localStorage.removeItem("pendingEmail");
   }, [searchParams, startLoading, stopLoading]);
 
   if (isLoading) {

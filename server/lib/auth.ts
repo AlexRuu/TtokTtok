@@ -110,8 +110,6 @@ async function linkOAuthAccountIfNeeded(
   accessToken: string
 ) {
   try {
-    console.log(`Linking account for userId: ${userId}, provider: ${provider}`);
-
     await prismadb.account.upsert({
       where: {
         provider_providerAccountId: {
@@ -130,8 +128,6 @@ async function linkOAuthAccountIfNeeded(
         type: "oauth",
       },
     });
-
-    console.log(`Successfully linked ${provider} account to user ${userId}`);
   } catch (error) {
     console.error("Error linking OAuth account:", error);
     throw new NextResponse("Error creating/updating account", { status: 500 });
@@ -214,7 +210,9 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user || !user.password) {
-          throw new Error("User not found or password not set");
+          throw new NextResponse("User not found or password not set", {
+            status: 401,
+          });
         }
 
         const isValid = await argon2.verify(

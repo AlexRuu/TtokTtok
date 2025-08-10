@@ -12,7 +12,7 @@ const EmailSent = () => {
         <KeyRound size={50} className="mx-auto" color="#7c86ff" />
         <h1 className="text-center text-2xl font-semibold">Forgot Password</h1>
         <p className="text-center text-lg">
-          Please check your email&apos;s inbox on further instructions on
+          Please check your email&apos;s inbox for further instructions on
           resetting your password.
         </p>
         <Button

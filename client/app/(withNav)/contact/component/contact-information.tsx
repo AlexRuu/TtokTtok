@@ -28,7 +28,7 @@ const ContactInformation = () => {
             href="mailto:ttokttok@gmail.com"
             className="text-[#8AA4C1] hover:text-[#8E77A6]"
           >
-            ttokttok@gmail.com
+            ttokttoktteoktteok@gmail.com
           </a>
         </span>
       </div>
