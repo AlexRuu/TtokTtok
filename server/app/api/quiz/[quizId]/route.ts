@@ -1,7 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { withRls } from "@/lib/withRLS";
 import { quizSchema } from "@/schemas/form-schemas";
-import { Prisma } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -46,31 +45,27 @@ export async function PATCH(
         return new NextResponse("Quiz does not exist", { status: 404 });
       }
 
-      await tx.$transaction(async (trx: Prisma.TransactionClient) => {
-        await trx.quiz.update({
-          where: { id: quizId },
-          data: { title },
-        });
+      await tx.quiz.update({
+        where: { id: quizId },
+        data: { title },
+      });
 
-        await trx.quizQuestion.deleteMany({
-          where: { quizId },
-        });
+      await tx.quizQuestion.deleteMany({
+        where: { quizId },
+      });
 
-        await trx.quizQuestion.createMany({
-          data: quizQuestion.map((q) => ({
-            quizId,
-            question: q.question,
-            quizType: q.quizType,
-            options:
-              q.quizType === "MULTIPLE_CHOICE" || q.quizType === "MATCHING"
-                ? q.options
-                : undefined,
-            answer:
-              typeof q.answer === "string"
-                ? q.answer
-                : JSON.stringify(q.answer),
-          })),
-        });
+      await tx.quizQuestion.createMany({
+        data: quizQuestion.map((q) => ({
+          quizId,
+          question: q.question,
+          quizType: q.quizType,
+          options:
+            q.quizType === "MULTIPLE_CHOICE" || q.quizType === "MATCHING"
+              ? q.options
+              : undefined,
+          answer:
+            typeof q.answer === "string" ? q.answer : JSON.stringify(q.answer),
+        })),
       });
 
       return new NextResponse("Quiz has been updated successfully", {

@@ -1,7 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { withRls } from "@/lib/withRLS";
 import { vocabularySchema } from "@/schemas/form-schemas";
-import { Prisma } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -58,30 +57,29 @@ export async function POST(req: Request) {
           status: 409,
         });
       }
-      await tx.$transaction(async (trx: Prisma.TransactionClient) => {
-        const vocabularyList = await trx.vocabularyList.create({
-          data: {
-            title,
-            lesson: { connect: { id: lessonId } },
-            vocabulary: {
-              createMany: {
-                data: vocabulary.map((item) => ({
-                  english: item.english,
-                  korean: item.korean,
-                  definition: item.definition,
-                })),
-              },
+      const vocabularyList = await tx.vocabularyList.create({
+        data: {
+          title,
+          lesson: { connect: { id: lessonId } },
+          vocabulary: {
+            createMany: {
+              data: vocabulary.map((item) => ({
+                english: item.english,
+                korean: item.korean,
+                definition: item.definition,
+              })),
             },
           },
-        });
-
-        await trx.tagging.create({
-          data: {
-            tagId: vocabTag.id,
-            vocabularyListId: vocabularyList.id,
-          },
-        });
+        },
       });
+
+      await tx.tagging.create({
+        data: {
+          tagId: vocabTag.id,
+          vocabularyListId: vocabularyList.id,
+        },
+      });
+
       return NextResponse.json("Successfully created vocabulary", {
         status: 201,
       });

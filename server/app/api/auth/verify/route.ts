@@ -3,7 +3,6 @@ import { getClientIp } from "@/lib/getIP";
 import { rateLimit } from "@/lib/rateLimit";
 import { withRls } from "@/lib/withRLS";
 import { verifySchema } from "@/schemas/form-schemas";
-import { Prisma } from "@prisma/client";
 import { verify } from "argon2";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
@@ -52,19 +51,17 @@ export async function POST(req: Request) {
         );
       }
 
-      await tx.$transaction(async (trx: Prisma.TransactionClient) => {
-        await trx.user.update({
-          where: { email: validToken.identifier },
-          data: { emailVerified: new Date() },
-        });
+      await tx.user.update({
+        where: { email: validToken.identifier },
+        data: { emailVerified: new Date() },
+      });
 
-        await trx.verificationToken.update({
-          where: { id: validToken.id },
-          data: {
-            used: true,
-            usedAt: new Date(),
-          },
-        });
+      await tx.verificationToken.update({
+        where: { id: validToken.id },
+        data: {
+          used: true,
+          usedAt: new Date(),
+        },
       });
 
       await tx.verificationToken.deleteMany({
