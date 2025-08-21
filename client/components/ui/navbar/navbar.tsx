@@ -108,13 +108,13 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-10 text-base lg:text-[1rem] font-medium text-[#6B4C3B]">
+          <div className="hidden md:flex items-center gap-4 lg:gap-10 text-base lg:text-[1rem] font-medium text-[#6B4C3B]">
             {links.map((link) => (
               <Link
                 key={link.name}
                 href={link.path}
                 className={cn(
-                  "text-[0.95rem] lg:text-[1rem] font-normal tracking-normal px-3 py-1.5 rounded-md transition-all duration-200",
+                  "text-[0.9rem] sm:text-[0.95rem] lg:text-[1rem] font-normal tracking-normal px-2 py-1 sm:px-3 sm:py-1.5 rounded-md transition-all duration-200",
                   "hover:text-[#A65A3A] hover:bg-[#FFF3EC]",
                   pathName === link.path &&
                     "text-[#A65A3A] underline underline-offset-4 decoration-[#D69E78]"
