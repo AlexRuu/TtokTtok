@@ -105,14 +105,14 @@ export interface Tag {
 export interface Tagging {
   id: string;
   tagId: string;
-  lessonId: string;
-  quizId: string;
-  vocabularyListId: string;
+  lessonId?: string;
+  quizId?: string;
+  vocabularyListId?: string;
   createdAt: string;
   updatedAt: string;
   tag: Tag;
   lesson: Lesson;
-  quiz: Quiz;
+  quiz?: Quiz;
   vocabularyList: VocabularyList;
 }
 
@@ -161,3 +161,8 @@ export type GroupedSearchResults = {
   quizzes: SearchResult[];
   vocabulary: SearchResult[];
 };
+
+// Helper for quiz page
+export interface UnitWithLessons extends Unit {
+  lesson: Lesson[];
+}
