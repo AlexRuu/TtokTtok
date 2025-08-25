@@ -40,6 +40,8 @@ export interface VocabularyList {
 export interface Quiz {
   id: string;
   lessonId: string;
+  title: string;
+  slug: string;
   createdAt: string;
   lesson: Lesson;
   quizQuestion: QuizQuestion[];
