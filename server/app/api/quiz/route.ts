@@ -4,6 +4,13 @@ import { quizSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
+const generateSlug = (title: string) =>
+  title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\p{Script=Hangul}a-z0-9\s-]/gu, "")
+    .replace(/\s+/g, "-");
+
 const quizTypeToTagMap: Record<string, string> = {
   MULTIPLE_CHOICE: "Multiple Choice",
   FILL_IN_THE_BLANK: "Fill In The Blank",
@@ -48,6 +55,7 @@ export async function POST(req: Request) {
       const createdQuiz = await tx.quiz.create({
         data: {
           title,
+          slug: generateSlug(title),
           lesson: { connect: { id: lessonId } },
           quizQuestion: {
             create: quizQuestion.map((q) => ({
