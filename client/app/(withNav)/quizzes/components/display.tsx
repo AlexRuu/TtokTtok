@@ -6,6 +6,7 @@ import Link from "next/link";
 type QuizWithRelations = {
   id: string;
   title: string;
+  slug: string;
   lesson: {
     id: string;
     title: string;
@@ -131,7 +132,7 @@ const QuizDisplay = ({ quizzes }: { quizzes: QuizWithRelations[] }) => {
                     className="bg-white p-3 rounded-xl shadow border border-[#FFEDE2] flex flex-col sm:flex-row sm:items-center justify-between"
                   >
                     <Link
-                      href={`/quizzes/${quiz.id}`}
+                      href={`/quizzes/${quiz.slug}`}
                       className="font-medium text-sm text-[#6B4C3B] hover:underline"
                     >
                       {quiz.title}
