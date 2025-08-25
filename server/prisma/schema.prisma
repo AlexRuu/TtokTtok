@@ -206,6 +206,7 @@ model Quiz {
   lessonId        String
   createdAt       DateTime          @default(now()) @db.Timestamptz(6)
   title           String
+  slug            String            @unique
   lesson          Lesson            @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   quizQuestion    QuizQuestion[]
   tagging         Tagging[]
