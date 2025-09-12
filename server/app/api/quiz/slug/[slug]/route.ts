@@ -26,7 +26,20 @@ export async function GET(
         return new NextResponse("Quiz not found", { status: 404 });
       }
 
-      return NextResponse.json(quiz);
+      // Get random 10 questions from list of questions
+      const shuffledQuizQuestions = [...quiz.quizQuestion].sort(
+        () => 0.5 - Math.random()
+      );
+      const randomQuestions = shuffledQuizQuestions.slice(
+        0,
+        Math.min(10, shuffledQuizQuestions.length)
+      );
+      const randomizedQuiz = {
+        ...quiz,
+        quizQuestion: randomQuestions,
+      };
+
+      return NextResponse.json(randomizedQuiz);
     });
   } catch (error) {
     console.error("Error finding specific quiz by slug", error);
