@@ -3,22 +3,25 @@ import { Quiz } from "@/types";
 import { notFound } from "next/navigation";
 import React from "react";
 import QuizClient from "./[components]/quiz-client";
+import { cookies } from "next/headers";
 
-const IndividualQuizPage = async ({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) => {
-  const { slug } = await params;
-  const quiz = (await getQuiz(slug)) as Quiz | null;
+const IndividualQuizPage = async ({ params }: { params: { slug: string } }) => {
+  const { slug } = params;
 
-  if (!quiz) {
-    notFound();
-  }
+  // Check if current in-progress quiz from cookie
+  const cookieStore = await cookies();
+  const inProgress =
+    cookieStore.get(`quiz-${slug}-in-progress`)?.value === "true";
+
+  // Only fetch quiz if not in progress
+  const quiz: Quiz | null = !inProgress
+    ? ((await getQuiz(slug)) as Quiz | null)
+    : null;
+  if (!quiz && !inProgress) notFound();
 
   return (
     <div>
-      <QuizClient quiz={quiz} />
+      <QuizClient quizId={slug} quiz={quiz} inProgress={inProgress} />
     </div>
   );
 };

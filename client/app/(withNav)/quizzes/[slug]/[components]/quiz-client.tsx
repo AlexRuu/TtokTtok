@@ -1,18 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Quiz, QuizQuestion } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import MatchingQuiz from "./matching-type";
+import Loader from "@/components/ui/loader";
+import useLoading from "@/hooks/use-loading";
+import useDebounce from "@/hooks/debounce";
 
-// Quiz Types
+// Quiz Types helpers
 const isMC = (q: QuizQuestion) => q.quizType === "MULTIPLE_CHOICE";
 const isTF = (q: QuizQuestion) => q.quizType === "TRUE_FALSE";
 const isFIB = (q: QuizQuestion) => q.quizType === "FILL_IN_THE_BLANK";
+
 type AnswerValue = string | Record<string, string> | boolean;
+
+interface CurrentAttempt {
+  quiz: Quiz;
+  answers: Record<string, AnswerValue>;
+}
 
 const isMatchingQuestion = (
   q: QuizQuestion
@@ -23,9 +32,52 @@ const isMatchingQuestion = (
     (o) => typeof o === "object" && o !== null && "left" in o && "right" in o
   );
 
-const QuizPage = ({ quiz }: { quiz: Quiz }) => {
+interface QuizClientProps {
+  quizId: string;
+  quiz?: Quiz | null;
+  inProgress?: boolean;
+}
+
+const QuizClient = ({
+  quizId,
+  quiz: initialQuiz,
+  inProgress = false,
+}: QuizClientProps) => {
+  const [quiz, setQuiz] = useState<Quiz | null | undefined>(initialQuiz);
   const [answers, setAnswers] = useState<Record<string, AnswerValue>>({});
+  const debouncedAnswers = useDebounce(answers, 500); // debounce to avoid excessive writes
   const [submitted, setSubmitted] = useState(false);
+  const { isLoading, startLoading, stopLoading } = useLoading();
+
+  // Hydrate saved attempt from localStorage if inProgress
+  useEffect(() => {
+    if (!quiz && inProgress) {
+      startLoading();
+      const saved = localStorage.getItem(`quiz-${quizId}-attempt`);
+      if (saved) {
+        const parsed: CurrentAttempt = JSON.parse(saved);
+        setQuiz(parsed.quiz);
+        setAnswers(parsed.answers || {});
+      }
+      stopLoading();
+    }
+  }, [quiz, inProgress, quizId, startLoading, stopLoading]);
+
+  // Save answers to localStorage (debounced)
+  useEffect(() => {
+    if (!quiz) return;
+
+    const attemptToSave: CurrentAttempt = {
+      quiz,
+      answers: debouncedAnswers,
+    };
+
+    localStorage.setItem(
+      `quiz-${quizId}-attempt`,
+      JSON.stringify(attemptToSave)
+    );
+    document.cookie = `quiz-${quizId}-in-progress=true; path=/`;
+  }, [debouncedAnswers, quiz, quizId]);
 
   const handleAnswerChange = (q: QuizQuestion, value: AnswerValue) => {
     setAnswers((prev) => ({ ...prev, [q.id]: value }));
@@ -33,12 +85,16 @@ const QuizPage = ({ quiz }: { quiz: Quiz }) => {
 
   const handleSubmit = () => {
     setSubmitted(true);
-    console.log("Submitted answers:", answers);
+    localStorage.removeItem(`quiz-${quizId}-attempt`);
+    document.cookie = `quiz-${quizId}-in-progress=; path=/; max-age=0`;
   };
+
+  if (isLoading || !quiz) return <Loader />;
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-8 min-h-screen bg-[#FFF9F5] text-[#6B4C3B] mt-10 rounded-xl shadow-md pb-20">
       <h1 className="text-2xl font-bold">{quiz.title}</h1>
+
       {quiz.quizQuestion.map((q, index) => (
         <Card key={q.id} className="shadow-sm border border-[#FFE4D6] bg-white">
           <CardContent className="p-6 space-y-4">
@@ -51,9 +107,7 @@ const QuizPage = ({ quiz }: { quiz: Quiz }) => {
               Array.isArray(q.options) &&
               (q.options as { option: string; value: string }[]).map(
                 (opt, i) => {
-                  const currentAnswer = answers[q.id] as string | undefined;
-                  const isSelected = currentAnswer === opt.value;
-
+                  const isSelected = answers[q.id] === opt.value;
                   return (
                     <Button
                       key={i}
@@ -76,9 +130,7 @@ const QuizPage = ({ quiz }: { quiz: Quiz }) => {
             {isTF(q) && (
               <div className="flex gap-4">
                 {["True", "False"].map((val) => {
-                  const currentAnswer = answers[q.id] as string | undefined;
-                  const isSelected = currentAnswer === val;
-
+                  const isSelected = answers[q.id] === val;
                   return (
                     <Button
                       key={val}
@@ -142,4 +194,4 @@ const QuizPage = ({ quiz }: { quiz: Quiz }) => {
   );
 };
 
-export default QuizPage;
+export default QuizClient;
