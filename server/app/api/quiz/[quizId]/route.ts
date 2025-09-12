@@ -41,6 +41,7 @@ export async function PATCH(
       const existingQuiz = await tx.quiz.findUnique({
         where: { id: quizId },
       });
+
       if (!existingQuiz) {
         return new NextResponse("Quiz does not exist", { status: 404 });
       }
@@ -67,10 +68,10 @@ export async function PATCH(
             typeof q.answer === "string" ? q.answer : JSON.stringify(q.answer),
         })),
       });
+    });
 
-      return new NextResponse("Quiz has been updated successfully", {
-        status: 200,
-      });
+    return new NextResponse("Quiz has been updated successfully", {
+      status: 200,
     });
   } catch (error) {
     console.error("There was an error updating quiz", error);
