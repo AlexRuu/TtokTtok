@@ -6,7 +6,7 @@ export const createClient = async () => {
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.SB_SECRET_KEY!,
     {
       cookies: {
         getAll() {
@@ -24,6 +24,6 @@ export const createClient = async () => {
           }
         },
       },
-    },
+    }
   );
 };
