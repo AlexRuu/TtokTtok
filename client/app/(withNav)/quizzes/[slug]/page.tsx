@@ -5,7 +5,8 @@ import React from "react";
 import QuizClient from "./[components]/quiz-client";
 import { cookies } from "next/headers";
 
-const IndividualQuizPage = async ({ params }: { params: { slug: string } }) => {
+const IndividualQuizPage = async (props: { params: Promise<{ slug: string }> }) => {
+  const params = await props.params;
   const { slug } = params;
 
   // Check if current in-progress quiz from cookie
