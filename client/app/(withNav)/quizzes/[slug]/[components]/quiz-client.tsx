@@ -10,6 +10,7 @@ import MatchingQuiz from "./matching-type";
 import Loader from "@/components/ui/loader";
 import useLoading from "@/hooks/use-loading";
 import useDebounce from "@/hooks/debounce";
+import { useRouter } from "next/navigation";
 
 // Quiz Types helpers
 const isMC = (q: QuizQuestion) => q.quizType === "MULTIPLE_CHOICE";
@@ -45,9 +46,17 @@ const QuizClient = ({
 }: QuizClientProps) => {
   const [quiz, setQuiz] = useState<Quiz | null | undefined>(initialQuiz);
   const [answers, setAnswers] = useState<Record<string, AnswerValue>>({});
-  const debouncedAnswers = useDebounce(answers, 500); // debounce to avoid excessive writes
+  const debouncedAnswers = useDebounce(answers, 500);
   const [submitted, setSubmitted] = useState(false);
   const { isLoading, startLoading, stopLoading } = useLoading();
+  const [loadingNew, setLoadingNew] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (loadingNew && quiz) {
+      setLoadingNew(false);
+    }
+  }, [quiz, loadingNew]);
 
   // Hydrate saved attempt from localStorage if inProgress
   useEffect(() => {
@@ -83,17 +92,38 @@ const QuizClient = ({
     setAnswers((prev) => ({ ...prev, [q.id]: value }));
   };
 
+  const handleStartNewQuiz = () => {
+    localStorage.removeItem(`quiz-${quizId}-attempt`);
+    document.cookie = `quiz-${quizId}-in-progress=; path=/; max-age=0`;
+
+    setAnswers({});
+    setSubmitted(false);
+
+    router.replace(`/quizzes/${quizId}?t=${Date.now()}`);
+
+    setTimeout(() => {
+      router.replace(`/quizzes/${quizId}`, { scroll: false });
+    }, 100);
+  };
+
   const handleSubmit = () => {
     setSubmitted(true);
     localStorage.removeItem(`quiz-${quizId}-attempt`);
     document.cookie = `quiz-${quizId}-in-progress=; path=/; max-age=0`;
   };
 
-  if (isLoading || !quiz) return <Loader />;
+  if (isLoading || !quiz || loadingNew) return <Loader />;
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-8 min-h-screen bg-[#FFF9F5] text-[#6B4C3B] mt-10 rounded-xl shadow-md pb-20">
       <h1 className="text-2xl font-bold">{quiz.title}</h1>
+      <Button
+        variant="outline"
+        className="mb-4 hover:cursor-pointer"
+        onClick={handleStartNewQuiz}
+      >
+        Start New Quiz
+      </Button>
 
       {quiz.quizQuestion.map((q, index) => (
         <Card key={q.id} className="shadow-sm border border-[#FFE4D6] bg-white">
