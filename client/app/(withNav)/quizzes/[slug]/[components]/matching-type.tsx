@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Xarrow from "react-xarrows";
 import { QuizQuestion } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,15 +11,23 @@ interface MatchingQuizProps {
   };
   disabled?: boolean;
   onChange?: (matches: Record<string, string>) => void;
+  value?: Record<string, string>;
 }
 
 const MatchingQuiz: React.FC<MatchingQuizProps> = ({
   question,
   disabled,
   onChange,
+  value,
 }) => {
   const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
   const [matches, setMatches] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (value) {
+      setMatches(value);
+    }
+  }, [value]);
 
   const handleLeftClick = (left: string) => {
     if (disabled) return;

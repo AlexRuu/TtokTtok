@@ -11,6 +11,7 @@ import Loader from "@/components/ui/loader";
 import useLoading from "@/hooks/use-loading";
 import useDebounce from "@/hooks/debounce";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 // Quiz Types helpers
 const isMC = (q: QuizQuestion) => q.quizType === "MULTIPLE_CHOICE";
@@ -37,26 +38,56 @@ interface QuizClientProps {
   quizId: string;
   quiz?: Quiz | null;
   inProgress?: boolean;
+  rateLimited?: boolean;
 }
 
 const QuizClient = ({
   quizId,
   quiz: initialQuiz,
   inProgress = false,
+  rateLimited = false,
 }: QuizClientProps) => {
   const [quiz, setQuiz] = useState<Quiz | null | undefined>(initialQuiz);
   const [answers, setAnswers] = useState<Record<string, AnswerValue>>({});
   const debouncedAnswers = useDebounce(answers, 500);
   const [submitted, setSubmitted] = useState(false);
   const { isLoading, startLoading, stopLoading } = useLoading();
-  const [loadingNew, setLoadingNew] = useState(false);
+
   const router = useRouter();
 
   useEffect(() => {
-    if (loadingNew && quiz) {
-      setLoadingNew(false);
+    if (rateLimited) {
+      toast.error(
+        "You’re starting quizzes too quickly. Please wait a few minutes.",
+        {
+          style: {
+            background: "#FFF9F5",
+            color: "#6B4C3B",
+            borderRadius: "12px",
+            padding: "14px 20px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+            fontSize: "15px",
+            border: "1px solid #FFD1B8",
+          },
+          className:
+            "transition-all transform duration-300 ease-in-out font-medium",
+        }
+      );
+      router.replace(`/quizzes/${quizId}`, { scroll: false });
+      stopLoading();
+      return;
     }
-  }, [quiz, loadingNew]);
+
+    if (initialQuiz) {
+      setQuiz(initialQuiz);
+      setAnswers({});
+      setSubmitted(false);
+      localStorage.removeItem(`quiz-${quizId}-attempt`);
+
+      router.replace(`/quizzes/${quizId}`, { scroll: false });
+      stopLoading();
+    }
+  }, [initialQuiz, quizId, router, stopLoading, rateLimited]);
 
   // Hydrate saved attempt from localStorage if inProgress
   useEffect(() => {
@@ -72,7 +103,7 @@ const QuizClient = ({
     }
   }, [quiz, inProgress, quizId, startLoading, stopLoading]);
 
-  // Save answers to localStorage (debounced)
+  // Save answers to localStorage
   useEffect(() => {
     if (!quiz) return;
 
@@ -85,7 +116,6 @@ const QuizClient = ({
       `quiz-${quizId}-attempt`,
       JSON.stringify(attemptToSave)
     );
-    document.cookie = `quiz-${quizId}-in-progress=true; path=/`;
   }, [debouncedAnswers, quiz, quizId]);
 
   const handleAnswerChange = (q: QuizQuestion, value: AnswerValue) => {
@@ -93,17 +123,8 @@ const QuizClient = ({
   };
 
   const handleStartNewQuiz = () => {
-    localStorage.removeItem(`quiz-${quizId}-attempt`);
-    document.cookie = `quiz-${quizId}-in-progress=; path=/; max-age=0`;
-
-    setAnswers({});
-    setSubmitted(false);
-
+    startLoading();
     router.replace(`/quizzes/${quizId}?t=${Date.now()}`);
-
-    setTimeout(() => {
-      router.replace(`/quizzes/${quizId}`, { scroll: false });
-    }, 100);
   };
 
   const handleSubmit = () => {
@@ -112,18 +133,20 @@ const QuizClient = ({
     document.cookie = `quiz-${quizId}-in-progress=; path=/; max-age=0`;
   };
 
-  if (isLoading || !quiz || loadingNew) return <Loader />;
+  if (isLoading || !quiz) return <Loader />;
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-8 min-h-screen bg-[#FFF9F5] text-[#6B4C3B] mt-10 rounded-xl shadow-md pb-20">
       <h1 className="text-2xl font-bold">{quiz.title}</h1>
-      <Button
-        variant="outline"
-        className="mb-4 hover:cursor-pointer"
-        onClick={handleStartNewQuiz}
-      >
-        Start New Quiz
-      </Button>
+      <div className="flex justify-end mb-4">
+        <Button
+          variant="outline"
+          className="hover:cursor-pointer border-[#FFD1B8] text-[#6B4C3B] hover:bg-[#FFE4D6] rounded-full px-6"
+          onClick={handleStartNewQuiz}
+        >
+          Start New Quiz
+        </Button>
+      </div>
 
       {quiz.quizQuestion.map((q, index) => (
         <Card key={q.id} className="shadow-sm border border-[#FFE4D6] bg-white">
@@ -206,6 +229,7 @@ const QuizClient = ({
                 question={q}
                 disabled={submitted}
                 onChange={(matches) => handleAnswerChange(q, matches)}
+                value={answers[q.id] as Record<string, string>}
               />
             )}
           </CardContent>

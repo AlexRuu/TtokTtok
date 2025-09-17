@@ -6,33 +6,38 @@ import { cookies } from "next/headers";
 
 const IndividualQuizPage = async (props: {
   params: Promise<{ slug: string }>;
-  searchParams?: { t?: string };
+  searchParams?: Promise<{ t?: string }>;
 }) => {
   const params = await props.params;
   const { slug } = params;
-  const forceNew = Boolean(props.searchParams?.t);
+  const forceNew = Boolean((await props.searchParams)?.t);
 
-  // Check if current in-progress quiz from cookie
   const cookieStore = await cookies();
-  const inProgress =
-    cookieStore.get(`quiz-${slug}-in-progress`)?.value === "true" && !forceNew;
+  const inProgressCookie =
+    cookieStore.get(`quiz-${slug}-in-progress`)?.value === "true";
 
-  // Only fetch quiz if not in progress
-  const quiz: Quiz | null = !inProgress
-    ? ((await getQuiz(slug)) as Quiz | null)
-    : null;
+  // Decide if we should fetch a new quiz
+  const shouldFetch = !inProgressCookie || forceNew;
 
-  if (!quiz && !inProgress) notFound();
+  let quiz: Quiz | null = null;
+  let rateLimited = false;
+
+  if (shouldFetch) {
+    const result = await getQuiz(slug, inProgressCookie && !forceNew);
+    quiz = result.quiz;
+    rateLimited = result.rateLimited;
+  }
+
+  // If there’s no quiz and nothing is in progress, show 404
+  if (!quiz && !inProgressCookie && !rateLimited) notFound();
 
   return (
-    <div>
-      <QuizClient
-        quizId={slug}
-        quiz={quiz}
-        inProgress={inProgress}
-        key={props.searchParams?.t || "initial"}
-      />
-    </div>
+    <QuizClient
+      quizId={slug}
+      quiz={quiz}
+      inProgress={inProgressCookie && !forceNew}
+      rateLimited={rateLimited}
+    />
   );
 };
 

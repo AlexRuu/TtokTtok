@@ -1,15 +1,25 @@
 import { authOptions } from "@/lib/auth";
+import { getClientIp } from "@/lib/getIP";
+import { rateLimit } from "@/lib/rateLimit";
 import { withRls } from "@/lib/withRLS";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function GET(
-  _req: Request,
+  req: Request,
   props: { params: Promise<{ slug: string }> }
 ) {
   const params = await props.params;
   try {
+    const ip = getClientIp(req);
+    const allowed = await rateLimit(ip, 1, 60);
+
+    if (!allowed) {
+      return new Response("Too many requests", { status: 429 });
+    }
+
     const session = await getServerSession(authOptions);
+
     return await withRls(session, async (tx) => {
       const quiz = await tx.quiz.findUnique({
         where: {
@@ -38,8 +48,9 @@ export async function GET(
         ...quiz,
         quizQuestion: randomQuestions,
       };
-
-      return NextResponse.json(randomizedQuiz);
+      const res = NextResponse.json(randomizedQuiz);
+      res.cookies.set(`quiz-${params.slug}-in-progress`, "true", { path: "/" });
+      return res;
     });
   } catch (error) {
     console.error("Error finding specific quiz by slug", error);
