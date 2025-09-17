@@ -10,16 +10,15 @@ export const rateLimit = async (
   limit: number,
   durationSeconds: number
 ) => {
-  const redisKey = `rate_limit:${key}`;
+  const redisKey =
+    process.env.NODE_ENV === "development" ? "dev-local" : `rate_limit:${key}`;
 
   const current = await redis.incr(redisKey);
-  if (current === 1) {
+
+  const ttl = await redis.ttl(redisKey);
+  if (ttl === -1) {
     await redis.expire(redisKey, durationSeconds);
   }
 
-  if (current > limit) {
-    return false;
-  }
-
-  return true;
+  return current <= limit;
 };
