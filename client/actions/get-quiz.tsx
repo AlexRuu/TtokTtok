@@ -1,10 +1,8 @@
 const URL = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/quiz/slug`;
 
-const getQuiz = async (slug: string, inProgress: boolean) => {
+const getQuiz = async (slug: string) => {
   try {
-    const res = await fetch(`${URL}/${slug}`, {
-      headers: { "x-in-progress": inProgress ? "true" : "false" },
-    });
+    const res = await fetch(`${URL}/${slug}`);
     if (res.status === 429) {
       return { quiz: null, rateLimited: true };
     }
