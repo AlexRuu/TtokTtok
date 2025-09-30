@@ -1,5 +1,25 @@
-import getQuiz from "@/actions/get-quiz";
 import QuizClient from "./[components]/quiz-client";
+import getQuizMetadata from "@/actions/get-quiz-metadata";
+import { notFound } from "next/navigation";
+
+export const generateMetadata = async (props: {
+  params: Promise<{ slug: string }>;
+}) => {
+  const params = await props.params;
+  const { metadata } = await getQuizMetadata(params.slug);
+
+  if (!metadata) {
+    return {
+      title: "Quiz Not Found",
+      description: "The requested quiz could not be found.",
+    };
+  }
+
+  return {
+    title: metadata.title,
+    description: `Take the quiz "${metadata.title}" on TtokTtok!`,
+  };
+};
 
 const IndividualQuizPage = async (props: {
   params: Promise<{ slug: string }>;
@@ -8,15 +28,13 @@ const IndividualQuizPage = async (props: {
   const { slug } = params;
 
   // Fetch initial quiz from backend
-  const { quiz: initialQuiz, rateLimited } = await getQuiz(slug);
+  const { metadata, error } = await getQuizMetadata(slug);
 
-  return (
-    <QuizClient
-      quizId={slug}
-      initialQuiz={initialQuiz ?? null} // may be null
-      rateLimited={rateLimited}
-    />
-  );
+  if (error || !metadata) {
+    return notFound();
+  }
+
+  return <QuizClient quizId={slug} />;
 };
 
 export default IndividualQuizPage;
