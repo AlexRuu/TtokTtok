@@ -12,6 +12,8 @@ import useLoading from "@/hooks/use-loading";
 import useDebounce from "@/hooks/debounce";
 import toast from "react-hot-toast";
 import getQuiz from "@/actions/get-quiz";
+import postQuizResult from "@/actions/post-quiz-submission";
+import { QuizResults } from "./quiz-results";
 
 // Quiz type helpers
 const isMC = (q: QuizQuestion) => q.quizType === "MULTIPLE_CHOICE";
@@ -23,6 +25,22 @@ type AnswerValue = string | Record<string, string> | boolean;
 interface CurrentAttempt {
   quiz: Quiz;
   answers: Record<string, AnswerValue>;
+}
+interface QuizResultItem {
+  questionId: string;
+  question: string;
+  quizType: "MULTIPLE_CHOICE" | "TRUE_FALSE" | "FILL_IN_THE_BLANK" | "MATCHING";
+  givenAnswer: string | boolean | { left: string; match: string }[] | null;
+  correctAnswer: string;
+  correctCount: number;
+  possibleCount: number;
+}
+
+interface QuizSubmissionResult {
+  quizId: string;
+  results: QuizResultItem[];
+  totalCorrect: number;
+  totalPossible: number;
 }
 
 const isMatchingQuestion = (
@@ -36,38 +54,91 @@ const isMatchingQuestion = (
 
 interface QuizClientProps {
   quizId: string;
-  initialQuiz?: Quiz | null;
-  rateLimited?: boolean;
 }
 
-const QuizClient = ({ quizId, initialQuiz }: QuizClientProps) => {
+const QuizClient = ({ quizId }: QuizClientProps) => {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [answers, setAnswers] = useState<Record<string, AnswerValue>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [results, setResults] = useState<QuizSubmissionResult | null>(null);
   const debouncedAnswers = useDebounce(answers, 500);
   const { isLoading, startLoading, stopLoading } = useLoading();
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    // Try localStorage first
-    const saved = localStorage.getItem(`quiz-${quizId}-attempt`);
-    if (saved) {
-      const parsed: CurrentAttempt = JSON.parse(saved);
-      setQuiz(parsed.quiz);
-      setAnswers(parsed.answers || {});
-    } else if (initialQuiz) {
-      // fallback to server initial quiz
-      setQuiz(initialQuiz);
-      setAnswers({});
-      localStorage.setItem(
-        `quiz-${quizId}-attempt`,
-        JSON.stringify({ quiz: initialQuiz, answers: {} })
-      );
+    const savedResults = localStorage.getItem(`quiz-${quizId}-results`);
+    if (savedResults) {
+      setResults(JSON.parse(savedResults));
+      setSubmitted(true);
+      setHydrated(true);
+      return;
     }
 
-    setHydrated(true); // mark hydration complete
-    stopLoading();
-  }, [initialQuiz, quizId, stopLoading]);
+    const savedAttempt = localStorage.getItem(`quiz-${quizId}-attempt`);
+    if (savedAttempt) {
+      const parsed: CurrentAttempt = JSON.parse(savedAttempt);
+      setQuiz(parsed.quiz);
+      setAnswers(parsed.answers || {});
+      setHydrated(true); // hydrated immediately
+      return;
+    }
+
+    // Only fetch from server if no saved results or attempt
+    const fetchQuiz = async () => {
+      startLoading();
+      try {
+        const { quiz: fetchedQuiz, rateLimited } = await getQuiz(quizId);
+        if (rateLimited) {
+          toast.error(
+            "You’re starting quizzes too quickly. Please wait a few minutes.",
+            {
+              style: {
+                background: "#FFF9F5",
+                color: "#6B4C3B",
+                borderRadius: "12px",
+                padding: "14px 20px",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                fontSize: "15px",
+                border: "1px solid #FFD1B8",
+              },
+              className:
+                "transition-all transform duration-300 ease-in-out font-medium",
+            }
+          );
+          return;
+        }
+
+        if (fetchedQuiz) {
+          setQuiz(fetchedQuiz);
+          setAnswers({});
+          localStorage.setItem(
+            `quiz-${quizId}-attempt`,
+            JSON.stringify({ quiz: fetchedQuiz, answers: {} })
+          );
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load quiz. Please try again.", {
+          style: {
+            background: "#FFF9F5",
+            color: "#6B4C3B",
+            borderRadius: "12px",
+            padding: "14px 20px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+            fontSize: "15px",
+            border: "1px solid #FFD1B8",
+          },
+          className:
+            "transition-all transform duration-300 ease-in-out font-medium",
+        });
+      } finally {
+        stopLoading();
+        setHydrated(true); // hydrated after fetch
+      }
+    };
+
+    fetchQuiz();
+  }, [quizId, startLoading, stopLoading]);
 
   // Save answers to localStorage
   useEffect(() => {
@@ -109,7 +180,6 @@ const QuizClient = ({ quizId, initialQuiz }: QuizClientProps) => {
       }
 
       if (newQuiz) {
-        // ✅ replace attempt only after we have a fresh quiz
         setQuiz(newQuiz);
         setAnswers({});
         setSubmitted(false);
@@ -138,12 +208,75 @@ const QuizClient = ({ quizId, initialQuiz }: QuizClientProps) => {
     }
   };
 
-  const handleSubmit = () => {
-    setSubmitted(true);
-    localStorage.removeItem(`quiz-${quizId}-attempt`);
+  const handleSubmit = async () => {
+    startLoading();
+    try {
+      if (!quiz) return;
+
+      const { results: submittedResults, error } = await postQuizResult(
+        quizId,
+        answers,
+        quiz.quizQuestion.map((q) => q.id)
+      );
+
+      if (error) {
+        toast.error("Failed to submit quiz. Try again.", {
+          style: {
+            background: "#FFF9F5",
+            color: "#6B4C3B",
+            borderRadius: "12px",
+            padding: "14px 20px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+            fontSize: "15px",
+            border: "1px solid #FFD1B8",
+          },
+          className:
+            "transition-all transform duration-300 ease-in-out font-medium",
+        });
+        return;
+      }
+
+      setResults(submittedResults);
+      setSubmitted(true);
+      localStorage.setItem(
+        `quiz-${quizId}-results`,
+        JSON.stringify(submittedResults)
+      );
+      localStorage.removeItem(`quiz-${quizId}-attempt`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to submit quiz. Try again.", {
+        style: {
+          background: "#FFF9F5",
+          color: "#6B4C3B",
+          borderRadius: "12px",
+          padding: "14px 20px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+          fontSize: "15px",
+          border: "1px solid #FFD1B8",
+        },
+        className:
+          "transition-all transform duration-300 ease-in-out font-medium",
+      });
+    } finally {
+      stopLoading();
+    }
   };
 
-  if (!hydrated || isLoading || !quiz) return <Loader />;
+  if (!hydrated || isLoading) return <Loader />;
+
+  if (submitted && results) {
+    return (
+      <QuizResults
+        title={quiz?.title || "Quiz Results"}
+        results={results.results}
+        totalCorrect={results.totalCorrect}
+        totalPossible={results.totalPossible}
+      />
+    );
+  }
+
+  if (!quiz) return <Loader />;
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-8 min-h-screen bg-[#FFF9F5] text-[#6B4C3B] mt-10 rounded-xl shadow-md pb-20">
