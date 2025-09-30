@@ -72,9 +72,6 @@ export async function POST(
     const session = await getServerSession(authOptions);
     const body = await req.json();
 
-    // All questions shown to the user
-    const questionIds: string[] = body.questionIds ?? [];
-
     // Submitted answers (may be fewer than shown questions)
     const submittedAnswers: SubmittedAnswer[] = Object.entries(
       body.answers ?? {}
@@ -93,6 +90,7 @@ export async function POST(
       ): Promise<{
         id: string;
         slug: string;
+        title: string;
         quizQuestion: QuizQuestionType[];
       }> =>
         tx.quiz.findUnique({
@@ -100,6 +98,7 @@ export async function POST(
           select: {
             id: true,
             slug: true,
+            title: true,
             quizQuestion: {
               where: { id: { in: allQuestionIds } },
               select: {
@@ -142,6 +141,7 @@ export async function POST(
 
     return NextResponse.json({
       quizId: quiz.id,
+      title: quiz.title,
       results,
       totalCorrect,
       totalPossible,
