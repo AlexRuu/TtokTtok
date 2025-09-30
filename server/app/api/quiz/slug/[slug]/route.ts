@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { getClientIp } from "@/lib/getIP";
+import { gradeQuiz } from "@/lib/grade-quiz";
 import { rateLimit } from "@/lib/rateLimit";
 import { withRls } from "@/lib/withRLS";
 import { getServerSession } from "next-auth";
@@ -12,7 +13,7 @@ export async function GET(
   const params = await props.params;
   try {
     const ip = getClientIp(req);
-    const allowed = await rateLimit(ip, 1, 60);
+    const allowed = await rateLimit(ip, 1, 1800);
 
     if (!allowed) {
       return new Response("Too many requests", { status: 429 });
@@ -57,5 +58,96 @@ export async function GET(
     return new NextResponse("Error finding specific quiz by slug", {
       status: 500,
     });
+  }
+}
+
+export async function POST(
+  req: Request,
+  props: { params: Promise<{ slug: string }> }
+) {
+  const params = await props.params;
+  const { slug } = params;
+
+  try {
+    const session = await getServerSession(authOptions);
+    const body = await req.json();
+
+    // All questions shown to the user
+    const questionIds: string[] = body.questionIds ?? [];
+
+    // Submitted answers (may be fewer than shown questions)
+    const submittedAnswers: SubmittedAnswer[] = Object.entries(
+      body.answers ?? {}
+    ).map(([questionId, answer]) => ({
+      questionId,
+      answer: answer as string | boolean | MatchingAnswer[],
+    }));
+
+    const allQuestionIds: string[] = body.questionIds ?? [];
+
+    // Fetch all questions shown to the user
+    const quiz = await withRls(
+      session,
+      (
+        tx
+      ): Promise<{
+        id: string;
+        slug: string;
+        quizQuestion: QuizQuestionType[];
+      }> =>
+        tx.quiz.findUnique({
+          where: { slug },
+          select: {
+            id: true,
+            slug: true,
+            quizQuestion: {
+              where: { id: { in: allQuestionIds } },
+              select: {
+                id: true,
+                question: true,
+                quizType: true,
+                answer: true,
+                options: true,
+              },
+            },
+          },
+        })
+    );
+
+    if (!quiz) return new NextResponse("Quiz not found", { status: 404 });
+
+    const orderedQuestions = allQuestionIds
+      .map((id) => quiz.quizQuestion.find((q) => q.id === id))
+      .filter(Boolean) as QuizQuestionType[];
+
+    // Grade all questions
+    const { results, totalCorrect, totalPossible } = gradeQuiz(
+      orderedQuestions,
+      submittedAnswers
+    );
+
+    // Save attempt if user is logged in
+    if (session?.user?.id) {
+      await withRls(session, (tx) =>
+        tx.userQuizAttempt.create({
+          data: {
+            userId: session.user.id,
+            quizId: quiz.id,
+            score: totalCorrect,
+            passed: totalCorrect / totalPossible >= 0.5,
+          },
+        })
+      );
+    }
+
+    return NextResponse.json({
+      quizId: quiz.id,
+      results,
+      totalCorrect,
+      totalPossible,
+    });
+  } catch (error) {
+    console.error("Error grading quiz:", error);
+    return new NextResponse("Error grading quiz", { status: 500 });
   }
 }
