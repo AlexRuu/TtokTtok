@@ -58,6 +58,16 @@ export interface QuizQuestion {
   quiz: Quiz;
 }
 
+export interface QuizResultItem {
+  questionId: string;
+  question: string;
+  quizType: "MULTIPLE_CHOICE" | "TRUE_FALSE" | "FILL_IN_THE_BLANK" | "MATCHING";
+  givenAnswer: string | boolean | { left: string; match: string }[] | null;
+  correctAnswer: string;
+  correctCount: number;
+  possibleCount: number;
+}
+
 // Lessons
 export interface LessonVersion {
   id: string;
