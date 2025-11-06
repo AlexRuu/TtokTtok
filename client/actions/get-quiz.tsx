@@ -2,17 +2,37 @@ const URL = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/quiz/slug`;
 
 const getQuiz = async (slug: string) => {
   try {
-    const res = await fetch(`${URL}/${slug}`);
-    if (res.status === 429) {
-      return { quiz: null, rateLimited: true };
-    }
-    if (!res.ok) return { quiz: null, rateLimited: false };
+    const res = await fetch(`${URL}/${slug}`, {
+      method: "GET",
+      credentials: "include",
+    });
 
-    const data = await res.json();
-    return { quiz: data, rateLimited: false };
+    const data = await res.json().catch(() => ({}));
+
+    if (res.status === 429 && !data.quiz) {
+      return {
+        quiz: null,
+        rateLimited: true,
+        remaining: data.remaining ?? 0,
+      };
+    }
+
+    if (data.quiz) {
+      return {
+        quiz: data.quiz,
+        rateLimited: !!data.rateLimited,
+        remaining: data.remaining ?? 0,
+      };
+    }
+
+    return {
+      quiz: data.quiz ?? data,
+      rateLimited: false,
+      remaining: 0,
+    };
   } catch (error) {
-    console.error(error);
-    return { quiz: null, rateLimited: false };
+    console.error("getQuiz error:", error);
+    return { quiz: null, rateLimited: false, remaining: 0 };
   }
 };
 
