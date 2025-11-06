@@ -1,10 +1,41 @@
 import { authOptions } from "@/lib/auth";
+import { Lesson, QuizQuestion, Tagging } from "@/lib/generated/prisma";
 import { getClientIp } from "@/lib/getIP";
 import { gradeQuiz } from "@/lib/grade-quiz";
-import { rateLimit } from "@/lib/rateLimit";
+import { delRedis, getRedisCache, rateLimit, setRedisCache } from "@/lib/redis";
 import { withRls } from "@/lib/withRLS";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+
+type Quiz = {
+  id: string;
+  lessonId: string;
+  title: string;
+  slug: string;
+  createdAt: string;
+  lesson: Lesson;
+  quizQuestion: QuizQuestion[];
+  tagging: Tagging[];
+};
+
+const TIER_LIMITS = {
+  guest: { max: 1, window: 1800 },
+  user: { max: 5, window: 3600 },
+} as const;
+
+const generateRandomQuiz = (quiz: Quiz) => {
+  const shuffledQuizQuestions = [...quiz.quizQuestion].sort(
+    () => 0.5 - Math.random()
+  );
+  const randomQuestions = shuffledQuizQuestions.slice(
+    0,
+    Math.min(10, shuffledQuizQuestions.length)
+  );
+  return {
+    ...quiz,
+    quizQuestion: randomQuestions,
+  };
+};
 
 export async function GET(
   req: Request,
@@ -12,52 +43,119 @@ export async function GET(
 ) {
   const params = await props.params;
   try {
+    const session = await getServerSession(authOptions);
     const ip = getClientIp(req);
-    const allowed = await rateLimit(ip, 1, 1800);
 
-    if (!allowed) {
-      return new Response("Too many requests", { status: 429 });
+    const tier = session?.user ? "user" : "guest";
+
+    const isUser = !!session?.user?.id;
+    const key = session?.user?.id
+      ? `quiz:get:${session.user.id}`
+      : `quiz:get:${ip}`;
+    const cacheKey = `quiz_in_progress:${key}:${params.slug}`;
+
+    if (isUser) {
+      // Logged-in users → check DB for ongoing attempt
+      const existingQuiz = (await withRls(session, (tx) =>
+        tx.userQuizInProgress.findFirst({
+          where: { userId: session!.user!.id, quiz: { slug: params.slug } },
+          include: {
+            quiz: {
+              include: {
+                quizQuestion: true,
+                lesson: { include: { unit: true } },
+                tagging: { include: { tag: true } },
+              },
+            },
+          },
+        })
+      )) as {
+        quiz: {
+          id: string;
+          title: string;
+          slug: string;
+          quizQuestion: any[];
+          lesson: any;
+          tagging: any[];
+        } | null;
+      };
+
+      if (existingQuiz) {
+        return NextResponse.json({
+          quiz: existingQuiz.quiz,
+          rateLimited: false,
+          remaining: 0,
+        });
+      }
+    } else {
+      // Guests → check Redis cache
+      const cached = await getRedisCache(cacheKey);
+      if (cached) {
+        return NextResponse.json({
+          quiz: cached,
+          rateLimited: false,
+          remaining: 0,
+        });
+      }
     }
 
-    const session = await getServerSession(authOptions);
+    const { allowed, remaining } = await rateLimit(
+      key,
+      TIER_LIMITS[tier].max,
+      TIER_LIMITS[tier].window
+    );
 
-    return await withRls(session, async (tx) => {
-      const quiz = await tx.quiz.findUnique({
-        where: {
-          slug: params.slug,
-        },
+    if (!allowed) {
+      // Nothing cached / found
+      return NextResponse.json(
+        { rateLimited: true, remaining },
+        { status: 429 }
+      );
+    }
+
+    // No active quiz — create one
+    const quiz = await withRls(session, async (tx) => {
+      return tx.quiz.findUnique({
+        where: { slug: params.slug },
         include: {
           quizQuestion: true,
           lesson: { include: { unit: true } },
           tagging: { include: { tag: true } },
         },
       });
+    });
 
-      if (!quiz) {
-        return new NextResponse("Quiz not found", { status: 404 });
-      }
+    if (!quiz) return new NextResponse("Quiz not found", { status: 404 });
 
-      // Get random 10 questions from list of questions
-      const shuffledQuizQuestions = [...quiz.quizQuestion].sort(
-        () => 0.5 - Math.random()
-      );
-      const randomQuestions = shuffledQuizQuestions.slice(
-        0,
-        Math.min(10, shuffledQuizQuestions.length)
-      );
-      const randomizedQuiz = {
-        ...quiz,
-        quizQuestion: randomQuestions,
-      };
-      const res = NextResponse.json(randomizedQuiz);
-      res.cookies.set(`quiz-${params.slug}-in-progress`, "true", { path: "/" });
-      return res;
+    const randomizedQuiz = generateRandomQuiz(quiz);
+    // Create save entry in DB
+    if (isUser) {
+      await withRls(session, async (tx) => {
+        tx.userQuizInProgress.create({
+          data: {
+            user: { connect: { id: session.user.id } },
+            quiz: { connect: { id: quiz.id } },
+            expires: new Date(Date.now() + TIER_LIMITS.user.window * 1000),
+            quizQuestion: {
+              connect: randomizedQuiz.quizQuestion.map((question) => ({
+                id: question.id,
+              })),
+            },
+          },
+        });
+      });
+    } else {
+      await setRedisCache(cacheKey, randomizedQuiz, TIER_LIMITS.guest.window);
+    }
+
+    return NextResponse.json({
+      quiz: randomizedQuiz,
+      rateLimited: false,
+      remaining,
     });
   } catch (error) {
-    console.error("Error finding specific quiz by slug", error);
-    return new NextResponse("Error finding specific quiz by slug", {
-      status: 500,
-    });
+    console.error("Error finding specific quiz by slug:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
 
@@ -70,6 +168,28 @@ export async function POST(
 
   try {
     const session = await getServerSession(authOptions);
+    const ip = getClientIp(req);
+
+    const tier = session?.user ? "user" : "guest";
+    const isUser = !!session?.user?.id;
+    const key = session?.user?.id
+      ? `quiz:post:${session.user.id}`
+      : `quiz:post:${ip}`;
+
+    const { allowed, remaining } = await rateLimit(
+      key,
+      TIER_LIMITS[tier].max,
+      TIER_LIMITS[tier].window
+    );
+
+    if (!allowed) {
+      return NextResponse.json(
+        { rateLimited: true, remaining },
+        { status: 429 }
+      );
+    }
+
+    const cacheKey = `quiz_in_progress:quiz:get:${ip}:${params.slug}`;
     const body = await req.json();
 
     // Submitted answers (may be fewer than shown questions)
@@ -126,17 +246,25 @@ export async function POST(
     );
 
     // Save attempt if user is logged in
-    if (session?.user?.id) {
+    if (isUser) {
       await withRls(session, (tx) =>
         tx.userQuizAttempt.create({
           data: {
-            userId: session.user.id,
-            quizId: quiz.id,
             score: totalCorrect,
             passed: totalCorrect / totalPossible >= 0.5,
+            user: { connect: { id: session.user.id } },
+            quiz: { connect: { id: quiz.id } },
           },
         })
       );
+      await withRls(session, (tx) =>
+        tx.userQuizInProgress.deleteMany({
+          where: { userId: session.user.id, quizId: quiz.id },
+        })
+      );
+    } else {
+      // Guests → remove cached quiz from Redis
+      await delRedis(cacheKey);
     }
 
     return NextResponse.json({
