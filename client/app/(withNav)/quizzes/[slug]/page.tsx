@@ -17,7 +17,7 @@ export const generateMetadata = async (props: {
 
   return {
     title: metadata.title,
-    description: `Take the quiz "${metadata.title}" on TtokTtok!`,
+    description: `Ttok Ttok Quiz: ${metadata.lesson.title} - ${metadata.title}.`,
   };
 };
 
