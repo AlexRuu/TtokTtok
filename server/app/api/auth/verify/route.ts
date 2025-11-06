@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { getClientIp } from "@/lib/getIP";
-import { rateLimit } from "@/lib/rateLimit";
+import { rateLimit } from "@/lib/redis";
 import { withRls } from "@/lib/withRLS";
 import { verifySchema } from "@/schemas/form-schemas";
 import { verify } from "argon2";

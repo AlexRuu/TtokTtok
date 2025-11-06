@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { getClientIp } from "@/lib/getIP";
-import { rateLimit } from "@/lib/rateLimit";
+import { rateLimit } from "@/lib/redis";
 import { withRls } from "@/lib/withRLS";
 import { contactFormSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";

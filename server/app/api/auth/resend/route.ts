@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { getClientIp } from "@/lib/getIP";
-import { rateLimit } from "@/lib/rateLimit";
+import { rateLimit } from "@/lib/redis";
 import { sendVerificationEmail } from "@/lib/verificationEmail";
 import { withRls } from "@/lib/withRLS";
 import { forgotPasswordFormSchema } from "@/schemas/form-schemas";

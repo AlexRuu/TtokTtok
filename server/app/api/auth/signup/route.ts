@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { sendVerificationEmail } from "@/lib/verificationEmail";
 import { signUpFormSchema } from "@/schemas/form-schemas";
 import { getClientIp } from "@/lib/getIP";
-import { rateLimit } from "@/lib/rateLimit";
+import { rateLimit } from "@/lib/redis";
 import { withRls } from "@/lib/withRLS";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
