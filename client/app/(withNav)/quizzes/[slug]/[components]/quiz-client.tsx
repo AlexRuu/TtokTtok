@@ -14,6 +14,8 @@ import toast from "react-hot-toast";
 import getQuiz from "@/actions/get-quiz";
 import postQuizResult from "@/actions/post-quiz-submission";
 import { QuizResults } from "./quiz-results";
+import { formatTime } from "@/lib/utils";
+import { QuizCooldown } from "./countdown";
 
 // Quiz type helpers
 const isMC = (q: QuizQuestion) => q.quizType === "MULTIPLE_CHOICE";
@@ -22,10 +24,6 @@ const isFIB = (q: QuizQuestion) => q.quizType === "FILL_IN_THE_BLANK";
 
 type AnswerValue = string | Record<string, string> | boolean;
 
-interface CurrentAttempt {
-  quiz: Quiz;
-  answers: Record<string, AnswerValue>;
-}
 interface QuizResultItem {
   questionId: string;
   question: string;
@@ -37,6 +35,7 @@ interface QuizResultItem {
 }
 
 interface QuizSubmissionResult {
+  title: string;
   quizId: string;
   results: QuizResultItem[];
   totalCorrect: number;
@@ -64,58 +63,59 @@ const QuizClient = ({ quizId }: QuizClientProps) => {
   const debouncedAnswers = useDebounce(answers, 500);
   const { isLoading, startLoading, stopLoading } = useLoading();
   const [hydrated, setHydrated] = useState(false);
+  const [cooldownUntil, setCooldownUntil] = useState<number | null>(null);
 
   useEffect(() => {
-    const savedResults = localStorage.getItem(`quiz-${quizId}-results`);
-    if (savedResults) {
-      setResults(JSON.parse(savedResults));
+    const storedResults = localStorage.getItem(`quiz-${quizId}-results`);
+    if (storedResults) {
+      setResults(JSON.parse(storedResults));
       setSubmitted(true);
       setHydrated(true);
       return;
     }
 
-    const savedAttempt = localStorage.getItem(`quiz-${quizId}-attempt`);
-    if (savedAttempt) {
-      const parsed: CurrentAttempt = JSON.parse(savedAttempt);
-      setQuiz(parsed.quiz);
-      setAnswers(parsed.answers || {});
-      setHydrated(true); // hydrated immediately
-      return;
+    const savedAnswers = localStorage.getItem(`quiz-${quizId}-answers`);
+    if (savedAnswers) {
+      setAnswers(JSON.parse(savedAnswers));
     }
 
-    // Only fetch from server if no saved results or attempt
     const fetchQuiz = async () => {
       startLoading();
       try {
-        const { quiz: fetchedQuiz, rateLimited } = await getQuiz(quizId);
-        if (rateLimited) {
-          toast.error(
-            "You’re starting quizzes too quickly. Please wait a few minutes.",
-            {
-              style: {
-                background: "#FFF9F5",
-                color: "#6B4C3B",
-                borderRadius: "12px",
-                padding: "14px 20px",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                fontSize: "15px",
-                border: "1px solid #FFD1B8",
-              },
-              className:
-                "transition-all transform duration-300 ease-in-out font-medium",
-            }
-          );
+        const {
+          quiz: fetchedQuiz,
+          rateLimited,
+          remaining,
+        } = await getQuiz(quizId);
+
+        if (!fetchedQuiz) {
+          if (rateLimited && remaining) {
+            const timeRemaining = formatTime(remaining);
+            toast.error(
+              `Hang tight! Another quiz will arrive in ${timeRemaining}.`,
+              {
+                style: {
+                  background: "#FFF9F5",
+                  color: "#6B4C3B",
+                  borderRadius: "12px",
+                  padding: "14px 20px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                  fontSize: "15px",
+                  border: "1px solid #FFD1B8",
+                },
+              }
+            );
+            setCooldownUntil(Date.now() + remaining * 1000);
+            setQuiz(null);
+            setHydrated(true);
+            return;
+          }
+          setQuiz(null);
           return;
         }
 
-        if (fetchedQuiz) {
-          setQuiz(fetchedQuiz);
-          setAnswers({});
-          localStorage.setItem(
-            `quiz-${quizId}-attempt`,
-            JSON.stringify({ quiz: fetchedQuiz, answers: {} })
-          );
-        }
+        setQuiz(fetchedQuiz);
+        setAnswers((prev) => (Object.keys(prev).length ? prev : {}));
       } catch (err) {
         console.error(err);
         toast.error("Failed to load quiz. Please try again.", {
@@ -128,12 +128,10 @@ const QuizClient = ({ quizId }: QuizClientProps) => {
             fontSize: "15px",
             border: "1px solid #FFD1B8",
           },
-          className:
-            "transition-all transform duration-300 ease-in-out font-medium",
         });
       } finally {
         stopLoading();
-        setHydrated(true); // hydrated after fetch
+        setHydrated(true);
       }
     };
 
@@ -144,24 +142,25 @@ const QuizClient = ({ quizId }: QuizClientProps) => {
   useEffect(() => {
     if (!quiz) return;
     localStorage.setItem(
-      `quiz-${quizId}-attempt`,
-      JSON.stringify({ quiz, answers: debouncedAnswers })
+      `quiz-${quizId}-answers`,
+      JSON.stringify(debouncedAnswers)
     );
-  }, [debouncedAnswers, quiz, quizId]);
+  }, [debouncedAnswers, quizId, quiz]);
 
+  // Set answer to state for saving
   const handleAnswerChange = (q: QuizQuestion, value: AnswerValue) => {
     setAnswers((prev) => ({ ...prev, [q.id]: value }));
   };
 
   const handleStartNewQuiz = async () => {
     startLoading();
-
     try {
-      const { quiz: newQuiz, rateLimited } = await getQuiz(quizId);
+      const { quiz: newQuiz, rateLimited, remaining } = await getQuiz(quizId);
 
       if (rateLimited) {
+        const timeRemaining = formatTime(remaining);
         toast.error(
-          "You’re starting quizzes too quickly. Please wait a few minutes.",
+          `Hang on tight! Another quiz will be ready in ${timeRemaining}.`,
           {
             style: {
               background: "#FFF9F5",
@@ -179,15 +178,10 @@ const QuizClient = ({ quizId }: QuizClientProps) => {
         return;
       }
 
-      if (newQuiz) {
-        setQuiz(newQuiz);
-        setAnswers({});
-        setSubmitted(false);
-        localStorage.setItem(
-          `quiz-${quizId}-attempt`,
-          JSON.stringify({ quiz: newQuiz, answers: {} })
-        );
-      }
+      setQuiz(newQuiz);
+      setAnswers({});
+      setSubmitted(false);
+      localStorage.removeItem(`quiz-${quizId}-results`);
     } catch (err) {
       console.error(err);
       toast.error("Failed to start a new quiz. Please try again.", {
@@ -209,15 +203,40 @@ const QuizClient = ({ quizId }: QuizClientProps) => {
   };
 
   const handleSubmit = async () => {
+    if (!quiz) return;
     startLoading();
-    try {
-      if (!quiz) return;
 
-      const { results: submittedResults, error } = await postQuizResult(
+    try {
+      const {
+        results: submittedResults,
+        error,
+        remaining,
+      } = await postQuizResult(
         quizId,
         answers,
         quiz.quizQuestion.map((q) => q.id)
       );
+
+      if (error === "rateLimited") {
+        const timeRemaining = formatTime(remaining);
+        toast.error(
+          `Oops! You’re submitting a bit too fast — try again in ${timeRemaining}`,
+          {
+            style: {
+              background: "#FFF9F5",
+              color: "#6B4C3B",
+              borderRadius: "12px",
+              padding: "14px 20px",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+              fontSize: "15px",
+              border: "1px solid #FFD1B8",
+            },
+            className:
+              "transition-all transform duration-300 ease-in-out font-medium",
+          }
+        );
+        return;
+      }
 
       if (error) {
         toast.error("Failed to submit quiz. Try again.", {
@@ -238,59 +257,55 @@ const QuizClient = ({ quizId }: QuizClientProps) => {
 
       setResults(submittedResults);
       setSubmitted(true);
+
       localStorage.setItem(
         `quiz-${quizId}-results`,
         JSON.stringify(submittedResults)
       );
-      localStorage.removeItem(`quiz-${quizId}-attempt`);
+      localStorage.removeItem(`quiz-${quizId}-answers`);
     } catch (err) {
       console.error(err);
-      toast.error("Failed to submit quiz. Try again.", {
-        style: {
-          background: "#FFF9F5",
-          color: "#6B4C3B",
-          borderRadius: "12px",
-          padding: "14px 20px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-          fontSize: "15px",
-          border: "1px solid #FFD1B8",
-        },
-        className:
-          "transition-all transform duration-300 ease-in-out font-medium",
-      });
+      toast.error("Failed to submit quiz. Try again.");
     } finally {
       stopLoading();
     }
   };
 
-  if (!hydrated || isLoading) return <Loader />;
+  if (cooldownUntil && !quiz) {
+    const remainingSeconds = Math.max(
+      0,
+      Math.floor((cooldownUntil - Date.now()) / 1000)
+    );
 
-  if (submitted && results) {
     return (
-      <QuizResults
-        title={quiz?.title || "Quiz Results"}
-        results={results.results}
-        totalCorrect={results.totalCorrect}
-        totalPossible={results.totalPossible}
+      <QuizCooldown
+        remainingSeconds={remainingSeconds}
+        onStartNewQuiz={handleStartNewQuiz}
       />
     );
   }
 
-  if (!quiz) return <Loader />;
+  if (!hydrated || isLoading) return <Loader />;
+
+  if (submitted && results) {
+    return (
+      <div className="space-y-4">
+        <QuizResults
+          title={results.title}
+          results={results.results}
+          totalCorrect={results.totalCorrect}
+          totalPossible={results.totalPossible}
+          onStartNewQuiz={handleStartNewQuiz}
+        />
+      </div>
+    );
+  }
+
+  if (!quiz || !quiz.quizQuestion) return <Loader />;
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-8 min-h-screen bg-[#FFF9F5] text-[#6B4C3B] mt-10 rounded-xl shadow-md pb-20">
       <h1 className="text-2xl font-bold">{quiz.title}</h1>
-      <div className="flex justify-end mb-4">
-        <Button
-          variant="outline"
-          className="hover:cursor-pointer border-[#FFD1B8] text-[#6B4C3B] hover:bg-[#FFE4D6] rounded-full px-6"
-          onClick={handleStartNewQuiz}
-          disabled={isLoading}
-        >
-          Start New Quiz
-        </Button>
-      </div>
 
       {quiz.quizQuestion.map((q, index) => (
         <Card key={q.id} className="shadow-sm border border-[#FFE4D6] bg-white">
@@ -383,7 +398,7 @@ const QuizClient = ({ quizId }: QuizClientProps) => {
       {!submitted && (
         <Button
           onClick={handleSubmit}
-          className="bg-[#FFB899] hover:bg-[#FF9E80] text-white rounded-full float-end"
+          className="bg-[#FFB899] hover:bg-[#FF9E80] text-white rounded-full float-end hover:cursor-pointer"
         >
           Submit Quiz
         </Button>
