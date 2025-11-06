@@ -44,10 +44,12 @@ export const gradeQuiz = (
             }));
           }
 
-          possibleCount = correct.length;
-          correctCount = correct.filter((pair) =>
-            given.some((g) => g.left === pair.left && g.match === pair.match)
-          ).length;
+          possibleCount = 1;
+          const pairValue = 1 / correct.length;
+          correctCount =
+            correct.filter((pair) =>
+              given.some((g) => g.left === pair.left && g.match === pair.match)
+            ).length * pairValue;
 
           submittedAnswerNormalized = given;
           break;
