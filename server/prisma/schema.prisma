@@ -27,6 +27,7 @@ model User {
   userLessonProgress  UserLessonProgress[]
   userQuizAttempt     UserQuizAttempt[]
   verificationToken   VerificationToken[]
+  UserQuizInProgress  UserQuizInProgress[]
 }
 
 model Account {
@@ -202,25 +203,39 @@ model Tagging {
 }
 
 model Quiz {
-  id              String            @id @default(cuid())
-  lessonId        String
-  createdAt       DateTime          @default(now()) @db.Timestamptz(6)
-  title           String
-  slug            String            @unique
-  lesson          Lesson            @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  quizQuestion    QuizQuestion[]
-  tagging         Tagging[]
-  userQuizAttempt UserQuizAttempt[]
+  id                 String               @id @default(cuid())
+  lessonId           String
+  createdAt          DateTime             @default(now()) @db.Timestamptz(6)
+  title              String
+  slug               String               @unique
+  lesson             Lesson               @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  quizQuestion       QuizQuestion[]
+  tagging            Tagging[]
+  userQuizAttempt    UserQuizAttempt[]
+  UserQuizInProgress UserQuizInProgress[]
 }
 
 model QuizQuestion {
-  id       String   @id @default(cuid())
-  question String
-  quizId   String
-  quizType QuizType
-  options  Json?
-  answer   String
-  quiz     Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  id                   String              @id @default(cuid())
+  question             String
+  quizId               String
+  quizType             QuizType
+  options              Json?
+  answer               String
+  quiz                 Quiz                @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  UserQuizInProgress   UserQuizInProgress? @relation(fields: [userQuizInProgressId], references: [id])
+  userQuizInProgressId String?
+}
+
+model UserQuizInProgress {
+  id           String         @id @default(cuid())
+  quizQuestion QuizQuestion[]
+  quizId       String
+  quiz         Quiz           @relation(fields: [quizId], references: [id])
+  userId       String
+  user         User           @relation(fields: [userId], references: [id])
+  createdAt    DateTime       @default(now()) @db.Timestamptz(6)
+  expires      DateTime       @db.Timestamptz(6)
 }
 
 model VocabularyList {
