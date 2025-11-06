@@ -8,19 +8,33 @@ const postQuizResult = async (
   try {
     const res = await fetch(`${URL}/${slug}`, {
       method: "POST",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ answers, questionIds }),
     });
 
-    if (!res.ok) {
-      return { results: null, error: `Failed to submit: ${res.status}` };
+    const data = await res.json().catch(() => ({}));
+
+    if (res.status === 429 || data.rateLimited) {
+      return {
+        results: null,
+        error: "rateLimited",
+        remaining: data.remaining ?? 0,
+      };
     }
 
-    const data = await res.json();
-    return { results: data, error: null };
+    if (!res.ok) {
+      return {
+        results: null,
+        error: `Failed to submit: ${res.status}`,
+        remaining: 0,
+      };
+    }
+
+    return { results: data, error: null, remaining: 0 };
   } catch (error) {
-    console.error(error);
-    return { results: null, error: "Error submitting quiz" };
+    console.error("postQuizResult error:", error);
+    return { results: null, error: "Error submitting quiz", remaining: 0 };
   }
 };
 
