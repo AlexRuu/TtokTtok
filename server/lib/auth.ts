@@ -8,7 +8,7 @@ import prismadb from "./prismadb";
 import * as argon2 from "argon2";
 import { NextResponse } from "next/server";
 import { getClientIp } from "./getIP";
-import { rateLimit } from "./rateLimit";
+import { rateLimit } from "./redis";
 
 // Auth Helpers
 async function fetchVerifiedEmail(
