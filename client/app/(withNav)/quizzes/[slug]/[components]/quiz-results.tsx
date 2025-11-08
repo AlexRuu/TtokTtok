@@ -4,7 +4,7 @@ import { QuizResultItem } from "@/types";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface QuizResultsProps {
   title: string;
@@ -47,6 +47,8 @@ export const QuizResults: React.FC<QuizResultsProps> = ({
   const percentageNum = Number(percentage);
   const { data: session } = useSession();
   const router = useRouter();
+  const pathName = usePathname();
+  const redirectPath = `/signin?redirect=${encodeURIComponent(pathName)}`;
 
   const passed = percentageNum >= 70;
 
@@ -160,7 +162,7 @@ export const QuizResults: React.FC<QuizResultsProps> = ({
           <p className="text-sm sm:text-base text-[#6B4C3B]/80">
             Save your progress for next time?{" "}
             <button
-              onClick={() => router.push("/signin")}
+              onClick={() => router.push(redirectPath)}
               className="text-[#FF9E80] font-semibold underline hover:text-[#FF7C50] ml-1 transition-colors hover:cursor-pointer"
             >
               Sign In / Sign Up

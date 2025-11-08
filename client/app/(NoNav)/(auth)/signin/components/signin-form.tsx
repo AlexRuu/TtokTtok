@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { CircleAlert } from "lucide-react";
 import Loader from "@/components/ui/loader";
 import useLoading from "@/hooks/use-loading";
@@ -50,6 +50,8 @@ const SignInForm = () => {
   > | null>(null);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/";
 
   const form = useForm<SignInFormValues>({
     resolver: zodResolver(formSchema),
@@ -108,7 +110,7 @@ const SignInForm = () => {
       });
     } else {
       stopLoading();
-      router.push("/");
+      router.push(redirect);
     }
   };
 
@@ -285,7 +287,9 @@ const SignInForm = () => {
                       disabled={isLoading}
                       focus-visible="outline"
                       aria-live="assertive"
-                      onClick={() => signIn(provider.id)}
+                      onClick={() =>
+                        signIn(provider.id, { callbackUrl: redirect })
+                      }
                       aria-label={`Sign in with ${provider.name}`}
                       className="flex items-center justify-center gap-2 hover:cursor-pointer py-4 sm:py-5 text-base sm:text-md bg-pink-200 hover:bg-pink-300 text-black w-full font-semibold rounded-xl transition-colors shadow-sm hover:scale-[1.01] hover:shadow-md duration-200 ease-in-out focus:ring-2 focus:ring-indigo-300 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400"
                     >

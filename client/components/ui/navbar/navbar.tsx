@@ -19,6 +19,10 @@ export default function Navbar() {
 
   const { data: session, status } = useSession();
   const pathName = usePathname();
+  const isQuizRoute = pathName.startsWith("/quizzes/");
+  const href = isQuizRoute
+    ? `/signin?redirect=${encodeURIComponent(pathName)}`
+    : "/signin";
 
   const navRef = useRef<HTMLDivElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -130,7 +134,7 @@ export default function Navbar() {
                 <AuthDropdown />
               ) : (
                 <Link
-                  href="/signin"
+                  href={href}
                   className="ml-2 px-5 py-2 text-base rounded-full bg-[#FFEFE7] hover:bg-[#f5dbcf] text-[#6B4C3B] transition font-medium shadow-sm"
                 >
                   Login
