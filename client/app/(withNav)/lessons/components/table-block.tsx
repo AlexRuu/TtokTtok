@@ -62,7 +62,7 @@ const TableBlock = ({ headers, rows, note }: TableBlockProps) => {
       </Table>
 
       {note && (
-        <p className="text-xs mt-2 text-[#A67C66] italic text-center">
+        <p className="text-xs mt-2 text-[#A67C66] italic text-left font-bold">
           * Ireggular form
         </p>
       )}
