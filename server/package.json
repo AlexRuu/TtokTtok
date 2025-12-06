@@ -8,6 +8,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
     "@next-auth/prisma-adapter": "^1.0.7",
+    "@prisma/adapter-pg": "^7.1.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-checkbox": "^1.3.2",
     "@radix-ui/react-dialog": "^1.1.14",
@@ -27,6 +28,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.3",
     "framer-motion": "^12.18.1",
     "googleapis": "^154.1.0",
     "jsonwebtoken": "^9.0.2",
@@ -36,6 +38,7 @@
     "next-auth": "^4.24.11",
     "next-themes": "^0.4.3",
     "nodemailer": "^7.0.10",
+    "pg": "^8.16.3",
     "prettier": "^3.3.3",
     "react": "19.0.0",
     "react-dom": "19.0.0",
@@ -46,21 +49,23 @@
     "zod": "^3.24.4"
   },
   "devDependencies": {
-    "@prisma/client": "^6.18.0",
+    "@prisma/client": "^7.1.0",
     "@tailwindcss/postcss": "^4.1.7",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.10.2",
     "@types/nodemailer": "^6.4.17",
+    "@types/pg": "^8.15.6",
     "@types/react": "^19.0.2",
     "@types/react-dom": "19.0.2",
     "i": "^0.3.7",
     "npm": "^11.6.0",
     "postcss": "8.4.49",
-    "prisma": "^6.18.0",
+    "prisma": "^7.1.0",
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^4.1.7",
     "tailwindcss-animate": "^1.0.7",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.2"
   }
 }

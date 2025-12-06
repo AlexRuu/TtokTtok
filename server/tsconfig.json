@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES2018",
-    "lib": [
-      "ES2018",
-      "DOM",
-      "ESNext"
-    ],
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "ESNext"],
     "module": "ESNext",
     "allowJs": true,
     "skipLibCheck": true,
@@ -24,18 +20,11 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     }
   },
-  "types": [
-    "next-auth"
-  ],
-  "typeRoots": [
-    "./node_modules/@types",
-    "./types"
-  ],
+  "types": ["next-auth"],
+  "typeRoots": ["./node_modules/@types", "./types"],
   "include": [
     "next-env.d.ts",
     "**/*.ts",
@@ -44,7 +33,5 @@
     "types/**/*.d.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
