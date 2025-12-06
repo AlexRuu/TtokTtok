@@ -3,6 +3,7 @@ import ProfileContainer from "../components/profileContainer";
 
 const ProfilePage = async () => {
   const profile = await getProfile();
+
   if (!profile) {
     return;
   }
