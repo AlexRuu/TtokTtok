@@ -1,11 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
+  provider            = "prisma-client"
+  output              = "../lib/generated/prisma"
+  importFileExtension = ""
+  engineType          = "client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -27,7 +28,8 @@ model User {
   userLessonProgress  UserLessonProgress[]
   userQuizAttempt     UserQuizAttempt[]
   verificationToken   VerificationToken[]
-  UserQuizInProgress  UserQuizInProgress[]
+  userQuizInProgress  UserQuizInProgress[]
+  userStats           UserStats[]
 }
 
 model Account {
@@ -87,6 +89,16 @@ model SavedVocabulary {
   @@unique([userId, vocabularyId])
 }
 
+model UserStats {
+  id                  String       @id @default(cuid())
+  userId              String
+  user                User         @relation(fields: [userId], references: [id])
+  quizzesCompleted    Quiz[]
+  unitsCompleted      Unit[]
+  vocabularyCompleted Vocabulary[]
+  updatedAt           DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
+}
+
 model UserChapterReview {
   id        String   @id @default(cuid())
   lessonId  String
@@ -102,15 +114,20 @@ model UserChapterReview {
 }
 
 model UserLessonProgress {
-  id          String    @id @default(cuid())
-  userId      String
-  lessonId    String
-  startedAt   DateTime  @default(now())
-  completedAt DateTime?
-  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String    @id @default(cuid())
+  userId       String
+  lessonId     String
+  startedAt    DateTime  @default(now())
+  completedAt  DateTime?
+  percentage   Int       @default(0)
+  viewedBlocks Int[]     @default([])
+  updatedAt    DateTime  @default(now()) @updatedAt
+  lesson       Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])
+  @@index([userId])
+  @@index([lessonId])
 }
 
 model UserQuizAttempt {
@@ -132,6 +149,8 @@ model Unit {
   updatedAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
   lesson            Lesson[]
   userChapterReview UserChapterReview[]
+  userStatsId       String?
+  userStats         UserStats?          @relation(fields: [userStatsId], references: [id])
 }
 
 model Lesson {
@@ -213,6 +232,8 @@ model Quiz {
   tagging            Tagging[]
   userQuizAttempt    UserQuizAttempt[]
   UserQuizInProgress UserQuizInProgress[]
+  userStats          UserStats?           @relation(fields: [userStatsId], references: [id])
+  userStatsId        String?
 }
 
 model QuizQuestion {
@@ -259,6 +280,8 @@ model Vocabulary {
   vocabularyListId String
   savedVocabulary  SavedVocabulary[]
   vocabularyList   VocabularyList    @relation(fields: [vocabularyListId], references: [id], onDelete: Cascade)
+  userStats        UserStats?        @relation(fields: [userStatsId], references: [id])
+  userStatsId      String?
 }
 
 model ContactMessage {
