@@ -15,7 +15,7 @@ const getProfile = async () => {
     const profile = await res.json();
     return profile;
   } catch (error) {
-    console.log("Could not fetch profile", error);
+    console.error("Could not fetch profile", error);
     redirect("/signin");
   }
 };
