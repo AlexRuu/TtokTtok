@@ -9,7 +9,7 @@ const LessonPage = async ({
   params: Promise<{ slug: string }>;
 }) => {
   const { slug } = await params;
-  const lesson = (await getLesson(slug)) as Lesson | null;
+  const lesson = (await getLesson(slug)) as Lesson;
 
   if (!lesson) {
     notFound();
