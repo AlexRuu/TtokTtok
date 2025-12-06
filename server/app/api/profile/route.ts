@@ -13,19 +13,21 @@ export async function GET(_req: Request) {
     return await withRls(session, async (tx) => {
       const profile = await tx.user.findFirst({
         where: { email: session.user.email },
+        include: { userStats: true },
       });
 
       if (!profile) {
         return new NextResponse("Profile not found", { status: 400 });
       }
 
-      const user = {
+      const userProfile = {
         email: profile.email,
         firstName: profile.firstName,
         lastName: profile.lastName,
+        stats: profile.userStats,
       };
 
-      return NextResponse.json(user);
+      return NextResponse.json(userProfile);
     });
   } catch (error) {
     console.error("Error retrieving profile", error);
