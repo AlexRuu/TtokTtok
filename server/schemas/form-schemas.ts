@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Role, Status } from "@/lib/generated/prisma";
+import { Role, Status } from "@/lib/generated/prisma/enums";
 
 const forgotPasswordFormSchema = z.object({
   email: z
