@@ -324,7 +324,7 @@ const QuizClient = ({ quizId }: QuizClientProps) => {
                     <Button
                       key={i}
                       variant={isSelected ? "default" : "outline"}
-                      className={`w-full justify-start rounded-full ${
+                      className={`w-full justify-start rounded-full hover:cursor-pointer ${
                         isSelected
                           ? "bg-[#FFE4D6] text-[#5A3F2C]"
                           : "border-[#FFD1B8] text-[#6B4C3B]"
@@ -347,7 +347,7 @@ const QuizClient = ({ quizId }: QuizClientProps) => {
                     <Button
                       key={val}
                       variant={isSelected ? "default" : "outline"}
-                      className={`flex-1 rounded-full ${
+                      className={`flex-1 rounded-full hover:cursor-pointer ${
                         isSelected
                           ? "bg-[#FFE4D6] text-[#5A3F2C]"
                           : "border-[#FFD1B8] text-[#6B4C3B]"

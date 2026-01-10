@@ -100,7 +100,7 @@ const MatchingQuiz: React.FC<MatchingQuizProps> = ({
               <Card
                 key={opt.right}
                 id={`right-${opt.right}`}
-                className={`p-3 cursor-pointer w-full ${
+                className={`p-3 cursor-pointer w-full hover:cursor-pointer ${
                   isMatched ? "opacity-50 bg-[#FFF8F3]" : "bg-white"
                 }`}
                 onClick={() => handleRightClick(opt.right)}
