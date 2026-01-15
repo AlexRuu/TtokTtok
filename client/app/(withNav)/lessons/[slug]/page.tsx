@@ -28,7 +28,10 @@ const LessonPage = async ({
         </header>
 
         <main className="prose prose-sm sm:prose lg:prose-lg max-w-none scroll-mt-32">
-          <LessonContent content={lesson.content as LessonBlock[]} />
+          <LessonContent
+            content={lesson.content as LessonBlock[]}
+            lessonId={lesson.id}
+          />
         </main>
       </div>
     </div>
