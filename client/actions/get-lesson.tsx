@@ -1,14 +1,17 @@
+import { Lesson } from "@/types";
+
 const URL = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/lessons/slug`;
 
 const getLesson = async (slug: string) => {
-  try {
-    const res = await fetch(`${URL}/${slug}`);
-    const lesson = res.json();
-    return lesson;
-  } catch (error) {
-    console.log(error);
-    return error;
+  const res = await fetch(`${URL}/${slug}`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch lesson");
   }
+
+  return (await res.json()) as Lesson;
 };
 
 export default getLesson;
