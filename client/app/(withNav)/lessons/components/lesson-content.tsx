@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import TextBlock from "./text-block";
 import ImageBlock from "./image-block";
@@ -10,7 +10,6 @@ import Link from "next/link";
 import type { LessonBlock } from "@/types";
 import { useLessonProgress } from "@/hooks/use-lesson-progress";
 import { useBlockObserver } from "@/hooks/use-observer-block";
-import useLoading from "@/hooks/use-loading";
 
 const COMPLETE_PERCENT = 90;
 
@@ -31,7 +30,6 @@ const LessonContent = ({
   const [showCompleteButton, setShowCompleteButton] = useState(false);
   const [lessonComplete, setLessonComplete] = useState(false);
   const hasAutoScrolled = useRef(false);
-  const { isLoading } = useLoading();
 
   const {
     markBlockViewed,
@@ -39,16 +37,9 @@ const LessonContent = ({
     markComplete,
     viewedBlocksRef,
     completed,
+    loading,
     lastViewedBlock,
-  } = useLessonProgress({
-    lessonId,
-    totalBlocks,
-    fetchServerProgress: async () => {
-      const res = await fetch(`/api/progress/lesson?lessonId=${lessonId}`);
-      if (!res.ok) return null;
-      return res.json();
-    },
-  });
+  } = useLessonProgress({ lessonId, totalBlocks });
 
   const handleMarkComplete = useCallback(async () => {
     await markComplete();
@@ -64,11 +55,13 @@ const LessonContent = ({
   });
 
   useEffect(() => {
+    if (loading) return;
     observeBlocks();
-  }, [content.length]);
+  }, [loading, content.length, observeBlocks]);
 
+  // Auto-scroll to last viewed block
   useEffect(() => {
-    if (isLoading) return;
+    if (loading) return;
     if (hasAutoScrolled.current) return;
     if (lastViewedBlock < 0) return;
 
@@ -80,13 +73,11 @@ const LessonContent = ({
       el.scrollIntoView({ behavior: "smooth", block: "start" });
       hasAutoScrolled.current = true;
     }
-  }, [isLoading, lastViewedBlock]);
+  }, [loading, lastViewedBlock]);
 
   // Show "Mark Complete" if progress passes threshold
   useEffect(() => {
-    if (progress >= COMPLETE_PERCENT && !completed) {
-      setShowCompleteButton(true);
-    }
+    setShowCompleteButton(progress >= COMPLETE_PERCENT && !completed);
   }, [progress, completed]);
 
   // Animate next steps once lesson completed
@@ -94,23 +85,26 @@ const LessonContent = ({
     setLessonComplete(completed);
   }, [completed]);
 
-  const nextSteps: NextStep[] = [
-    {
-      title: "Take the Quiz",
-      description: "Test your understanding of this lesson.",
-      href: "/quiz/lesson-1",
-    },
-    {
-      title: "Review Vocabulary",
-      description: "Go over the key words from this lesson.",
-      href: "/vocabulary/lesson-1",
-    },
-    {
-      title: "Next Lesson",
-      description: "Continue your learning journey.",
-      href: "/lessons/lesson-2",
-    },
-  ];
+  const nextSteps = useMemo<NextStep[]>(
+    () => [
+      {
+        title: "Take the Quiz",
+        description: "Test your understanding of this lesson.",
+        href: "/quiz/lesson-1",
+      },
+      {
+        title: "Review Vocabulary",
+        description: "Go over the key words from this lesson.",
+        href: "/vocabulary/lesson-1",
+      },
+      {
+        title: "Next Lesson",
+        description: "Continue your learning journey.",
+        href: "/lessons/lesson-2",
+      },
+    ],
+    []
+  );
 
   return (
     <article className="space-y-6">
@@ -180,7 +174,6 @@ const LessonContent = ({
             <h2 className="text-2xl font-bold mb-6 text-[#6B4C3B]">
               Next Steps
             </h2>
-
             <motion.div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {nextSteps.map((step, idx) => (
                 <motion.div

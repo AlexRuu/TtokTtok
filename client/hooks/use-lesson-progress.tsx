@@ -2,107 +2,143 @@
 
 import { useSession } from "next-auth/react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useProgressCommitter } from "@/hooks/use-progress-committer";
 
 const STORAGE_KEY = (lessonId: string) => `ttok_lesson_${lessonId}_progress`;
-const DEBOUNCE_MS = 30_000;
 
 type ProgressPayload = {
   lessonId: string;
   viewedBlocks: number[];
   percentage: number;
+  lastViewedBlock: number;
+};
+
+type ProgressData = {
+  viewedBlocks: number[];
+  percentage?: number;
+  lastViewedBlock?: number;
+  completed?: boolean;
 };
 
 export function useLessonProgress({
   lessonId,
   totalBlocks,
-  fetchServerProgress,
 }: {
   lessonId: string;
   totalBlocks: number;
-  fetchServerProgress?: () => Promise<{
-    viewedBlocks: number[];
-    percentage: number;
-  } | null>;
 }) {
   const [viewedBlocksSet, setViewedBlocksSet] = useState<Set<number>>(
     new Set()
   );
   const [completed, setCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { data: session, status } = useSession();
-  const isAuthed = status === "authenticated";
-  const debounceTimer = useRef<number | null>(null);
-  const lastViewedBlockRef = useRef<number>(-1);
   const [lastViewedBlock, setLastViewedBlock] = useState(-1);
-  const lastSyncedPercentage = useRef<number>(0);
-  const isUnmounting = useRef(false);
-  const hasMergedAnonymousProgress = useRef(false);
-  const viewedBlocksRef = useRef<Set<number>>(new Set());
 
-  // helper: compute percentage from viewedBlocks
+  const { status } = useSession();
+  const isAuthed = status === "authenticated";
+
+  const viewedBlocksRef = useRef<Set<number>>(new Set());
+  const lastViewedBlockRef = useRef<number>(-1);
+  const lastSyncedPercentage = useRef<number>(0);
+  const hasMergedAnonymousProgress = useRef(false);
+
+  /* ---------------- progress compute ---------------- */
+  const progressRef = useRef<number>(0);
+  const [progress, setProgress] = useState(0);
+
   const computePercent = useCallback(() => {
-    return completed
-      ? 100
-      : Math.round((viewedBlocksSet.size / Math.max(1, totalBlocks)) * 100);
+    if (completed) return 100;
+    return Math.round((viewedBlocksSet.size / Math.max(1, totalBlocks)) * 100);
   }, [viewedBlocksSet, completed, totalBlocks]);
 
-  // load localStorage and optionally server
+  useEffect(() => {
+    const pct = computePercent();
+    progressRef.current = pct;
+    setProgress(pct);
+  }, [viewedBlocksSet, completed, computePercent]);
+
+  /* ---------------- sync ---------------- */
+  const syncToServer = useCallback(
+    async (force = false) => {
+      if (!isAuthed) return;
+      const percentage = computePercent();
+      if (!force && percentage - lastSyncedPercentage.current < 5) return;
+
+      const payload: ProgressPayload = {
+        lessonId,
+        viewedBlocks: Array.from(viewedBlocksRef.current),
+        percentage,
+        lastViewedBlock: lastViewedBlockRef.current,
+      };
+
+      try {
+        await fetch("/api/progress/lesson", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        lastSyncedPercentage.current = percentage;
+      } catch (e) {
+        console.error("progress sync failed", e);
+      }
+    },
+    [lessonId, isAuthed, computePercent]
+  );
+
+  const scheduleCommit = useProgressCommitter(syncToServer, 2000);
+
+  /* ---------------- initial load ---------------- */
   useEffect(() => {
     let mounted = true;
+
     (async () => {
-      const raw = localStorage.getItem(STORAGE_KEY(lessonId));
-      let local = null;
-      if (raw) {
-        try {
-          local = JSON.parse(raw);
-        } catch {}
+      try {
+        // 1️⃣ Fetch server progress ONCE
+        const res = await fetch(`/api/progress/lesson?lessonId=${lessonId}`);
+        const serverData: ProgressData | null = res.ok
+          ? await res.json()
+          : null;
+
+        // 2️⃣ Load local progress
+        const raw = localStorage.getItem(STORAGE_KEY(lessonId));
+        const localData: ProgressData | null = raw ? JSON.parse(raw) : null;
+
+        // 3️⃣ Merge
+        const merged = new Set<number>();
+        serverData?.viewedBlocks?.forEach((n: number) => merged.add(n));
+        localData?.viewedBlocks?.forEach((n: number) => merged.add(n));
+
+        if (!mounted) return;
+
+        setViewedBlocksSet(merged);
+        viewedBlocksRef.current = merged;
+
+        const maxIdx = merged.size > 0 ? Math.max(...Array.from(merged)) : -1;
+        setLastViewedBlock(maxIdx);
+        lastViewedBlockRef.current = maxIdx;
+
+        setCompleted(
+          localData?.completed === true || serverData?.percentage === 100
+        );
+        lastSyncedPercentage.current = Math.max(
+          serverData?.percentage ?? 0,
+          localData?.percentage ?? 0
+        );
+      } catch (err) {
+        console.error("Failed to fetch progress", err);
+      } finally {
+        setLoading(false);
       }
-
-      let server = null;
-      if (fetchServerProgress) {
-        try {
-          server = await fetchServerProgress();
-        } catch {}
-      }
-
-      const merged = new Set<number>();
-      server?.viewedBlocks?.forEach((n) => merged.add(n));
-      local?.viewedBlocks?.forEach((n: number) => merged.add(n));
-
-      if (!mounted) return;
-
-      setViewedBlocksSet((prev) => {
-        const next = new Set(prev);
-        merged.forEach((n) => next.add(n));
-        return next;
-      });
-
-      const maxIdx =
-        merged.size > 0 ? Math.max(...Array.from(merged.values())) : -1;
-
-      lastViewedBlockRef.current = maxIdx;
-      setLastViewedBlock(maxIdx);
-
-      setCompleted(local?.completed ?? server?.percentage === 100);
-      lastSyncedPercentage.current = Math.max(
-        server?.percentage ?? 0,
-        local?.percentage ?? 0
-      );
-      setLoading(false);
     })();
 
     return () => {
       mounted = false;
     };
-  }, [lessonId, fetchServerProgress]);
+  }, [lessonId]);
 
+  /* ---------------- anonymous → authed merge ---------------- */
   useEffect(() => {
-    viewedBlocksRef.current = viewedBlocksSet;
-  }, [viewedBlocksSet]);
-
-  useEffect(() => {
-    if (!isAuthed) return;
-    if (hasMergedAnonymousProgress.current) return;
+    if (!isAuthed || hasMergedAnonymousProgress.current) return;
 
     const raw = localStorage.getItem(STORAGE_KEY(lessonId));
     if (!raw) {
@@ -123,37 +159,12 @@ export function useLessonProgress({
       return;
     }
 
-    (async () => {
-      try {
-        const payload = {
-          viewedBlocks: Array.from(viewedBlocksSet.values()),
-          percentage: completed ? 100 : computePercent(),
-          completed,
-          lastViewedBlock,
-          updatedAt: Date.now(),
-        };
+    scheduleCommit(true);
+    localStorage.removeItem(STORAGE_KEY(lessonId));
+    hasMergedAnonymousProgress.current = true;
+  }, [isAuthed, lessonId, scheduleCommit]);
 
-        await fetch("/api/progress/lesson", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        lastSyncedPercentage.current = Math.max(
-          lastSyncedPercentage.current,
-          payload.percentage
-        );
-
-        localStorage.removeItem(STORAGE_KEY(lessonId));
-      } catch (e) {
-        console.error("anonymous merge failed", e);
-      } finally {
-        hasMergedAnonymousProgress.current = true;
-      }
-    })();
-  }, [isAuthed, lessonId]);
-
-  // save to localStorage when viewedBlocks or completed changes
+  /* ---------------- localStorage persistence ---------------- */
   useEffect(() => {
     const payload = {
       viewedBlocks: Array.from(viewedBlocksSet.values()),
@@ -165,120 +176,50 @@ export function useLessonProgress({
     localStorage.setItem(STORAGE_KEY(lessonId), JSON.stringify(payload));
   }, [viewedBlocksSet, completed, lastViewedBlock, lessonId, computePercent]);
 
-  // debounced sync to server
-  const scheduleSync = useCallback(() => {
-    if (debounceTimer.current) {
-      window.clearTimeout(debounceTimer.current);
-      debounceTimer.current = null;
-    }
-    debounceTimer.current = window.setTimeout(async () => {
-      try {
-        const payload: ProgressPayload = {
-          lessonId,
-          viewedBlocks: Array.from(viewedBlocksSet.values()),
-          percentage: computePercent(),
-        };
-        // avoid sending if not increased since last sync
-        if (payload.percentage <= lastSyncedPercentage.current) return;
-        const res = await fetch("/api/progress/lesson", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (res.ok) {
-          lastSyncedPercentage.current = payload.percentage;
-        }
-      } catch (e) {
-        console.error("sync error", e);
-      }
-    }, DEBOUNCE_MS) as unknown as number;
-  }, [lessonId, viewedBlocksSet, computePercent]);
-
-  // final sync on unload
+  /* ---------------- page exit safety sync ---------------- */
   useEffect(() => {
-    const onUnload = () => {
-      // clear timers
-      if (debounceTimer.current) {
-        window.clearTimeout(debounceTimer.current);
-        debounceTimer.current = null;
-      }
-
-      // attempt synchronous navigator.sendBeacon if available
-      try {
-        const payload = {
+    const flush = () => {
+      if (!isAuthed) return;
+      navigator.sendBeacon?.(
+        "/api/progress/lesson",
+        JSON.stringify({
           lessonId,
-          viewedBlocks: Array.from(viewedBlocksSet.values()),
+          viewedBlocks: Array.from(viewedBlocksRef.current),
           percentage: computePercent(),
-        };
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon("/api/progress/lesson", JSON.stringify(payload));
-        } else {
-          // fallback: synchronous XHR (rare)
-          const xhr = new XMLHttpRequest();
-          xhr.open("PATCH", "/api/progress/lesson", false);
-          xhr.setRequestHeader("Content-Type", "application/json");
-          try {
-            xhr.send(JSON.stringify(payload));
-          } catch (e) {
-            /* ignore */
-          }
-        }
-      } catch (e) {}
+          lastViewedBlock: lastViewedBlockRef.current,
+        })
+      );
     };
+    window.addEventListener("pagehide", flush);
+    return () => window.removeEventListener("pagehide", flush);
+  }, [lessonId, isAuthed, computePercent]);
 
-    window.addEventListener("beforeunload", onUnload);
-    window.addEventListener("pagehide", onUnload);
-
-    return () => {
-      isUnmounting.current = true;
-      window.removeEventListener("beforeunload", onUnload);
-      window.removeEventListener("pagehide", onUnload);
-    };
-  }, [lessonId, viewedBlocksSet, computePercent]);
-
+  /* ---------------- public actions ---------------- */
   const markBlockViewed = useCallback(
     (idx: number) => {
-      setViewedBlocksSet((prev) => {
-        if (prev.has(idx)) return prev;
-        const updated = new Set(prev);
-        updated.add(idx);
-        viewedBlocksRef.current = updated;
-        return updated;
-      });
-      setLastViewedBlock(idx);
+      viewedBlocksRef.current.add(idx);
+      setViewedBlocksSet(new Set(viewedBlocksRef.current));
+
       lastViewedBlockRef.current = idx;
-      scheduleSync();
+      setLastViewedBlock(idx);
+
+      scheduleCommit();
     },
-    [scheduleSync]
+    [scheduleCommit]
   );
 
-  // In markComplete:
-  const markComplete = useCallback(async () => {
+  const markComplete = useCallback(() => {
     setCompleted(true);
-
-    try {
-      const payload: ProgressPayload = {
-        lessonId,
-        viewedBlocks: Array.from(viewedBlocksSet.values()),
-        percentage: 100,
-      };
-      await fetch("/api/progress/lesson", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      lastSyncedPercentage.current = 100;
-    } catch (e) {
-      console.error("complete sync failed", e);
-    }
-  }, [lessonId, viewedBlocksSet]);
+    lastViewedBlockRef.current = totalBlocks - 1;
+    scheduleCommit(true);
+  }, [scheduleCommit, totalBlocks]);
 
   return {
     viewedBlocks: viewedBlocksSet,
     viewedBlocksRef,
     markBlockViewed,
     markComplete,
-    progress: computePercent(),
+    progress,
     completed,
     loading,
     lastViewedBlock,
