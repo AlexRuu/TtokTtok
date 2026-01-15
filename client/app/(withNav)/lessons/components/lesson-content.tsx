@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import TextBlock from "./text-block";
 import ImageBlock from "./image-block";
@@ -8,9 +8,11 @@ import NoteBlock from "./note-block";
 import TableBlock from "./table-block";
 import Link from "next/link";
 import type { LessonBlock } from "@/types";
+import { useLessonProgress } from "@/hooks/use-lesson-progress";
+import { useBlockObserver } from "@/hooks/use-observer-block";
+import useLoading from "@/hooks/use-loading";
 
-const DWELL_MS = 2000;
-const COMPLETE_THRESHOLD = 0.9;
+const COMPLETE_PERCENT = 90;
 
 type NextStep = {
   title: string;
@@ -18,66 +20,79 @@ type NextStep = {
   href: string;
 };
 
-const LessonContent = ({ content }: { content: LessonBlock[] }) => {
+const LessonContent = ({
+  content,
+  lessonId,
+}: {
+  content: LessonBlock[];
+  lessonId: string;
+}) => {
   const totalBlocks = content.length;
-  const timersRef = useRef<Record<number, number | null>>({});
-  const viewedRef = useRef<Set<number>>(new Set());
-  const [progress, setProgress] = useState(0);
   const [showCompleteButton, setShowCompleteButton] = useState(false);
   const [lessonComplete, setLessonComplete] = useState(false);
+  const hasAutoScrolled = useRef(false);
+  const { isLoading } = useLoading();
 
-  useEffect(() => {
-    if (!totalBlocks) return;
+  const {
+    markBlockViewed,
+    progress,
+    markComplete,
+    viewedBlocksRef,
+    completed,
+    lastViewedBlock,
+  } = useLessonProgress({
+    lessonId,
+    totalBlocks,
+    fetchServerProgress: async () => {
+      const res = await fetch(`/api/progress/lesson?lessonId=${lessonId}`);
+      if (!res.ok) return null;
+      return res.json();
+    },
+  });
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const el = entry.target as HTMLElement;
-          const idxAttr = el.getAttribute("data-block-index");
-          if (!idxAttr) return;
-          const idx = Number(idxAttr);
-
-          if (viewedRef.current.has(idx)) return;
-
-          if (entry.isIntersecting) {
-            if (timersRef.current[idx]) clearTimeout(timersRef.current[idx]!);
-            timersRef.current[idx] = window.setTimeout(() => {
-              viewedRef.current.add(idx);
-              const newPercent = (viewedRef.current.size / totalBlocks) * 100;
-              setProgress((prev) => Math.max(prev, Math.round(newPercent)));
-
-              if (viewedRef.current.size / totalBlocks >= COMPLETE_THRESHOLD) {
-                setShowCompleteButton(true);
-              }
-            }, DWELL_MS);
-          } else {
-            if (timersRef.current[idx]) {
-              clearTimeout(timersRef.current[idx]!);
-              timersRef.current[idx] = null;
-            }
-          }
-        });
-      },
-      { threshold: [0.1, 0.25, 0.5], rootMargin: "0px 0px -20% 0px" }
-    );
-
-    const els = Array.from(
-      document.querySelectorAll<HTMLElement>("[data-block-index]")
-    );
-    els.forEach((el) => observer.observe(el));
-
-    return () => {
-      Object.values(timersRef.current).forEach((t) => t && clearTimeout(t));
-      observer.disconnect();
-    };
-  }, [totalBlocks]);
-
-  const markComplete = () => {
-    setProgress(100);
+  const handleMarkComplete = useCallback(async () => {
+    await markComplete();
     setShowCompleteButton(false);
     setLessonComplete(true);
-    console.log("Lesson marked complete");
-  };
+  }, [markComplete]);
+
+  // IntersectionObserver for dwell-based viewing
+  const { observeBlocks } = useBlockObserver({
+    content,
+    markBlockViewed,
+    viewedBlocksRef,
+  });
+
+  useEffect(() => {
+    observeBlocks();
+  }, [content.length]);
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (hasAutoScrolled.current) return;
+    if (lastViewedBlock < 0) return;
+
+    const el = document.querySelector<HTMLElement>(
+      `[data-block-index="${lastViewedBlock}"]`
+    );
+
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      hasAutoScrolled.current = true;
+    }
+  }, [isLoading, lastViewedBlock]);
+
+  // Show "Mark Complete" if progress passes threshold
+  useEffect(() => {
+    if (progress >= COMPLETE_PERCENT && !completed) {
+      setShowCompleteButton(true);
+    }
+  }, [progress, completed]);
+
+  // Animate next steps once lesson completed
+  useEffect(() => {
+    setLessonComplete(completed);
+  }, [completed]);
 
   const nextSteps: NextStep[] = [
     {
@@ -140,11 +155,10 @@ const LessonContent = ({ content }: { content: LessonBlock[] }) => {
           </span>
         </div>
 
-        {/* Mark Complete button */}
         {showCompleteButton && (
           <div className="flex justify-end mt-3">
             <button
-              onClick={markComplete}
+              onClick={handleMarkComplete}
               className="px-5 py-2 rounded-xl bg-[#F3DCCB] text-[#6B4C3B] font-semibold shadow hover:bg-[#EBC9B1] transition cursor-pointer select-none"
             >
               Mark Complete
