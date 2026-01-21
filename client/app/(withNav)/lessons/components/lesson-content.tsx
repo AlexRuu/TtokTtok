@@ -38,17 +38,18 @@ const LessonContent = ({
     viewedBlocksRef,
     completed,
     loading,
+    shouldResumeRef,
     lastViewedBlock,
   } = useLessonProgress({ lessonId, totalBlocks });
 
-  const handleMarkComplete = useCallback(async () => {
-    await markComplete();
+  const handleMarkComplete = useCallback(() => {
+    markComplete();
     setShowCompleteButton(false);
     setLessonComplete(true);
   }, [markComplete]);
 
-  // IntersectionObserver for dwell-based viewing
-  const { observeBlocks } = useBlockObserver({
+  /* ---------------- IntersectionObserver ---------------- */
+  const { observeBlocks, resetObserver } = useBlockObserver({
     content,
     markBlockViewed,
     viewedBlocksRef,
@@ -56,31 +57,31 @@ const LessonContent = ({
 
   useEffect(() => {
     if (loading) return;
-    observeBlocks();
-  }, [loading, content.length, observeBlocks]);
+    resetObserver();
+  }, [loading, resetObserver]);
 
-  // Auto-scroll to last viewed block
+  /* ---------------- Auto-scroll to last viewed block ---------------- */
   useEffect(() => {
     if (loading) return;
+    if (!shouldResumeRef.current) return;
     if (hasAutoScrolled.current) return;
     if (lastViewedBlock < 0) return;
 
     const el = document.querySelector<HTMLElement>(
-      `[data-block-index="${lastViewedBlock}"]`
+      `[data-block-index="${lastViewedBlock}"]`,
     );
-
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
       hasAutoScrolled.current = true;
     }
-  }, [loading, lastViewedBlock]);
+  }, [loading, lastViewedBlock, shouldResumeRef]);
 
-  // Show "Mark Complete" if progress passes threshold
+  /* ---------------- Show "Mark Complete" button ---------------- */
   useEffect(() => {
     setShowCompleteButton(progress >= COMPLETE_PERCENT && !completed);
   }, [progress, completed]);
 
-  // Animate next steps once lesson completed
+  /* ---------------- Animate next steps ---------------- */
   useEffect(() => {
     setLessonComplete(completed);
   }, [completed]);
@@ -103,7 +104,7 @@ const LessonContent = ({
         href: "/lessons/lesson-2",
       },
     ],
-    []
+    [],
   );
 
   return (

@@ -52,6 +52,14 @@ export const useBlockObserver = ({
     });
   }, []);
 
+  const resetObserver = useCallback(() => {
+    observerRef.current?.disconnect();
+    observedBlocksRef.current.clear();
+    dwellTimersRef.current.forEach(clearTimeout);
+    dwellTimersRef.current.clear();
+    observeBlocks();
+  }, [observeBlocks]);
+
   useEffect(() => {
     // Initialize observer
     observerRef.current = new IntersectionObserver(
@@ -60,19 +68,21 @@ export const useBlockObserver = ({
           const el = entry.target as HTMLElement;
           const idx = Number(el.dataset.blockIndex);
 
-          if (viewedBlocksRef.current.has(idx)) return;
+          const alreadyViewed = viewedBlocksRef.current.has(idx);
 
-          // Start dwell timer
-          if (entry.isIntersecting && !dwellTimersRef.current.has(idx)) {
-            const dwell = getDwellTime(contentRef.current[idx]);
-            const timer = window.setTimeout(() => {
-              markBlockViewedRef.current(idx);
-              dwellTimersRef.current.delete(idx);
-            }, dwell);
-            dwellTimersRef.current.set(idx, timer);
+          if (entry.isIntersecting && !alreadyViewed) {
+            if (!dwellTimersRef.current.has(idx)) {
+              const dwell = getDwellTime(contentRef.current[idx]);
+              const timer = window.setTimeout(() => {
+                markBlockViewedRef.current(idx);
+                dwellTimersRef.current.delete(idx);
+              }, dwell);
+
+              dwellTimersRef.current.set(idx, timer);
+            }
           }
-          // Clear dwell timer if leaving viewport
-          else if (!entry.isIntersecting) {
+
+          if (!entry.isIntersecting) {
             const timer = dwellTimersRef.current.get(idx);
             if (timer) {
               clearTimeout(timer);
@@ -81,7 +91,7 @@ export const useBlockObserver = ({
           }
         });
       },
-      { threshold: 0.01, rootMargin: "0px" }
+      { threshold: 0.01, rootMargin: "0px" },
     );
 
     // Start observing blocks
@@ -95,5 +105,5 @@ export const useBlockObserver = ({
     };
   }, [observeBlocks, getDwellTime]);
 
-  return { observeBlocks };
+  return { observeBlocks, resetObserver };
 };

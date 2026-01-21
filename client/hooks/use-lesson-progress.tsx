@@ -27,41 +27,44 @@ export function useLessonProgress({
   lessonId: string;
   totalBlocks: number;
 }) {
+  /* ---------------- core state ---------------- */
   const [viewedBlocksSet, setViewedBlocksSet] = useState<Set<number>>(
-    new Set()
+    new Set(),
   );
   const [completed, setCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [lastViewedBlock, setLastViewedBlock] = useState(-1);
 
+  /* ---------------- refs ---------------- */
+  const viewedBlocksRef = useRef<Set<number>>(new Set());
+  const lastViewedBlockRef = useRef(-1);
+  const lastSyncedPercentage = useRef(0);
+  const hasHydratedInitialProgress = useRef(false);
+  const hasMergedAnonymousProgress = useRef(false);
+  const shouldResumeRef = useRef(false);
+
+  /* ---------------- auth ---------------- */
   const { status } = useSession();
   const isAuthed = status === "authenticated";
 
-  const viewedBlocksRef = useRef<Set<number>>(new Set());
-  const lastViewedBlockRef = useRef<number>(-1);
-  const lastSyncedPercentage = useRef<number>(0);
-  const hasMergedAnonymousProgress = useRef(false);
+  /* ---------------- helpers ---------------- */
+  const computePercent = useCallback(
+    (blocks: Set<number>, isComplete: boolean) => {
+      if (isComplete) return 100;
+      return Math.round((blocks.size / Math.max(1, totalBlocks)) * 100);
+    },
+    [totalBlocks],
+  );
 
-  /* ---------------- progress compute ---------------- */
-  const progressRef = useRef<number>(0);
-  const [progress, setProgress] = useState(0);
-
-  const computePercent = useCallback(() => {
-    if (completed) return 100;
-    return Math.round((viewedBlocksSet.size / Math.max(1, totalBlocks)) * 100);
-  }, [viewedBlocksSet, completed, totalBlocks]);
-
-  useEffect(() => {
-    const pct = computePercent();
-    progressRef.current = pct;
-    setProgress(pct);
-  }, [viewedBlocksSet, completed, computePercent]);
+  const progress = computePercent(viewedBlocksSet, completed);
 
   /* ---------------- sync ---------------- */
   const syncToServer = useCallback(
     async (force = false) => {
       if (!isAuthed) return;
-      const percentage = computePercent();
+
+      const percentage = computePercent(viewedBlocksRef.current, completed);
+
       if (!force && percentage - lastSyncedPercentage.current < 5) return;
 
       const payload: ProgressPayload = {
@@ -82,50 +85,49 @@ export function useLessonProgress({
         console.error("progress sync failed", e);
       }
     },
-    [lessonId, isAuthed, computePercent]
+    [lessonId, isAuthed, completed, computePercent],
   );
 
   const scheduleCommit = useProgressCommitter(syncToServer, 2000);
 
-  /* ---------------- initial load ---------------- */
+  /* ---------------- initial hydration ---------------- */
   useEffect(() => {
     let mounted = true;
 
     (async () => {
       try {
-        // 1️⃣ Fetch server progress ONCE
         const res = await fetch(`/api/progress/lesson?lessonId=${lessonId}`);
         const serverData: ProgressData | null = res.ok
           ? await res.json()
           : null;
 
-        // 2️⃣ Load local progress
         const raw = localStorage.getItem(STORAGE_KEY(lessonId));
         const localData: ProgressData | null = raw ? JSON.parse(raw) : null;
 
-        // 3️⃣ Merge
         const merged = new Set<number>();
-        serverData?.viewedBlocks?.forEach((n: number) => merged.add(n));
-        localData?.viewedBlocks?.forEach((n: number) => merged.add(n));
+        serverData?.viewedBlocks?.forEach((n) => merged.add(n));
+        localData?.viewedBlocks?.forEach((n) => merged.add(n));
 
-        if (!mounted) return;
+        if (!mounted || hasHydratedInitialProgress.current) return;
+        hasHydratedInitialProgress.current = true;
 
-        setViewedBlocksSet(merged);
-        viewedBlocksRef.current = merged;
-
+        // Determine if we should auto-resume scroll
         const maxIdx = merged.size > 0 ? Math.max(...Array.from(merged)) : -1;
-        setLastViewedBlock(maxIdx);
-        lastViewedBlockRef.current = maxIdx;
+        shouldResumeRef.current = maxIdx > 0;
 
-        setCompleted(
-          localData?.completed === true || serverData?.percentage === 100
-        );
-        lastSyncedPercentage.current = Math.max(
-          serverData?.percentage ?? 0,
-          localData?.percentage ?? 0
-        );
+        viewedBlocksRef.current = merged;
+        setViewedBlocksSet(merged);
+
+        lastViewedBlockRef.current = maxIdx;
+        setLastViewedBlock(maxIdx);
+
+        const isCompleted =
+          localData?.completed === true || serverData?.percentage === 100;
+        setCompleted(isCompleted);
+
+        lastSyncedPercentage.current = computePercent(merged, isCompleted);
       } catch (err) {
-        console.error("Failed to fetch progress", err);
+        console.error("Failed to hydrate progress", err);
       } finally {
         setLoading(false);
       }
@@ -134,7 +136,7 @@ export function useLessonProgress({
     return () => {
       mounted = false;
     };
-  }, [lessonId]);
+  }, [lessonId, computePercent]);
 
   /* ---------------- anonymous → authed merge ---------------- */
   useEffect(() => {
@@ -146,14 +148,7 @@ export function useLessonProgress({
       return;
     }
 
-    let local;
-    try {
-      local = JSON.parse(raw);
-    } catch {
-      hasMergedAnonymousProgress.current = true;
-      return;
-    }
-
+    const local = JSON.parse(raw);
     if (!local?.viewedBlocks?.length) {
       hasMergedAnonymousProgress.current = true;
       return;
@@ -164,48 +159,40 @@ export function useLessonProgress({
     hasMergedAnonymousProgress.current = true;
   }, [isAuthed, lessonId, scheduleCommit]);
 
-  /* ---------------- localStorage persistence ---------------- */
+  /* ---------------- persistence ---------------- */
   useEffect(() => {
-    const payload = {
-      viewedBlocks: Array.from(viewedBlocksSet.values()),
-      percentage: computePercent(),
-      completed,
-      lastViewedBlock,
-      updatedAt: Date.now(),
-    };
-    localStorage.setItem(STORAGE_KEY(lessonId), JSON.stringify(payload));
-  }, [viewedBlocksSet, completed, lastViewedBlock, lessonId, computePercent]);
+    localStorage.setItem(
+      STORAGE_KEY(lessonId),
+      JSON.stringify({
+        viewedBlocks: Array.from(viewedBlocksSet),
+        percentage: progress,
+        completed,
+        lastViewedBlock,
+        updatedAt: Date.now(),
+      }),
+    );
+  }, [viewedBlocksSet, progress, completed, lastViewedBlock, lessonId]);
 
-  /* ---------------- page exit safety sync ---------------- */
-  useEffect(() => {
-    const flush = () => {
-      if (!isAuthed) return;
-      navigator.sendBeacon?.(
-        "/api/progress/lesson",
-        JSON.stringify({
-          lessonId,
-          viewedBlocks: Array.from(viewedBlocksRef.current),
-          percentage: computePercent(),
-          lastViewedBlock: lastViewedBlockRef.current,
-        })
-      );
-    };
-    window.addEventListener("pagehide", flush);
-    return () => window.removeEventListener("pagehide", flush);
-  }, [lessonId, isAuthed, computePercent]);
-
-  /* ---------------- public actions ---------------- */
+  /* ---------------- actions ---------------- */
   const markBlockViewed = useCallback(
     (idx: number) => {
-      viewedBlocksRef.current.add(idx);
-      setViewedBlocksSet(new Set(viewedBlocksRef.current));
+      setViewedBlocksSet((prev) => {
+        if (prev.has(idx)) return prev;
 
-      lastViewedBlockRef.current = idx;
-      setLastViewedBlock(idx);
+        const next = new Set(prev);
+        next.add(idx);
 
-      scheduleCommit();
+        viewedBlocksRef.current = next;
+
+        lastViewedBlockRef.current = idx;
+        setLastViewedBlock(idx);
+
+        scheduleCommit();
+
+        return next;
+      });
     },
-    [scheduleCommit]
+    [scheduleCommit],
   );
 
   const markComplete = useCallback(() => {
@@ -217,6 +204,7 @@ export function useLessonProgress({
   return {
     viewedBlocks: viewedBlocksSet,
     viewedBlocksRef,
+    shouldResumeRef,
     markBlockViewed,
     markComplete,
     progress,
