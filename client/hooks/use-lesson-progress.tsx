@@ -11,6 +11,7 @@ type ProgressPayload = {
   viewedBlocks: number[];
   percentage: number;
   lastViewedBlock: number;
+  completed: boolean;
 };
 
 type ProgressData = {
@@ -42,6 +43,7 @@ export function useLessonProgress({
   const hasHydratedInitialProgress = useRef(false);
   const hasMergedAnonymousProgress = useRef(false);
   const shouldResumeRef = useRef(false);
+  const completedRef = useRef(false);
 
   /* ---------------- auth ---------------- */
   const { status } = useSession();
@@ -63,7 +65,10 @@ export function useLessonProgress({
     async (force = false) => {
       if (!isAuthed) return;
 
-      const percentage = computePercent(viewedBlocksRef.current, completed);
+      const percentage = computePercent(
+        viewedBlocksRef.current,
+        completedRef.current,
+      );
 
       if (!force && percentage - lastSyncedPercentage.current < 5) return;
 
@@ -71,6 +76,7 @@ export function useLessonProgress({
         lessonId,
         viewedBlocks: Array.from(viewedBlocksRef.current),
         percentage,
+        completed: completedRef.current,
         lastViewedBlock: lastViewedBlockRef.current,
       };
 
@@ -85,7 +91,7 @@ export function useLessonProgress({
         console.error("progress sync failed", e);
       }
     },
-    [lessonId, isAuthed, completed, computePercent],
+    [lessonId, isAuthed, computePercent],
   );
 
   const scheduleCommit = useProgressCommitter(syncToServer, 2000);
@@ -124,6 +130,7 @@ export function useLessonProgress({
         const isCompleted =
           localData?.completed === true || serverData?.percentage === 100;
         setCompleted(isCompleted);
+        completedRef.current = isCompleted;
 
         lastSyncedPercentage.current = computePercent(merged, isCompleted);
       } catch (err) {
@@ -196,8 +203,23 @@ export function useLessonProgress({
   );
 
   const markComplete = useCallback(() => {
-    setCompleted(true);
+    const allBlocks = new Set<number>();
+
+    for (let i = 0; i < totalBlocks; i++) {
+      allBlocks.add(i);
+    }
+
+    // Sync refs first (important)
+    viewedBlocksRef.current = allBlocks;
+    completedRef.current = true;
     lastViewedBlockRef.current = totalBlocks - 1;
+
+    // Then update React state
+    setViewedBlocksSet(allBlocks);
+    setLastViewedBlock(totalBlocks - 1);
+    setCompleted(true);
+
+    // Force server sync
     scheduleCommit(true);
   }, [scheduleCommit, totalBlocks]);
 

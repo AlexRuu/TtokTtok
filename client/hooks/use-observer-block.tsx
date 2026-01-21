@@ -14,17 +14,18 @@ export const useBlockObserver = ({
   markBlockViewed,
   viewedBlocksRef,
 }: UseBlockObserverProps) => {
-  // Refs
-  const dwellTimersRef = useRef<Map<number, number>>(new Map());
-  const observedBlocksRef = useRef<Set<number>>(new Set());
+  /* ---------------- refs ---------------- */
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const observedBlocksRef = useRef<Set<number>>(new Set());
+  const dwellTimersRef = useRef<Map<number, number>>(new Map());
+
   const markBlockViewedRef = useRef(markBlockViewed);
   const contentRef = useRef(content);
 
   markBlockViewedRef.current = markBlockViewed;
   contentRef.current = content;
 
-  // Default dwell times
+  /* ---------------- dwell times ---------------- */
   const getDwellTime = useCallback((block: LessonBlock) => {
     switch (block.type) {
       case "text":
@@ -40,49 +41,60 @@ export const useBlockObserver = ({
     }
   }, []);
 
-  // Observe unobserved blocks in the DOM
+  /* ---------------- observe blocks ---------------- */
   const observeBlocks = useCallback(() => {
+    if (!observerRef.current) return;
+
     const els = document.querySelectorAll<HTMLElement>("[data-block-index]");
     els.forEach((el) => {
       const idx = Number(el.dataset.blockIndex);
-      if (!observedBlocksRef.current.has(idx) && observerRef.current) {
-        observerRef.current.observe(el);
-        observedBlocksRef.current.add(idx);
-      }
+
+      if (Number.isNaN(idx)) return;
+      if (observedBlocksRef.current.has(idx)) return;
+
+      observerRef.current!.observe(el);
+      observedBlocksRef.current.add(idx);
     });
   }, []);
 
+  /* ---------------- reset observer ---------------- */
   const resetObserver = useCallback(() => {
     observerRef.current?.disconnect();
     observedBlocksRef.current.clear();
+
     dwellTimersRef.current.forEach(clearTimeout);
     dwellTimersRef.current.clear();
+
     observeBlocks();
   }, [observeBlocks]);
 
+  /* ---------------- observer setup ---------------- */
   useEffect(() => {
-    // Initialize observer
     observerRef.current = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           const el = entry.target as HTMLElement;
           const idx = Number(el.dataset.blockIndex);
 
-          const alreadyViewed = viewedBlocksRef.current.has(idx);
+          if (Number.isNaN(idx)) return;
 
-          if (entry.isIntersecting && !alreadyViewed) {
-            if (!dwellTimersRef.current.has(idx)) {
-              const dwell = getDwellTime(contentRef.current[idx]);
-              const timer = window.setTimeout(() => {
-                markBlockViewedRef.current(idx);
-                dwellTimersRef.current.delete(idx);
-              }, dwell);
+          // Never track blocks already viewed
+          if (viewedBlocksRef.current.has(idx)) return;
 
-              dwellTimersRef.current.set(idx, timer);
-            }
-          }
+          if (entry.isIntersecting) {
+            if (dwellTimersRef.current.has(idx)) return;
 
-          if (!entry.isIntersecting) {
+            const block = contentRef.current[idx];
+            if (!block) return;
+
+            const dwell = getDwellTime(block);
+            const timer = window.setTimeout(() => {
+              markBlockViewedRef.current(idx);
+              dwellTimersRef.current.delete(idx);
+            }, dwell);
+
+            dwellTimersRef.current.set(idx, timer);
+          } else {
             const timer = dwellTimersRef.current.get(idx);
             if (timer) {
               clearTimeout(timer);
@@ -91,19 +103,23 @@ export const useBlockObserver = ({
           }
         });
       },
-      { threshold: 0.01, rootMargin: "0px" },
+      {
+        threshold: 0.01,
+        rootMargin: "0px",
+      },
     );
 
-    // Start observing blocks
     observeBlocks();
 
-    // Cleanup on unmount
     return () => {
+      observerRef.current?.disconnect();
       dwellTimersRef.current.forEach(clearTimeout);
       dwellTimersRef.current.clear();
-      observerRef.current?.disconnect();
     };
-  }, [observeBlocks, getDwellTime]);
+  }, [observeBlocks, getDwellTime, viewedBlocksRef]);
 
-  return { observeBlocks, resetObserver };
+  return {
+    observeBlocks,
+    resetObserver,
+  };
 };
