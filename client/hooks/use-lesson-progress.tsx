@@ -58,7 +58,7 @@ export function useLessonProgress({
     [totalBlocks],
   );
 
-  const progress = computePercent(viewedBlocksSet, completed);
+  const progress = completed ? 100 : computePercent(viewedBlocksSet, false);
 
   /* ---------------- sync ---------------- */
   const syncToServer = useCallback(
@@ -180,9 +180,14 @@ export function useLessonProgress({
     );
   }, [viewedBlocksSet, progress, completed, lastViewedBlock, lessonId]);
 
+  useEffect(() => {
+    completedRef.current = completed;
+  }, [completed]);
+
   /* ---------------- actions ---------------- */
   const markBlockViewed = useCallback(
     (idx: number) => {
+      if (completedRef.current) return;
       setViewedBlocksSet((prev) => {
         if (prev.has(idx)) return prev;
 
