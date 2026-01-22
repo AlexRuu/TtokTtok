@@ -145,6 +145,7 @@ model Unit {
   id                String              @id @default(cuid())
   unitNumber        Int                 @default(autoincrement())
   title             String
+  slug              String
   createdAt         DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
   lesson            Lesson[]
