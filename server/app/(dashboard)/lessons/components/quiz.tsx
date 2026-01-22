@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Quiz, QuizQuestion } from "@/lib/generated/prisma";
+import { Quiz, QuizQuestion } from "@/lib/generated/prisma/client";
 
 interface QuizContentProps {
   quiz: (Quiz & { quizQuestion: QuizQuestion[] })[];
@@ -40,7 +40,7 @@ const QuizContent: React.FC<QuizContentProps> = ({ quiz }) => {
                   }
                 } catch (e) {
                   console.warn(
-                    `Failed to parse options for question ${question.id}`
+                    `Failed to parse options for question ${question.id}`,
                   );
                 }
               }

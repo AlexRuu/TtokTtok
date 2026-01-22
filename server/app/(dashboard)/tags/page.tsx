@@ -11,7 +11,6 @@ import {
 import prismadb from "@/lib/prismadb";
 import { Edit } from "lucide-react";
 import Link from "next/link";
-import React from "react";
 
 const TagsPage = async () => {
   const tags = await prismadb.tag.findMany({});

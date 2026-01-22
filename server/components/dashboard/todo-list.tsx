@@ -42,7 +42,9 @@ const TodoList = () => {
   const handleComplete = async (id: string) => {
     setCompletingId(id);
     setTodos((prev) =>
-      prev.map((todo) => (todo.id === id ? { ...todo, completed: true } : todo))
+      prev.map((todo) =>
+        todo.id === id ? { ...todo, completed: true } : todo,
+      ),
     );
     await fetch(`/api/todo/${id}`, { method: "PATCH" });
     setTimeout(() => {
@@ -84,7 +86,7 @@ const TodoList = () => {
                     <span
                       className={cn(
                         "block transition-opacity duration-300 text-base",
-                        isCompleting && "opacity-60 text-gray-400"
+                        isCompleting && "opacity-60 text-gray-400",
                       )}
                     >
                       {todo.title}
@@ -92,7 +94,7 @@ const TodoList = () => {
 
                     {isCompleting && (
                       <motion.div
-                        className="absolute top-1/2 left-0 h-[2px] bg-gray-400 z-10"
+                        className="absolute top-1/2 left-0 h-0.5 bg-gray-400 z-10"
                         initial={{ width: 0 }}
                         animate={{ width: "100%" }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}

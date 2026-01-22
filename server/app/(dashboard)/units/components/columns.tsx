@@ -3,8 +3,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
 import { Button } from "@/components/ui/button";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import { Lesson } from "@/lib/generated/prisma";
+import { ArrowDown, ArrowUp } from "lucide-react";
+import { Lesson } from "@/lib/generated/prisma/client";
 
 export type Unit = {
   id: string;

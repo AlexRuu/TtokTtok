@@ -4,6 +4,13 @@ import { unitsSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
+const generateSlug = (title: string) =>
+  title
+    .toLowerCase()
+    .trim()
+    .replace(/[^\p{Script=Hangul}a-z0-9\s-]/gu, "")
+    .replace(/\s+/g, "-");
+
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -41,6 +48,7 @@ export async function POST(req: Request) {
       await tx.unit.create({
         data: {
           title: title,
+          slug: generateSlug(title),
         },
       });
 

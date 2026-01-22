@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Vocabulary, VocabularyList } from "@/lib/generated/prisma";
+import { Vocabulary, VocabularyList } from "@/lib/generated/prisma/client";
 
 interface VocabularyProps {
   vocabularyList: VocabularyList & { vocabulary: Vocabulary[] };

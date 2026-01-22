@@ -1,6 +1,6 @@
 "use client";
 
-import { Role, Status } from "@/lib/generated/prisma";
+import { Role, Status } from "@/lib/generated/prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { CellAction } from "./cell-action";
 import { Button } from "@/components/ui/button";
@@ -99,7 +99,7 @@ export const columns: ColumnDef<User>[] = [
             "rounded-md px-2 py-1 text-xs font-semibold capitalize transition-colors duration-200",
             status === "active"
               ? "bg-pink-100 text-pink-700 hover:bg-pink-200"
-              : "bg-red-100 text-red-600 hover:bg-red-200"
+              : "bg-red-100 text-red-600 hover:bg-red-200",
           )}
         >
           {status}

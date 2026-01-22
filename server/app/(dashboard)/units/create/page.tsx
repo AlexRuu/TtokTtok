@@ -1,5 +1,3 @@
-import React from "react";
-
 import UnitsForm from "../components/units-form";
 
 const CreateUnitPage = () => {

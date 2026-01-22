@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { findAscUnits } from "@/prisma/prismaFetches";
 import Link from "next/link";
-import React from "react";
 import { UnitTable } from "./components/unit-table";
 import { columns } from "./components/columns";
 

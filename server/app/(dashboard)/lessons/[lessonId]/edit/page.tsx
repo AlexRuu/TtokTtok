@@ -1,4 +1,3 @@
-import React from "react";
 import LessonForm from "../../components/lesson-form";
 import {
   findAscUnits,

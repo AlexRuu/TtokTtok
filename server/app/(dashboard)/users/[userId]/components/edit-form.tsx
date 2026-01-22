@@ -19,7 +19,7 @@ import useLoading from "@/hooks/use-loading";
 import { cn } from "@/lib/utils";
 import { editUserSchema } from "@/schemas/form-schemas";
 import { EditUserValues } from "@/schemas/form-schemas";
-import { Role, Status, User } from "@/lib/generated/prisma";
+import { Role, Status, User } from "@/lib/generated/prisma/client";
 import {
   Select,
   SelectItem,
@@ -138,7 +138,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                             fieldName as keyof EditUserValues
                           ] && form.formState.isSubmitted
                             ? "text-red-400! before:text-red-400"
-                            : ""
+                            : "",
                         )}
                       >
                         {fieldName === "firstName" ? "First Name" : "Last Name"}
@@ -157,7 +157,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                         renderError(
                           form.formState.errors[
                             fieldName as keyof EditUserValues
-                          ]
+                          ],
                         )}
                     </FormItem>
                   )}
@@ -178,7 +178,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                     className={cn(
                       form.formState.errors.email && form.formState.isSubmitted
                         ? "text-red-400! before:text-red-400"
-                        : ""
+                        : "",
                     )}
                   >
                     Email
@@ -212,7 +212,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                     className={cn(
                       form.formState.errors.role && form.formState.isSubmitted
                         ? "text-red-400! before:text-red-400"
-                        : ""
+                        : "",
                     )}
                   >
                     Status
@@ -247,7 +247,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                     className={cn(
                       form.formState.errors.role && form.formState.isSubmitted
                         ? "text-red-400! before:text-red-400"
-                        : ""
+                        : "",
                     )}
                   >
                     Role

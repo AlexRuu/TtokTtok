@@ -19,7 +19,12 @@ import {
 } from "@/components/ui/select";
 import { quizActions } from "@/actions/form-actions";
 import useLoading from "@/hooks/use-loading";
-import { Lesson, Quiz, QuizQuestion, Unit } from "@/lib/generated/prisma";
+import {
+  Lesson,
+  Quiz,
+  QuizQuestion,
+  Unit,
+} from "@/lib/generated/prisma/client";
 import { quizSchema, quizSchemaValues } from "@/schemas/form-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader } from "lucide-react";
@@ -206,7 +211,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
                   className={cn(
                     form.formState.errors.title && form.formState.isSubmitted
                       ? "text-red-400! before:text-red-400"
-                      : ""
+                      : "",
                   )}
                 >
                   Title
@@ -261,7 +266,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
                     | "FILL_IN_THE_BLANK"
                     | "TRUE_FALSE"
                     | "MATCHING"
-                    | ""
+                    | "",
                 )
               }
             >
@@ -395,7 +400,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
                           const updatePair = (
                             i: number,
                             key: "left" | "right",
-                            val: string
+                            val: string,
                           ) => {
                             const newPairs = [...pairs];
                             newPairs[i] = { ...newPairs[i], [key]: val };
@@ -408,7 +413,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
 
                           const removePair = (i: number) => {
                             const newPairs = pairs.filter(
-                              (_, idx) => idx !== i
+                              (_, idx) => idx !== i,
                             );
                             field.onChange(newPairs);
                           };
@@ -473,7 +478,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
                           const updateAnswer = (
                             i: number,
                             key: "left" | "match",
-                            val: string
+                            val: string,
                           ) => {
                             const newAnswers = [...answers];
                             newAnswers[i] = { ...newAnswers[i], [key]: val };
@@ -489,7 +494,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
 
                           const removeAnswer = (i: number) => {
                             const newAnswers = answers.filter(
-                              (_, idx) => idx !== i
+                              (_, idx) => idx !== i,
                             );
                             field.onChange(newAnswers);
                           };
@@ -511,7 +516,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
                                           updateAnswer(
                                             i,
                                             "left",
-                                            e.target.value
+                                            e.target.value,
                                           )
                                         }
                                         className="w-1/2"
@@ -523,7 +528,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
                                           updateAnswer(
                                             i,
                                             "match",
-                                            e.target.value
+                                            e.target.value,
                                           )
                                         }
                                         className="w-1/2"
@@ -584,7 +589,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
                           const updateOption = (
                             i: number,
                             key: "option" | "value",
-                            val: string
+                            val: string,
                           ) => {
                             const newOptions = [...options];
                             newOptions[i] = { ...newOptions[i], [key]: val };
@@ -600,7 +605,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
 
                           const removeOption = (i: number) => {
                             const newOptions = options.filter(
-                              (_, idx) => idx !== i
+                              (_, idx) => idx !== i,
                             );
                             field.onChange(newOptions);
                           };
@@ -622,7 +627,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
                                           updateOption(
                                             i,
                                             "option",
-                                            e.target.value
+                                            e.target.value,
                                           )
                                         }
                                         className="w-1/4"
@@ -634,7 +639,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
                                           updateOption(
                                             i,
                                             "value",
-                                            e.target.value
+                                            e.target.value,
                                           )
                                         }
                                         className="w-3/4"

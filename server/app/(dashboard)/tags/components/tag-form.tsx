@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { tagActions } from "@/actions/form-actions";
 import useLoading from "@/hooks/use-loading";
-import { Tag } from "@/lib/generated/prisma";
+import { Tag } from "@/lib/generated/prisma/client";
 import { cn } from "@/lib/utils";
 import { tagSchema, tagSchemaValues } from "@/schemas/form-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -96,7 +96,7 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
                       className={cn(
                         form.formState.errors.name && form.formState.isSubmitted
                           ? "text-red-400! before:text-red-400"
-                          : ""
+                          : "",
                       )}
                     >
                       Name
@@ -127,7 +127,7 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
                     className={cn(
                       form.formState.errors.name && form.formState.isSubmitted
                         ? "text-red-400! before:text-red-400"
-                        : ""
+                        : "",
                     )}
                   >
                     Background Colour
@@ -157,7 +157,7 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
                     className={cn(
                       form.formState.errors.name && form.formState.isSubmitted
                         ? "text-red-400! before:text-red-400"
-                        : ""
+                        : "",
                     )}
                   >
                     Text Colour
@@ -187,7 +187,7 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
                     className={cn(
                       form.formState.errors.name && form.formState.isSubmitted
                         ? "text-red-400! before:text-red-400"
-                        : ""
+                        : "",
                     )}
                   >
                     Border Colour

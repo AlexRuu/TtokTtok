@@ -25,7 +25,7 @@ import {
   Unit,
   Vocabulary,
   VocabularyList,
-} from "@/lib/generated/prisma";
+} from "@/lib/generated/prisma/client";
 import {
   vocabularySchema,
   vocabularySchemaValues,
@@ -116,7 +116,7 @@ const VocabularyForm: React.FC<VocabularyFormProps> = ({
                   className={cn(
                     form.formState.errors.title && form.formState.isSubmitted
                       ? "text-red-400! before:text-red-400"
-                      : ""
+                      : "",
                   )}
                 >
                   Title

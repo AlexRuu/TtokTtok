@@ -12,7 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { unitAction } from "@/actions/form-actions";
 import useLoading from "@/hooks/use-loading";
-import { Unit } from "@/lib/generated/prisma";
 import { cn } from "@/lib/utils";
 import { unitsSchema, UnitsSchemaValues } from "@/schemas/form-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +19,7 @@ import { useRouter } from "next/navigation";
 import React, { startTransition } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { Unit } from "@/lib/generated/prisma/client";
 
 const formSchema = unitsSchema;
 
@@ -94,7 +94,7 @@ const UnitsForm: React.FC<EditUnitsFormProps> = ({ initialData }) => {
                         form.formState.errors.title &&
                           form.formState.isSubmitted
                           ? "text-red-400! before:text-red-400"
-                          : ""
+                          : "",
                       )}
                     >
                       Title

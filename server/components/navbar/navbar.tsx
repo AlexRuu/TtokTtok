@@ -67,7 +67,7 @@ export default function Navbar() {
         path: "/users",
       },
     ],
-    []
+    [],
   );
   const dropdownLinks = useMemo(
     () => [
@@ -83,7 +83,7 @@ export default function Navbar() {
       { name: "Tags", path: "/tags" },
       { name: "Vocabulary", path: "/vocabulary" },
     ],
-    []
+    [],
   );
 
   useEffect(() => {
@@ -123,7 +123,7 @@ export default function Navbar() {
             className="flex items-center space-x-1 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded"
           >
             {/* Logo */}
-            <div className="relative w-12 h-12 min-h-[48px]">
+            <div className="relative w-12 h-12 min-h-12">
               <Image
                 src="/tteok.png"
                 alt="Ttok Logo"
@@ -158,7 +158,7 @@ export default function Navbar() {
                   "focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded px-2 py-1 hover:text-[#A65A3A] transition-colors border-b-2 border-transparent focus-visible:text-[#A65A3A]",
                   pathName === link.path
                     ? "border-[#A65A3A] text-[#A65A3A] font-medium"
-                    : ""
+                    : "",
                 )}
               >
                 {link.name}
@@ -184,7 +184,7 @@ export default function Navbar() {
                 }}
                 className="min-w-28 overflow-visible relative flex flex-col px-3 pb-3 pt-1 top-3 bg-[#FBEDE7]/80 backdrop-blur-md border border-[#e8dcd5] shadow-sm rounded-xl"
               >
-                <div className="absolute top-[-6px] right-3/7 w-3 h-3 bg-[#e7dad5d8] rotate-45 border border-[#e8dcd5] z-60" />
+                <div className="absolute -top-1.5 right-3/7 w-3 h-3 bg-[#e7dad5d8] rotate-45 border border-[#e8dcd5] z-60" />
                 {dropdownLinks.map((link) => (
                   <Link
                     href={link.path}
@@ -192,7 +192,7 @@ export default function Navbar() {
                     aria-current={pathName === link.path ? "page" : undefined}
                     className={cn(
                       "focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded px-2 py-1 hover:text-[#A65A3A] transition-colors border-b-2 border-transparent focus-visible:text-[#A65A3A]",
-                      pathName === link.path ? "text-[#A65A3A] font-bold" : ""
+                      pathName === link.path ? "text-[#A65A3A] font-bold" : "",
                     )}
                   >
                     {link.name}

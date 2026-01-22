@@ -9,7 +9,7 @@ import {
   UserLessonProgress,
   Vocabulary,
   VocabularyList,
-} from "@/lib/generated/prisma";
+} from "@/lib/generated/prisma/client";
 import React from "react";
 
 interface LessonStatsSummaryProps {
@@ -36,11 +36,11 @@ const LessonStatsSummary: React.FC<LessonStatsSummaryProps> = ({ lesson }) => {
 
   const usersStarted = lesson.userLessonProgress.length;
   const usersCompleted = lesson.userLessonProgress.filter(
-    (item) => item.completedAt !== null
+    (item) => item.completedAt !== null,
   ).length;
   const savedByUser = lesson.userChapterReview.length;
   const completionRate = Number(
-    ((usersCompleted / usersStarted) * 100).toFixed(0)
+    ((usersCompleted / usersStarted) * 100).toFixed(0),
   );
 
   return (

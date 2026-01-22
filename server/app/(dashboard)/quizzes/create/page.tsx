@@ -1,4 +1,3 @@
-import React from "react";
 import QuizForm from "../components/quiz-form";
 import { findLessons } from "@/prisma/prismaFetches";
 

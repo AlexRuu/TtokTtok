@@ -122,7 +122,7 @@ const SignInForm = () => {
                         form.formState.errors.email &&
                           form.formState.isSubmitted
                           ? "border-red-400 focus:ring-red-400"
-                          : ""
+                          : "",
                       )}
                     />
                   </FormControl>
@@ -146,8 +146,8 @@ const SignInForm = () => {
                       "peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-[#A1C6EA] peer-not-placeholder-shown:bg-white",
                       "peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white",
                       form.formState.errors.email && form.formState.isSubmitted
-                        ? "!text-red-400"
-                        : "text-gray-500"
+                        ? "text-red-400!"
+                        : "text-gray-500",
                     )}
                   >
                     Email
@@ -175,7 +175,7 @@ const SignInForm = () => {
                         form.formState.errors.password &&
                           form.formState.isSubmitted
                           ? "border-red-400 focus:ring-red-400"
-                          : ""
+                          : "",
                       )}
                     />
                   </FormControl>
@@ -200,8 +200,8 @@ const SignInForm = () => {
                       "peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white",
                       form.formState.errors.password &&
                         form.formState.isSubmitted
-                        ? "!text-red-400"
-                        : "text-gray-500"
+                        ? "text-red-400!"
+                        : "text-gray-500",
                     )}
                   >
                     Password

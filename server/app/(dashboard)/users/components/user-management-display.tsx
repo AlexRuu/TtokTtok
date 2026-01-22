@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@/lib/generated/prisma";
+import { User } from "@/lib/generated/prisma/client";
 import { subDays } from "date-fns";
 import { UserTable } from "./user-table";
 import { ColumnDef } from "@tanstack/react-table";
@@ -27,7 +27,7 @@ const UserManagementDisplay: React.FC<UserManagementDisplayProps> = ({
   const deleteRequested = users.filter((user) => user.status === "INACTIVE");
   const activeUsers = users.filter((user) => user.status === "ACTIVE");
   const needDelete = deleteRequested.filter(
-    (user) => user.updatedAt < deleteThresholdDate
+    (user) => user.updatedAt < deleteThresholdDate,
   );
 
   useEffect(() => {
