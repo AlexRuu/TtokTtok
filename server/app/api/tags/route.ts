@@ -2,6 +2,7 @@ import { authOptions } from "@/lib/auth";
 import { withRls } from "@/lib/withRLS";
 import { tagSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 function capitalizeFirstLetter(val: string) {
@@ -34,6 +35,8 @@ export async function POST(req: Request) {
           borderColour: borderColour,
         },
       });
+
+      revalidatePath("/tags");
 
       return NextResponse.json({
         message: "Successfully created unit",

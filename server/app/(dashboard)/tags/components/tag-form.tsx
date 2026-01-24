@@ -47,12 +47,10 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
     startLoading();
     try {
       const action = initialData ? "PATCH" : "POST";
-      tagActions(data, action, stopLoading, initialData?.id);
-      startTransition(() => {
-        router.refresh();
-        stopLoading();
-        router.push("/tags");
-      });
+      await tagActions(data, action, stopLoading, initialData?.id);
+      router.refresh();
+      stopLoading();
+      router.push("/tags");
     } catch (error) {
       console.log(error);
       toast.error("There was an error updating unit.", {
@@ -132,15 +130,21 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
                   >
                     Background Colour
                   </FormLabel>
-                  <FormControl>
-                    <Input
-                      id="backgroundColour"
-                      {...field}
-                      type="text"
-                      onInvalid={(e) => e.preventDefault()}
-                      className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
+                  <div className="w-full grid grid-cols-[5fr_1fr]">
+                    <FormControl>
+                      <Input
+                        id="backgroundColour"
+                        {...field}
+                        type="text"
+                        onInvalid={(e) => e.preventDefault()}
+                        className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
+                      />
+                    </FormControl>
+                    <div
+                      className="h-10 w-10 rounded-lg ml-5 border-black border"
+                      style={{ backgroundColor: field.value }}
                     />
-                  </FormControl>
+                  </div>
                 </FormItem>
               )}
             />
@@ -162,15 +166,21 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
                   >
                     Text Colour
                   </FormLabel>
-                  <FormControl>
-                    <Input
-                      id="textColour"
-                      {...field}
-                      type="text"
-                      onInvalid={(e) => e.preventDefault()}
-                      className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
+                  <div className="w-full grid grid-cols-[5fr_1fr]">
+                    <FormControl>
+                      <Input
+                        id="textColour"
+                        {...field}
+                        type="text"
+                        onInvalid={(e) => e.preventDefault()}
+                        className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
+                      />
+                    </FormControl>
+                    <div
+                      className="h-10 w-10 rounded-lg ml-5 border-black border"
+                      style={{ backgroundColor: field.value }}
                     />
-                  </FormControl>
+                  </div>
                 </FormItem>
               )}
             />
@@ -192,15 +202,21 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
                   >
                     Border Colour
                   </FormLabel>
-                  <FormControl>
-                    <Input
-                      id="borderColour"
-                      {...field}
-                      type="text"
-                      onInvalid={(e) => e.preventDefault()}
-                      className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
+                  <div className="w-full grid grid-cols-[5fr_1fr]">
+                    <FormControl>
+                      <Input
+                        id="borderColour"
+                        {...field}
+                        type="text"
+                        onInvalid={(e) => e.preventDefault()}
+                        className="w-full rounded-md border border-gray-300 bg-transparent px-3 py-5 text-base shadow-xs placeholder-transparent focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-indigo-300"
+                      />
+                    </FormControl>
+                    <div
+                      className="h-10 w-10 rounded-lg ml-5 border-black border"
+                      style={{ backgroundColor: field.value }}
                     />
-                  </FormControl>
+                  </div>
                 </FormItem>
               )}
             />

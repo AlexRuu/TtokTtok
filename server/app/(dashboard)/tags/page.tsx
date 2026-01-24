@@ -13,12 +13,15 @@ import { Edit } from "lucide-react";
 import Link from "next/link";
 
 const TagsPage = async () => {
-  const tags = await prismadb.tag.findMany({});
+  const tags = await prismadb.tag.findMany({ orderBy: { name: "asc" } });
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
       <div className="w-full flex justify-end">
-        <Button className="font-semibold bg-indigo-200 hover:bg-indigo-300 text-indigo-900 flex items-center justify-center gap-2 py-4 sm:py-5 text-base rounded-xl transition-all duration-200 shadow-xs hover:scale-[1.01] hover:shadow-md active:scale-[0.99] focus:outline-hidden focus:ring-2 focus:ring-indigo-300 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400">
+        <Button
+          asChild
+          className="font-semibold bg-indigo-200 hover:bg-indigo-300 text-indigo-900 flex items-center justify-center gap-2 py-4 sm:py-5 text-base rounded-xl transition-all duration-200 shadow-xs hover:scale-[1.01] hover:shadow-md active:scale-[0.99] focus:outline-hidden focus:ring-2 focus:ring-indigo-300 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400"
+        >
           <Link href={"/tags/create"}>+ Create</Link>
         </Button>
       </div>
@@ -27,6 +30,7 @@ const TagsPage = async () => {
           <TableHeader className="bg-muted text-muted-foreground">
             <TableRow>
               <TableHead className="text-center px-4 py-2">Name</TableHead>
+              <TableHead className="text-center px-4 py-2">Preview</TableHead>
               <TableHead className="text-center px-4 py-2">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -34,9 +38,23 @@ const TagsPage = async () => {
             {tags.map((tag) => (
               <TableRow key={tag.id} className="text-center">
                 <TableCell className="px-4 py-2">{tag.name}</TableCell>
+                <TableCell className="px-4 py-2 text-center">
+                  <div
+                    style={{
+                      backgroundColor: tag.backgroundColour,
+                      color: tag.textColour,
+                      borderColor: tag.borderColour,
+                      borderWidth: "1px",
+                    }}
+                    className="rounded-2xl mx-auto w-32 py-2 border"
+                  >
+                    {tag.name}
+                  </div>
+                </TableCell>
                 <TableCell className="px-4 py-2 space-x-2">
                   <div className="w-1/4 gap-5 flex mx-auto items-center">
                     <Button
+                      asChild
                       size="sm"
                       variant="outline"
                       className="bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-medium px-5 text-base rounded-xl shadow-sm transition-all hover:scale-[1.01] focus:ring-2 focus:ring-indigo-300 hover:cursor-pointer py-4 sm:py-5 sm:text-md hover:shadow-md duration-200 ease-in-out"
@@ -67,7 +85,7 @@ const TagsPage = async () => {
             <div className="text-lg font-medium mb-1">{tag.name}</div>
             <div className="flex gap-2">
               <Button size="sm" variant="outline" className="w-full">
-                <Link href={`/units/`}>Edit</Link>
+                <Link href={`/tags/${tag.id}`}>Edit</Link>
               </Button>
               <DeleteButton title="Delete Tag?" path="tags" id={tag.id} />
             </div>
@@ -75,7 +93,7 @@ const TagsPage = async () => {
         ))}
         {tags.length === 0 && (
           <div className="text-center text-muted-foreground text-sm">
-            No units found.
+            No tags found.
           </div>
         )}
       </div>

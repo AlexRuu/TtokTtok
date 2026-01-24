@@ -2,11 +2,12 @@ import { authOptions } from "@/lib/auth";
 import { withRls } from "@/lib/withRLS";
 import { tagSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  props: { params: Promise<{ tagId: string }> }
+  props: { params: Promise<{ tagId: string }> },
 ) {
   const params = await props.params;
   try {
@@ -44,7 +45,7 @@ export async function PATCH(
           borderColour: borderColour,
         },
       });
-
+      revalidatePath("/tags");
       return new NextResponse("Successfully updated tag", { status: 200 });
     });
   } catch (error) {
@@ -55,7 +56,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  props: { params: Promise<{ tagId: string }> }
+  props: { params: Promise<{ tagId: string }> },
 ) {
   const params = await props.params;
   try {
@@ -78,6 +79,7 @@ export async function DELETE(
       await tx.tag.delete({
         where: { id: tagId },
       });
+      revalidatePath("/tags");
 
       return new NextResponse("Tag was successfully deleted", { status: 200 });
     });
