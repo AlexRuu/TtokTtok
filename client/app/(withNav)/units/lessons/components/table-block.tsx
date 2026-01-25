@@ -51,7 +51,7 @@ const TableBlock = ({ headers, rows, note }: TableBlockProps) => {
               {row.map((cell, j) => (
                 <TableCell
                   key={j}
-                  className="px-4 py-2 border border-[#EAD2B7] text-[#6B4C3B] text-center"
+                  className="px-4 py-2 border border-[#EAD2B7] text-[#6B4C3B] text-center break-all whitespace-normal"
                 >
                   {cell}
                 </TableCell>

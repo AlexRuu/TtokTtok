@@ -36,7 +36,7 @@ const GroupedLessons = ({ units }: GroupedLessonsProps) => {
             {unit.lesson.map((lesson) => (
               <li key={lesson.id}>
                 <Link
-                  href={`/lessons/${lesson.slug}`}
+                  href={`/units/lessons/${lesson.slug}`}
                   className="inline-flex items-center space-x-2 px-5 py-2 rounded-full bg-[#F0D9C6] text-[#6B4C3B] font-medium shadow-sm hover:bg-[#D89C84] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D89C84] transition duration-200"
                 >
                   {/* Lesson icon */}

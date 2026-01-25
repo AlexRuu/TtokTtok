@@ -67,11 +67,11 @@ export default function Navbar() {
     () => [
       { name: "Home", path: "/" },
       { name: "About", path: "/about" },
-      { name: "Lessons", path: "/lessons" },
+      { name: "Lessons", path: "/units/lessons" },
       { name: "Quizzes", path: "/quizzes" },
       { name: "Tags", path: "/tags" },
     ],
-    []
+    [],
   );
 
   if (!mounted) return <Loader />;
@@ -84,13 +84,13 @@ export default function Navbar() {
         aria-label="Main navigation"
         className="sticky top-0 z-50 bg-[#FAF3F0]/70 backdrop-blur-md border-b border-[#f0e1da] shadow-md"
       >
-        <div className="w-full max-w-screen-xl mx-auto px-8 py-5 flex items-center justify-between">
+        <div className="w-full max-w-7xl mx-auto px-8 py-5 flex items-center justify-between">
           {/* Logo + Title */}
           <Link
             href="/"
             className="flex items-center space-x-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#A65A3A] rounded"
           >
-            <div className="relative w-12 h-12 min-h-[48px] transition-transform duration-200 hover:scale-[1.03]">
+            <div className="relative w-12 h-12 min-h-12 transition-transform duration-200 hover:scale-[1.03]">
               <Image
                 src="/tteok.png"
                 alt="Ttok Logo"
@@ -121,7 +121,7 @@ export default function Navbar() {
                   "text-[0.9rem] sm:text-[0.95rem] lg:text-[1rem] font-normal tracking-normal px-2 py-1 sm:px-3 sm:py-1.5 rounded-md transition-all duration-200",
                   "hover:text-[#A65A3A] hover:bg-[#FFF3EC]",
                   pathName === link.path &&
-                    "text-[#A65A3A] underline underline-offset-4 decoration-[#D69E78]"
+                    "text-[#A65A3A] underline underline-offset-4 decoration-[#D69E78]",
                 )}
               >
                 {link.name}
