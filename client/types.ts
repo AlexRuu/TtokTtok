@@ -78,6 +78,13 @@ export interface LessonVersion {
   lesson: Lesson;
 }
 
+export interface LessonSummary {
+  id: string;
+  slug: string;
+  lessonNumber: number;
+  title?: string;
+}
+
 export interface Lesson {
   id: string;
   title: string;
@@ -97,11 +104,13 @@ export interface Lesson {
 // Units
 export interface Unit {
   id: string;
+  slug: string;
   unitNumber: number;
   title: string;
   createdAt: string;
   updatedAt: string;
   lesson: Lesson[];
+  lessonSummaries: LessonSummary[];
 }
 
 // Tagging System

@@ -5,18 +5,28 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   _req: Request,
-  props: { params: Promise<{ slug: string }> }
+  props: { params: Promise<{ slug: string }> },
 ) {
   const params = await props.params;
   try {
     const session = await getServerSession(authOptions);
     return await withRls(session, async (tx) => {
       const lesson = await tx.lesson.findUnique({
-        where: {
-          slug: params.slug,
-        },
+        where: { slug: params.slug },
         include: {
-          unit: true,
+          unit: {
+            include: {
+              lesson: {
+                orderBy: { lessonNumber: "asc" },
+                select: {
+                  id: true,
+                  slug: true,
+                  lessonNumber: true,
+                  title: true,
+                },
+              },
+            },
+          },
           quiz: { include: { quizQuestion: true } },
           tagging: { include: { tag: true } },
           vocabularyList: { include: { vocabulary: true } },
@@ -27,7 +37,15 @@ export async function GET(
         return new NextResponse("Lesson not found", { status: 404 });
       }
 
-      return NextResponse.json(lesson);
+      const { lessons, ...unitRest } = lesson.unit;
+
+      return NextResponse.json({
+        ...lesson,
+        unit: {
+          ...unitRest,
+          lessonSummaries: lessons,
+        },
+      });
     });
   } catch (error) {
     console.error("Error finding specific lesson by slug", error);
