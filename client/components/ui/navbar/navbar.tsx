@@ -67,7 +67,7 @@ export default function Navbar() {
     () => [
       { name: "Home", path: "/" },
       { name: "About", path: "/about" },
-      { name: "Lessons", path: "/units/lessons" },
+      { name: "Units", path: "/units" },
       { name: "Quizzes", path: "/quizzes" },
       { name: "Tags", path: "/tags" },
     ],
