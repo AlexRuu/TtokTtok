@@ -45,7 +45,7 @@
     "react-hook-form": "^7.56.4",
     "react-hot-toast": "^2.5.2",
     "react-toastify": "^11.0.5",
-    "tar": "^7.5.2",
+    "tar": "^7.5.7",
     "zod": "^3.24.4"
   },
   "devDependencies": {
@@ -60,7 +60,7 @@
     "i": "^0.3.7",
     "npm": "^11.6.0",
     "postcss": "8.4.49",
-    "prisma": "^7.1.0",
+    "prisma": "^6.19.2",
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^4.1.7",
     "tailwindcss-animate": "^1.0.7",
