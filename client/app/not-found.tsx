@@ -3,6 +3,12 @@ import Navbar from "@/components/ui/navbar/navbar";
 import PageContainer from "@/components/ui/page-container";
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "404 – Page Not Found",
+  description: "The page you’re looking for doesn’t exist.",
+};
 
 export default function NotFound() {
   return (
