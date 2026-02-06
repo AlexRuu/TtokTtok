@@ -44,7 +44,7 @@ export const syncAnonymousProgress = async (lessonId: string) => {
 
   const mergedPercentage = Math.max(
     local.percentage ?? 0,
-    server?.percentage ?? 0
+    server?.percentage ?? 0,
   );
 
   await fetch("/api/progress/lesson", {
@@ -58,4 +58,8 @@ export const syncAnonymousProgress = async (lessonId: string) => {
   });
 
   localStorage.removeItem(STORAGE_KEY);
+};
+
+export const getRandomSubset = <T>(items: T[], size: number): T[] => {
+  return [...items].sort(() => Math.random() - 0.5).slice(0, size);
 };
