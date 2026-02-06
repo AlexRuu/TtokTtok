@@ -24,10 +24,12 @@ export interface Vocabulary {
   updatedAt: string;
   vocabularyListId: string;
   vocabularyList: VocabularyList;
+  isSaved?: boolean;
 }
 
 export interface VocabularyList {
   id: string;
+  title: string;
   createdAt: string;
   updatedAt: string;
   lessonId: string;
