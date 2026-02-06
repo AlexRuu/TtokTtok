@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { Prisma } from "@/lib/generated/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { withRls } from "@/lib/withRLS";
@@ -28,7 +27,7 @@ export async function GET(req: Request) {
       .map((slug) => decodeURIComponent(slug));
 
     const selectedTagNames = selectedTagSlugs.map((slug) =>
-      slug.replace(/-/g, " ")
+      slug.replace(/-/g, " "),
     );
 
     const buildTagFilters = (tagNames: string[]) =>
@@ -39,7 +38,7 @@ export async function GET(req: Request) {
               is: {
                 name: {
                   equals: tagName,
-                  mode: Prisma.QueryMode.insensitive,
+                  mode: "insensitive",
                 },
               },
             },
@@ -116,12 +115,12 @@ export async function GET(req: Request) {
           } else if (type === "quiz") {
             subtitle = getSubtitle(
               item.lesson?.unit?.unitNumber,
-              item.lesson?.lessonNumber
+              item.lesson?.lessonNumber,
             );
           } else if (type === "vocabulary") {
             subtitle = getSubtitle(
               item.lesson?.unit?.unitNumber,
-              item.lesson?.lessonNumber
+              item.lesson?.lessonNumber,
             );
           }
 
@@ -150,7 +149,7 @@ export async function GET(req: Request) {
     console.error("Error fetching tagged content", error);
     return NextResponse.json(
       { lessons: [], quizzes: [], vocabulary: [] },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

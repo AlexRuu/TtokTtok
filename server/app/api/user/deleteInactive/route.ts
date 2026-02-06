@@ -2,8 +2,9 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { subDays } from "date-fns";
-import { Status } from "@/lib/generated/prisma";
+
 import { withRls } from "@/lib/withRLS";
+import { Status } from "@/lib/generated/prisma/enums";
 
 export async function DELETE(_req: Request) {
   try {
@@ -29,14 +30,14 @@ export async function DELETE(_req: Request) {
         `Deleted ${deleted.count} users who requested account deletion.`,
         {
           status: 200,
-        }
+        },
       );
     });
   } catch (error) {
     console.error("There was an error deleting inactive users", error);
     return new NextResponse(
       "There was an error trying to delete inactive users",
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
