@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 
 type QuizWithRelations = {
@@ -10,7 +10,8 @@ type QuizWithRelations = {
   lesson: {
     id: string;
     title: string;
-    unit: { id: string; title: string };
+    slug: string;
+    unit: { id: string; title: string; slug: string };
   };
   tagging?: { tag: { id: string; name: string } }[];
 };
@@ -18,41 +19,18 @@ type QuizWithRelations = {
 type GroupedQuizzes = Record<
   string,
   {
-    title: string; // unit title
+    title: string;
     lessons: Record<
       string,
       {
-        title: string; // lesson title
+        title: string;
         quizzes: QuizWithRelations[];
       }
     >;
   }
 >;
 
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
-};
-
-const lessonVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 100, damping: 15 },
-  },
-};
-
-const quizVariants = {
-  hidden: { opacity: 0, y: 5 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 120, damping: 20 },
-  },
-};
-
-const headerVariants = {
+const headerVariants: Variants = {
   hidden: { opacity: 0, y: -5 },
   visible: {
     opacity: 1,
@@ -61,7 +39,30 @@ const headerVariants = {
   },
 };
 
-const tagVariants = {
+const lessonVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 100, damping: 15 },
+  },
+};
+
+const quizVariants: Variants = {
+  hidden: { opacity: 0, y: 5 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 120, damping: 20 },
+  },
+};
+
+const containerVariants: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } },
+};
+
+const tagVariants: Variants = {
   hidden: { opacity: 0, scale: 0.8 },
   visible: {
     opacity: 1,
@@ -87,7 +88,7 @@ const QuizDisplay = ({ quizzes }: { quizzes: QuizWithRelations[] }) => {
       acc[unitId].lessons[lessonId].quizzes.push(quiz);
       return acc;
     },
-    {} as GroupedQuizzes
+    {} as GroupedQuizzes,
   );
 
   return (
@@ -132,7 +133,7 @@ const QuizDisplay = ({ quizzes }: { quizzes: QuizWithRelations[] }) => {
                     className="bg-white p-3 rounded-xl shadow border border-[#FFEDE2] flex flex-col sm:flex-row sm:items-center justify-between"
                   >
                     <Link
-                      href={`/quizzes/${quiz.slug}`}
+                      href={`/units/${quiz.lesson.unit.slug}/lessons/${quiz.lesson.slug}/quiz`}
                       className="font-medium text-sm text-[#6B4C3B] hover:underline"
                     >
                       {quiz.title}

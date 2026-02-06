@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
-import { Lesson, QuizQuestion, Tagging } from "@/lib/generated/prisma";
+import { Lesson, QuizQuestion, Tagging } from "@/lib/generated/prisma/client";
+
 import { getClientIp } from "@/lib/getIP";
 import { gradeQuiz } from "@/lib/grade-quiz";
 import { delRedis, getRedisCache, rateLimit, setRedisCache } from "@/lib/redis";
@@ -25,11 +26,11 @@ const TIER_LIMITS = {
 
 const generateRandomQuiz = (quiz: Quiz) => {
   const shuffledQuizQuestions = [...quiz.quizQuestion].sort(
-    () => 0.5 - Math.random()
+    () => 0.5 - Math.random(),
   );
   const randomQuestions = shuffledQuizQuestions.slice(
     0,
-    Math.min(10, shuffledQuizQuestions.length)
+    Math.min(10, shuffledQuizQuestions.length),
   );
   return {
     ...quiz,
@@ -39,7 +40,7 @@ const generateRandomQuiz = (quiz: Quiz) => {
 
 export async function GET(
   req: Request,
-  props: { params: Promise<{ slug: string }> }
+  props: { params: Promise<{ slug: string }> },
 ) {
   const params = await props.params;
   try {
@@ -68,7 +69,7 @@ export async function GET(
               },
             },
           },
-        })
+        }),
       )) as {
         quiz: {
           id: string;
@@ -102,14 +103,14 @@ export async function GET(
     const { allowed, remaining } = await rateLimit(
       key,
       TIER_LIMITS[tier].max,
-      TIER_LIMITS[tier].window
+      TIER_LIMITS[tier].window,
     );
 
     if (!allowed) {
       // Nothing cached / found
       return NextResponse.json(
         { rateLimited: true, remaining },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -161,7 +162,7 @@ export async function GET(
 
 export async function POST(
   req: Request,
-  props: { params: Promise<{ slug: string }> }
+  props: { params: Promise<{ slug: string }> },
 ) {
   const params = await props.params;
   const { slug } = params;
@@ -179,13 +180,13 @@ export async function POST(
     const { allowed, remaining } = await rateLimit(
       key,
       TIER_LIMITS[tier].max,
-      TIER_LIMITS[tier].window
+      TIER_LIMITS[tier].window,
     );
 
     if (!allowed) {
       return NextResponse.json(
         { rateLimited: true, remaining },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -194,7 +195,7 @@ export async function POST(
 
     // Submitted answers (may be fewer than shown questions)
     const submittedAnswers: SubmittedAnswer[] = Object.entries(
-      body.answers ?? {}
+      body.answers ?? {},
     ).map(([questionId, answer]) => ({
       questionId,
       answer: answer as string | boolean | MatchingAnswer[],
@@ -206,7 +207,7 @@ export async function POST(
     const quiz = await withRls(
       session,
       (
-        tx
+        tx,
       ): Promise<{
         id: string;
         slug: string;
@@ -230,7 +231,7 @@ export async function POST(
               },
             },
           },
-        })
+        }),
     );
 
     if (!quiz) return new NextResponse("Quiz not found", { status: 404 });
@@ -242,7 +243,7 @@ export async function POST(
     // Grade all questions
     const { results, totalCorrect, totalPossible } = gradeQuiz(
       orderedQuestions,
-      submittedAnswers
+      submittedAnswers,
     );
 
     // Save attempt if user is logged in
@@ -255,12 +256,12 @@ export async function POST(
             user: { connect: { id: session.user.id } },
             quiz: { connect: { id: quiz.id } },
           },
-        })
+        }),
       );
       await withRls(session, (tx) =>
         tx.userQuizInProgress.deleteMany({
           where: { userId: session.user.id, quizId: quiz.id },
-        })
+        }),
       );
     } else {
       // Guests → remove cached quiz from Redis

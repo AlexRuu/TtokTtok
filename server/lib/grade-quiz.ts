@@ -16,7 +16,7 @@ export interface QuizSubmissionResult {
 
 export const gradeQuiz = (
   questions: QuizQuestionType[],
-  submittedAnswers: SubmittedAnswer[]
+  submittedAnswers: SubmittedAnswer[],
 ): QuizSubmissionResult => {
   let totalCorrect = 0;
   let totalPossible = 0;
@@ -48,7 +48,7 @@ export const gradeQuiz = (
           const pairValue = 1 / correct.length;
           correctCount =
             correct.filter((pair) =>
-              given.some((g) => g.left === pair.left && g.match === pair.match)
+              given.some((g) => g.left === pair.left && g.match === pair.match),
             ).length * pairValue;
 
           submittedAnswerNormalized = given;
@@ -75,7 +75,8 @@ export const gradeQuiz = (
 
         default:
           // MULTIPLE_CHOICE
-          correctCount = submitted.answer === q.answer ? 1 : 0;
+          correctCount =
+            submitted.answer.toString().charAt(0) === q.answer ? 1 : 0;
           break;
       }
     }
