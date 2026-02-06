@@ -22,7 +22,7 @@ const QuizNavigationDesktop = ({ units }: DesktopProps) => {
       setShowBottomFade(scrollTop + clientHeight < scrollHeight);
     };
 
-    checkScroll(); // initial
+    checkScroll();
     container.addEventListener("scroll", checkScroll);
     window.addEventListener("resize", checkScroll);
 
@@ -55,11 +55,11 @@ const QuizNavigationDesktop = ({ units }: DesktopProps) => {
       </div>
 
       {showTopFade && (
-        <div className="pointer-events-none absolute top-[3.5rem] left-0 right-0 h-8 bg-gradient-to-b from-[#FFF9F5] to-transparent" />
+        <div className="pointer-events-none absolute top-14 left-0 right-0 h-8 bg-linear-to-b from-[#FFF9F5] to-transparent" />
       )}
 
       {showBottomFade && (
-        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#FFEDE2] to-transparent" />
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-8 bg-linear-to-t from-[#FFEDE2] to-transparent" />
       )}
     </aside>
   );

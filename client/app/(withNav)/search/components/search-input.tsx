@@ -7,7 +7,7 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
-import { useLoading } from "@/hooks/loading-context";
+import useLoading from "@/hooks/use-loading";
 
 interface FormValues {
   q: string;
@@ -30,10 +30,13 @@ const SearchInput: React.FC<SearchInputProps> = ({ initialQuery = "" }) => {
   const onSubmit = (values: FormValues) => {
     const trimmed = values.q.trim();
     if (trimmed) {
-      startLoading();
       router.push(`/search?q=${encodeURIComponent(trimmed)}`);
     }
   };
+
+  useEffect(() => {
+    console.log(isLoading);
+  }, [isLoading]);
 
   const handleClear = () => {
     form.setValue("q", "");
@@ -42,7 +45,6 @@ const SearchInput: React.FC<SearchInputProps> = ({ initialQuery = "" }) => {
 
   useEffect(() => {
     form.setValue("q", initialQuery);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialQuery]);
 
   return (

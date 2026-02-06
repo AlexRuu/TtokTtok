@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Book, BookOpen, Layers, PenTool, Tag } from "lucide-react";
 import SearchInput from "./components/search-input";
 import SearchPageWrapper from "./components/search-page-wrapper";
-import { LoadingProvider } from "@/hooks/loading-context";
+
 import { Metadata } from "next";
 import Image from "next/image";
 
@@ -54,93 +54,91 @@ const SearchPage = async (props: SearchPageProps) => {
       acc[result.type].push(result);
       return acc;
     },
-    {} as Record<SearchResult["type"], SearchResult[]>
+    {} as Record<SearchResult["type"], SearchResult[]>,
   );
 
   return (
-    <LoadingProvider>
-      <SearchPageWrapper>
-        <main className="mx-auto mt-10 max-w-4xl w-full px-4 sm:px-6 py-14 bg-[#FFF9F5] text-[#6B4C3B] rounded-2xl shadow-md space-y-12 mb-10">
-          {/* Search Input */}
-          <div>
-            <SearchInput initialQuery={query} />
+    <SearchPageWrapper>
+      <main className="mx-auto mt-10 max-w-4xl w-full px-4 sm:px-6 py-14 bg-[#FFF9F5] text-[#6B4C3B] rounded-2xl shadow-md space-y-12 mb-10">
+        {/* Search Input */}
+        <div>
+          <SearchInput initialQuery={query} />
+        </div>
+
+        {/* No Query */}
+        {!hasQuery && (
+          <div className="text-center text-[#B59E90] flex flex-col items-center justify-center px-6 space-y-4">
+            <p className="text-sm italic">
+              Start typing to find lessons, quizzes, and more!
+            </p>
+            <Image
+              src="/searching-tteok.png"
+              alt="Searching Tteok"
+              width={400}
+              height={400}
+              className="mb-4 rounded-2xl border border-[#F3E7DF] shadow-sm w-full max-w-[300px]"
+            />
           </div>
+        )}
 
-          {/* No Query */}
-          {!hasQuery && (
-            <div className="text-center text-[#B59E90] flex flex-col items-center justify-center px-6 space-y-4">
-              <p className="text-sm italic">
-                Start typing to find lessons, quizzes, and more!
-              </p>
-              <Image
-                src="/searching-tteok.png"
-                alt="Searching Tteok"
-                width={400}
-                height={400}
-                className="mb-4 rounded-2xl border border-[#F3E7DF] shadow-sm w-full max-w-[300px]"
-              />
-            </div>
-          )}
+        {/* No Results */}
+        {hasQuery && (!results || results.length === 0) && (
+          <div className="text-center text-[#B59E90]">
+            <p className="text-sm">
+              No results found. Try searching something else!
+            </p>
+          </div>
+        )}
 
-          {/* No Results */}
-          {hasQuery && (!results || results.length === 0) && (
-            <div className="text-center text-[#B59E90]">
-              <p className="text-sm">
-                No results found. Try searching something else!
-              </p>
-            </div>
-          )}
+        {/* Grouped Results */}
+        {hasQuery &&
+          grouped &&
+          order.map((type) => {
+            const items = grouped[type];
+            if (!items || items.length === 0) return null;
 
-          {/* Grouped Results */}
-          {hasQuery &&
-            grouped &&
-            order.map((type) => {
-              const items = grouped[type];
-              if (!items || items.length === 0) return null;
+            return (
+              <section
+                key={type}
+                className="bg-white bg-opacity-70 rounded-xl p-6 md:p-8 shadow-sm border border-[#F1E4DB] space-y-4"
+              >
+                <h2 className="text-sm font-semibold text-[#B59E90] uppercase tracking-wider border-b border-[#EEDFD3] pb-2">
+                  {typeLabels[type]}
+                </h2>
 
-              return (
-                <section
-                  key={type}
-                  className="bg-white bg-opacity-70 rounded-xl p-6 md:p-8 shadow-sm border border-[#F1E4DB] space-y-4"
+                <ul
+                  className={
+                    type === "tag"
+                      ? "grid grid-cols-1 sm:grid-cols-2 gap-3"
+                      : "space-y-3"
+                  }
                 >
-                  <h2 className="text-sm font-semibold text-[#B59E90] uppercase tracking-wider border-b border-[#EEDFD3] pb-2">
-                    {typeLabels[type]}
-                  </h2>
-
-                  <ul
-                    className={
-                      type === "tag"
-                        ? "grid grid-cols-1 sm:grid-cols-2 gap-3"
-                        : "space-y-3"
-                    }
-                  >
-                    {items.map((item) => (
-                      <li key={item.id}>
-                        <Link
-                          href={item.href}
-                          className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-[#F9EDEB] border border-transparent hover:border-[#EEDFD3] transition-all duration-150 shadow-sm"
-                        >
-                          <div className="shrink-0 text-[#B59E90]">
-                            {icons[type]}
-                          </div>
-                          <div className="flex flex-col justify-center overflow-hidden">
-                            <p className="font-medium truncate text-[#6B4C3B] leading-tight">
-                              {item.title}
-                            </p>
-                            <p className="text-sm text-[#B59E90] truncate">
-                              {item.subtitle}
-                            </p>
-                          </div>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              );
-            })}
-        </main>
-      </SearchPageWrapper>
-    </LoadingProvider>
+                  {items.map((item) => (
+                    <li key={item.id}>
+                      <Link
+                        href={item.href}
+                        className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-[#F9EDEB] border border-transparent hover:border-[#EEDFD3] transition-all duration-150 shadow-sm"
+                      >
+                        <div className="shrink-0 text-[#B59E90]">
+                          {icons[type]}
+                        </div>
+                        <div className="flex flex-col justify-center overflow-hidden">
+                          <p className="font-medium truncate text-[#6B4C3B] leading-tight">
+                            {item.title}
+                          </p>
+                          <p className="text-sm text-[#B59E90] truncate">
+                            {item.subtitle}
+                          </p>
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
+      </main>
+    </SearchPageWrapper>
   );
 };
 

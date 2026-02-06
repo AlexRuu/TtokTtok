@@ -169,11 +169,14 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
 
     const grouped = results.reduce<
       Record<SearchResult["type"], SearchResult[]>
-    >((acc, result) => {
-      acc[result.type] = acc[result.type] || [];
-      acc[result.type].push(result);
-      return acc;
-    }, {} as Record<SearchResult["type"], SearchResult[]>);
+    >(
+      (acc, result) => {
+        acc[result.type] = acc[result.type] || [];
+        acc[result.type].push(result);
+        return acc;
+      },
+      {} as Record<SearchResult["type"], SearchResult[]>,
+    );
 
     const order: SearchResult["type"][] = [
       "lesson",
@@ -218,6 +221,7 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
                       <Link
                         href={result.href}
                         className="flex items-start gap-3"
+                        onClick={() => setIsSearchOpen(false)}
                       >
                         <div className="pt-1 text-[#B59E90]">
                           {result.type === "lesson" && <Book size={18} />}
@@ -263,12 +267,12 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
                 if (e.key === "ArrowDown") {
                   e.preventDefault();
                   setHighlightedIndex((prev) =>
-                    prev < results.length - 1 ? prev + 1 : 0
+                    prev < results.length - 1 ? prev + 1 : 0,
                   );
                 } else if (e.key === "ArrowUp") {
                   e.preventDefault();
                   setHighlightedIndex((prev) =>
-                    prev > 0 ? prev - 1 : results.length - 1
+                    prev > 0 ? prev - 1 : results.length - 1,
                   );
                 } else if (e.key === "Enter" && highlightedIndex >= 0) {
                   e.preventDefault();
@@ -332,12 +336,12 @@ const SearchBar = ({ variant = "desktop" }: SearchBarProps) => {
                         if (e.key === "ArrowDown") {
                           e.preventDefault();
                           setHighlightedIndex((prev) =>
-                            prev < results.length - 1 ? prev + 1 : 0
+                            prev < results.length - 1 ? prev + 1 : 0,
                           );
                         } else if (e.key === "ArrowUp") {
                           e.preventDefault();
                           setHighlightedIndex((prev) =>
-                            prev > 0 ? prev - 1 : results.length - 1
+                            prev > 0 ? prev - 1 : results.length - 1,
                           );
                         } else if (e.key === "Enter" && highlightedIndex >= 0) {
                           e.preventDefault();

@@ -1,25 +1,32 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useLoading } from "@/hooks/loading-context";
+import useLoading from "@/hooks/use-loading";
+import Loader from "@/components/ui/loader";
 
 const SearchPageWrapper: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { stopLoading } = useLoading();
+  const { isLoading, stopLoading, startLoading } = useLoading();
   const searchParams = useSearchParams();
   const query = searchParams.get("q") ?? "";
 
+  const [lastQuery, setLastQuery] = useState(query);
   useEffect(() => {
-    const timer = setTimeout(() => {
+    if (query && query !== lastQuery) {
+      startLoading();
+      setLastQuery(query);
+    } else {
       stopLoading();
-    }, 50);
+    }
+  }, [query, lastQuery]);
 
-    return () => clearTimeout(timer);
-  }, [query, stopLoading]);
+  useEffect(() => {
+    console.log(isLoading);
+  }, [isLoading]);
 
-  return <>{children}</>;
+  return <>{isLoading ? <Loader /> : children}</>;
 };
 
 export default SearchPageWrapper;

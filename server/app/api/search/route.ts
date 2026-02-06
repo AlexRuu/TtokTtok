@@ -11,6 +11,7 @@ type Lesson = {
   lessonNumber: number;
   slug: string;
   unitNumber: number;
+  unitSlug: string;
   score: number;
 };
 
@@ -19,6 +20,7 @@ type Quiz = {
   title: string;
   lessonSlug: string;
   lessonNumber: number;
+  unitSlug: string;
   score: number;
 };
 
@@ -27,6 +29,7 @@ type Vocabulary = {
   title: string;
   lessonSlug: string;
   lessonNumber: number;
+  unitSlug: string;
   score: number;
 };
 
@@ -63,17 +66,17 @@ export async function GET(req: Request) {
 
     return await withRls(session, async (tx) => {
       const lessons: Lesson[] = await tx.$queryRaw<Lesson[]>`
-      SELECT l.id, l.title, l."lessonNumber", l.slug, u."unitNumber",
-        ts_rank(to_tsvector('english', l.title || ' lesson ' || l."lessonNumber"), plainto_tsquery('english', ${query})) AS score
-      FROM public."Lesson" l
-      JOIN public."Unit" u ON l."unitId" = u.id
-      WHERE
-        to_tsvector('english', l.title || ' lesson ' || l."lessonNumber") @@ plainto_tsquery('english', ${query})
-        OR l.title ILIKE '%' || ${query} || '%'
-        OR CAST(l."lessonNumber" AS TEXT) ILIKE '%' || ${query} || '%'
-      ORDER BY score DESC
-      LIMIT 10;
-    `;
+  SELECT l.id, l.title, l."lessonNumber", l.slug, u."unitNumber", u.slug AS "unitSlug",
+    ts_rank(to_tsvector('english', l.title || ' lesson ' || l."lessonNumber"), plainto_tsquery('english', ${query})) AS score
+  FROM public."Lesson" l
+  JOIN public."Unit" u ON l."unitId" = u.id
+  WHERE
+    to_tsvector('english', l.title || ' lesson ' || l."lessonNumber") @@ plainto_tsquery('english', ${query})
+    OR l.title ILIKE '%' || ${query} || '%'
+    OR CAST(l."lessonNumber" AS TEXT) ILIKE '%' || ${query} || '%'
+  ORDER BY score DESC
+  LIMIT 10;
+`;
 
       const units: Unit[] = await tx.$queryRaw<Unit[]>`
       SELECT id, title, "unitNumber",
@@ -88,28 +91,30 @@ export async function GET(req: Request) {
     `;
 
       const quizzes: Quiz[] = await tx.$queryRaw<Quiz[]>`
-      SELECT q.id, q.title, l.slug AS "lessonSlug", l."lessonNumber",
-        ts_rank(to_tsvector('english', q.title), plainto_tsquery('english', ${query})) AS score
-      FROM public."Quiz" q
-      JOIN public."Lesson" l ON q."lessonId" = l.id
-      WHERE
-        to_tsvector('english', q.title) @@ plainto_tsquery('english', ${query})
-        OR q.title ILIKE '%' || ${query} || '%'
-      ORDER BY score DESC
-      LIMIT 10;
-    `;
+  SELECT q.id, q.title, l.slug AS "lessonSlug", l."lessonNumber", u.slug AS "unitSlug",
+    ts_rank(to_tsvector('english', q.title), plainto_tsquery('english', ${query})) AS score
+  FROM public."Quiz" q
+  JOIN public."Lesson" l ON q."lessonId" = l.id
+  JOIN public."Unit" u ON l."unitId" = u.id
+  WHERE
+    to_tsvector('english', q.title) @@ plainto_tsquery('english', ${query})
+    OR q.title ILIKE '%' || ${query} || '%'
+  ORDER BY score DESC
+  LIMIT 10;
+`;
 
       const vocabLists: Vocabulary[] = await tx.$queryRaw<Vocabulary[]>`
-      SELECT v.id, v.title, l.slug AS "lessonSlug", l."lessonNumber",
-        ts_rank(to_tsvector('english', v.title), plainto_tsquery('english', ${query})) AS score
-      FROM public."VocabularyList" v
-      JOIN public."Lesson" l ON v."lessonId" = l.id
-      WHERE
-        to_tsvector('english', v.title) @@ plainto_tsquery('english', ${query})
-        OR v.title ILIKE '%' || ${query} || '%'
-      ORDER BY score DESC
-      LIMIT 10;
-    `;
+  SELECT v.id, v.title, l.slug AS "lessonSlug", l."lessonNumber", u.slug AS "unitSlug",
+    ts_rank(to_tsvector('english', v.title), plainto_tsquery('english', ${query})) AS score
+  FROM public."VocabularyList" v
+  JOIN public."Lesson" l ON v."lessonId" = l.id
+  JOIN public."Unit" u ON l."unitId" = u.id
+  WHERE
+    to_tsvector('english', v.title) @@ plainto_tsquery('english', ${query})
+    OR v.title ILIKE '%' || ${query} || '%'
+  ORDER BY score DESC
+  LIMIT 10;
+`;
 
       const tags: Tag[] = await tx.$queryRaw<Tag[]>`
       SELECT id, name,
@@ -129,7 +134,7 @@ export async function GET(req: Request) {
             id: lesson.id,
             title: `${lesson.lessonNumber}. ${lesson.title}`,
             subtitle: `Unit ${lesson.unitNumber}`,
-            href: `/lessons/${lesson.slug}`,
+            href: `/units/${lesson.unitSlug}/lessons/${lesson.slug}`,
             type: "lesson",
           })),
         ...quizzes
@@ -138,7 +143,7 @@ export async function GET(req: Request) {
             id: quiz.id,
             title: quiz.title,
             subtitle: `Lesson ${quiz.lessonNumber} Quiz`,
-            href: `/lesson/${quiz.lessonSlug}/quiz`,
+            href: `/units/${quiz.unitSlug}/lessons/${quiz.lessonSlug}/quiz`,
             type: "quiz",
           })),
         ...vocabLists
@@ -147,7 +152,7 @@ export async function GET(req: Request) {
             id: vocab.id,
             title: vocab.title,
             subtitle: `Lesson ${vocab.lessonNumber} Vocabulary`,
-            href: `/lesson/${vocab.lessonSlug}/vocabulary`,
+            href: `/units/${vocab.unitSlug}/lessons/${vocab.lessonSlug}/vocabulary`,
             type: "vocabulary",
           })),
         ...units
@@ -175,13 +180,13 @@ export async function GET(req: Request) {
   } catch (error) {
     console.error(
       "There was an error with searching for related queries.",
-      error
+      error,
     );
     return new NextResponse(
       "There was an error with searching for related queries.",
       {
         status: 500,
-      }
+      },
     );
   }
 }
