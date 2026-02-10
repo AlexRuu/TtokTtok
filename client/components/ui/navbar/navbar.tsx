@@ -69,6 +69,7 @@ export default function Navbar() {
       { name: "About", path: "/about" },
       { name: "Units", path: "/units" },
       { name: "Quizzes", path: "/quizzes" },
+      { name: "Vocabulary", path: "/vocabulary" },
       { name: "Tags", path: "/tags" },
     ],
     [],
