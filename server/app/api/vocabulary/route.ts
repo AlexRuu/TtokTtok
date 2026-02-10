@@ -89,3 +89,25 @@ export async function POST(req: Request) {
     return new NextResponse("Error POSTing vocabulary", { status: 500 });
   }
 }
+
+export async function GET(_req: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    return await withRls(session, async (tx) => {
+      const vocabularyList = await tx.vocabularyList.findMany({
+        include: {
+          lesson: { include: { unit: true } },
+          tagging: { include: { tag: true } },
+        },
+        orderBy: { lesson: { unit: { unitNumber: "asc" } } },
+      });
+
+      return NextResponse.json(vocabularyList);
+    });
+  } catch (error) {
+    console.error("Error fetching vocabulary list.", error);
+    return new NextResponse("There was an error fetching the vocabulary list", {
+      status: 500,
+    });
+  }
+}
