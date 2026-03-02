@@ -33,7 +33,6 @@ export interface VocabularyList {
   createdAt: string;
   updatedAt: string;
   lessonId: string;
-  tagging: Tagging[];
   vocabulary: Vocabulary[];
   lesson: Lesson;
 }
