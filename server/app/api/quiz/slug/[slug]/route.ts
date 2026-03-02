@@ -105,7 +105,6 @@ export async function GET(
       TIER_LIMITS[tier].max,
       TIER_LIMITS[tier].window,
     );
-
     if (!allowed) {
       // Nothing cached / found
       return NextResponse.json(
@@ -166,7 +165,6 @@ export async function POST(
 ) {
   const params = await props.params;
   const { slug } = params;
-
   try {
     const session = await getServerSession(authOptions);
     const ip = getClientIp(req);
