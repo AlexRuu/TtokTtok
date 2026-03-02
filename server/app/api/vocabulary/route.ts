@@ -97,7 +97,6 @@ export async function GET(_req: Request) {
       const vocabularyList = await tx.vocabularyList.findMany({
         include: {
           lesson: { include: { unit: true } },
-          tagging: { include: { tag: true } },
         },
         orderBy: { lesson: { unit: { unitNumber: "asc" } } },
       });
