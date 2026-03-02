@@ -20,8 +20,11 @@ const QuizNavigationMobile = ({ units }: MobileProps) => {
     <div className="lg:hidden w-full mb-4">
       <Drawer>
         <DrawerTrigger asChild>
-          <Button className="w-full rounded-xl bg-[#FFEDE2] text-[#6B4C3B] font-medium py-2 shadow-md hover:bg-[#FFD9C2] transition">
-            Browse Units
+          <Button
+            size="lg"
+            className="w-full rounded-xl bg-[#FFEDE2] text-[#6B4C3B] font-medium py-2 shadow-md hover:bg-[#FFD9C2] transition"
+          >
+            Jump to Unit
           </Button>
         </DrawerTrigger>
 
@@ -39,7 +42,7 @@ const QuizNavigationMobile = ({ units }: MobileProps) => {
                     const el = document.getElementById(`unit-${unit.id}`);
                     el?.scrollIntoView({ behavior: "smooth", block: "start" });
                   }}
-                  className="w-full text-left px-4 py-3 rounded-xl bg-[#FFEDE2] text-[#6B4C3B] hover:bg-[#FFD9C2] transition font-medium shadow-sm"
+                  className="w-full text-left px-4 py-3 rounded-xl bg-[#FFEDE2] text-[#6B4C3B] hover:bg-[#FFD9C2] transition font-medium shadow-sm hover:cursor-pointer"
                 >
                   {unit.title}
                 </button>

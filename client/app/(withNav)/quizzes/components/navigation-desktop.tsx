@@ -11,6 +11,7 @@ const QuizNavigationDesktop = ({ units }: DesktopProps) => {
   const [showTopFade, setShowTopFade] = useState(false);
   const [showBottomFade, setShowBottomFade] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [activeUnit, setActiveUnit] = useState<string | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -32,13 +33,38 @@ const QuizNavigationDesktop = ({ units }: DesktopProps) => {
     };
   }, []);
 
+  useEffect(() => {
+    const sections = units.map((u) => document.getElementById(`unit-${u.id}`));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id.replace("unit-", "");
+            setActiveUnit(id);
+          }
+        });
+      },
+      { rootMargin: "-30% 0px -60% 0px" },
+    );
+
+    sections.forEach((section) => {
+      if (section) observer.observe(section);
+    });
+
+    return () => observer.disconnect();
+  }, [units]);
+
   return (
     <aside className="hidden lg:block w-60 self-start sticky top-32">
-      <div className="flex flex-col bg-[#FFF9F5] p-4 rounded-2xl border border-[#FFEDE2] shadow-md h-[76.5vh]">
+      <div
+        ref={containerRef}
+        className="flex flex-col bg-[#FFF9F5] p-4 rounded-2xl border border-[#FFEDE2] shadow-md h-[76.5vh]"
+      >
         <h3 className="text-lg font-semibold text-[#6B4C3B] border-b border-[#e8d7cc] pb-2">
           Units
         </h3>
-        <div className="flex flex-col space-y-2 mt-2 overflow-y-scroll no-scrollbar relative h-[80vh]">
+        <div className="flex flex-col space-y-2 mt-2 overflow-y-auto no-scrollbar relative flex-1">
           {units.map((unit) => (
             <button
               key={unit.id}
@@ -46,7 +72,11 @@ const QuizNavigationDesktop = ({ units }: DesktopProps) => {
                 const el = document.getElementById(`unit-${unit.id}`);
                 el?.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
-              className="text-left w-full font-medium text-[#6B4C3B] px-3 py-2 rounded-xl bg-[#FFEDE2] hover:bg-[#FFD9C2] shadow-sm hover:shadow-md transition hover:cursor-pointer"
+              className={`text-left w-full font-medium px-3 py-2 rounded-xl shadow-sm transition hover:cursor-pointer ${
+                activeUnit === unit.id
+                  ? "bg-[#FFD9C2] text-[#5A3F2C]"
+                  : "bg-[#FFEDE2] text-[#6B4C3B] hover:bg-[#FFD9C2]"
+              }`}
             >
               {unit.title}
             </button>
