@@ -16,7 +16,12 @@ export async function GET(req: Request) {
     const session = await getServerSession(authOptions);
     return await withRls(session, async (tx) => {
       const units = await tx.unit.findMany({
-        include: { lesson: { orderBy: { lessonNumber: "asc" } } },
+        include: {
+          lesson: {
+            include: { tagging: { include: { tag: true } } },
+            orderBy: { lessonNumber: "asc" },
+          },
+        },
         orderBy: { unitNumber: "asc" },
       });
 
