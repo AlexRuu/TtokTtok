@@ -5,6 +5,7 @@ const getQuiz = async (slug: string) => {
     const res = await fetch(`${URL}/${slug}`, {
       method: "GET",
       credentials: "include",
+      cache: "no-store",
     });
 
     const data = await res.json().catch(() => ({}));
