@@ -2,6 +2,8 @@
 
 import { motion, Variants } from "framer-motion";
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 
 type VocabularyWithRelations = {
   id: string;
@@ -10,64 +12,27 @@ type VocabularyWithRelations = {
     id: string;
     title: string;
     slug: string;
+    lessonNumber: number;
     unit: { id: string; title: string; slug: string };
   };
-  tagging?: { tag: { id: string; name: string } }[];
 };
 
-type GroupedVocabulary = Record<
-  string,
-  {
+type GroupedUnit = {
+  id: string;
+  title: string;
+  lessons: {
+    id: string;
     title: string;
-    lessons: Record<
-      string,
-      {
-        title: string;
-        vocabularyList: VocabularyWithRelations[];
-      }
-    >;
-  }
->;
-
-const headerVariants: Variants = {
-  hidden: { opacity: 0, y: -5 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 100, damping: 20 },
-  },
-};
-
-const lessonVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 100, damping: 15 },
-  },
-};
-
-const vocabularyVariants: Variants = {
-  hidden: { opacity: 0, y: 5 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 120, damping: 20 },
-  },
+    lessonNumber: number;
+    slug: string;
+    vocabularyTitle: string;
+    unitSlug: string;
+  }[];
 };
 
 const containerVariants: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.1 } },
-};
-
-const tagVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { type: "spring", stiffness: 120, damping: 20 },
-  },
+  visible: { transition: { staggerChildren: 0.05 } },
 };
 
 const VocabularyDisplay = ({
@@ -75,93 +40,117 @@ const VocabularyDisplay = ({
 }: {
   vocabularyList: VocabularyWithRelations[];
 }) => {
-  const grouped: GroupedVocabulary = vocabularyList.reduce<GroupedVocabulary>(
-    (acc, vocabulary) => {
-      const unitId = vocabulary.lesson.unit.id;
-      if (!acc[unitId])
-        acc[unitId] = { title: vocabulary.lesson.unit.title, lessons: {} };
+  const [openUnit, setOpenUnit] = useState<string | null>(null);
 
-      const lessonId = vocabulary.lesson.id;
-      if (!acc[unitId].lessons[lessonId])
-        acc[unitId].lessons[lessonId] = {
-          title: vocabulary.lesson.title,
-          vocabularyList: [],
-        };
+  // Group by unit using Map
+  const groupedMap = new Map<string, GroupedUnit>();
+  vocabularyList.forEach((vocab) => {
+    const unitId = vocab.lesson.unit.id;
+    if (!groupedMap.has(unitId)) {
+      groupedMap.set(unitId, {
+        id: unitId,
+        title: vocab.lesson.unit.title,
+        lessons: [],
+      });
+    }
+    groupedMap.get(unitId)!.lessons.push({
+      id: vocab.lesson.id,
+      title: vocab.lesson.title,
+      lessonNumber: vocab.lesson.lessonNumber,
+      slug: vocab.lesson.slug,
+      vocabularyTitle: vocab.title,
+      unitSlug: vocab.lesson.unit.slug,
+    });
+  });
 
-      acc[unitId].lessons[lessonId].vocabularyList.push(vocabulary);
-      return acc;
-    },
-    {} as GroupedVocabulary,
+  const grouped = Array.from(groupedMap.values());
+  grouped.forEach((unit) =>
+    unit.lessons.sort((a, b) => a.lessonNumber - b.lessonNumber),
   );
 
   return (
     <div className="space-y-10">
-      {Object.entries(grouped).map(([unitId, unit]) => (
-        <section
-          key={unitId}
-          id={`unit-${unitId}`}
-          className="space-y-6 scroll-mt-24"
-        >
-          {/* Unit Header */}
-          <motion.h2
-            className="flex items-center text-xl font-bold text-[#5A3F2C] mt-6"
-            variants={headerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
+      {grouped.map((unit) => {
+        const isOpen = openUnit === unit.id;
+
+        return (
+          <section
+            key={unit.id}
+            id={`unit-${unit.id}`}
+            className="rounded-3xl bg-[#FFFDFB] border border-[#F3E4DA] px-7 py-6 scroll-mt-24 transition hover:shadow-sm"
           >
-            {unit.title}
-          </motion.h2>
-
-          {Object.entries(unit.lessons).map(([lessonId, lesson]) => (
-            <motion.div
-              key={lessonId}
-              id={`lesson-${lessonId}`}
-              variants={lessonVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              className="bg-[#FFF8F3] p-4 rounded-2xl border border-[#FFE4D6] shadow-sm space-y-3"
+            {/* Unit Header */}
+            <motion.button
+              onClick={() => setOpenUnit(isOpen ? null : unit.id)}
+              aria-expanded={isOpen}
+              aria-controls={`unit-${unit.id}-content`}
+              className="w-full text-left flex items-center justify-between hover:cursor-pointer"
             >
-              <h3 className="text-md font-semibold text-[#6B4C3B]">
-                {lesson.title}
-              </h3>
+              <div className="space-y-1">
+                <p className="text-lg font-medium text-[#6B4C3B]">
+                  {unit.title}
+                </p>
+                <p className="text-sm text-[#C1A08A] mb-2">
+                  {unit.lessons.length} vocabulary set
+                  {unit.lessons.length > 1 ? "s" : ""}
+                </p>
+              </div>
 
-              <motion.div variants={containerVariants} className="space-y-2">
-                {lesson.vocabularyList.map((vocabulary) => (
-                  <motion.div
-                    key={vocabulary.id}
-                    variants={vocabularyVariants}
-                    whileHover={{ scale: 1.02 }}
-                    className="bg-white p-3 rounded-xl shadow border border-[#FFEDE2] flex flex-col sm:flex-row sm:items-center justify-between"
+              <motion.div
+                animate={{ rotate: isOpen ? 180 : 0 }}
+                transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                className="text-[#C1A08A]"
+              >
+                <ChevronDown size={18} />
+              </motion.div>
+            </motion.button>
+
+            {/* Collapsible Lessons */}
+            <motion.div
+              initial={false}
+              animate={{
+                height: isOpen ? "auto" : 0,
+                opacity: isOpen ? 1 : 0,
+              }}
+              transition={{
+                duration: 0.35,
+                ease: [0.4, 0, 0.2, 1],
+              }}
+              className="overflow-hidden"
+            >
+              <motion.ul
+                variants={containerVariants}
+                initial="hidden"
+                animate={isOpen ? "visible" : "hidden"}
+                className="pl-3 space-y-1.5"
+              >
+                {unit.lessons.map((lesson) => (
+                  <motion.li
+                    key={lesson.id}
+                    className="space-y-2"
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.25 }}
                   >
                     <Link
-                      href={`/units/${vocabulary.lesson.unit.slug}/lessons/${vocabulary.lesson.slug}/quiz`}
-                      className="font-medium text-sm text-[#6B4C3B] hover:underline"
+                      href={`/units/${lesson.unitSlug}/lessons/${lesson.slug}/vocabulary`}
+                      className="block rounded-xl px-3 py-2 transition hover:bg-[#FCF4EF]"
                     >
-                      {vocabulary.title}
+                      <p className="text-[15px] font-normal text-[#7A5C4B]">
+                        {lesson.vocabularyTitle}
+                      </p>
+                      <p className="text-xs text-[#BFA391] mt-0.5">
+                        Lesson {lesson.lessonNumber} – {lesson.title}
+                      </p>
                     </Link>
-
-                    {vocabulary.tagging && vocabulary.tagging.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
-                        {vocabulary.tagging.map((t) => (
-                          <motion.span
-                            key={t.tag.id}
-                            variants={tagVariants}
-                            className="px-2 py-0.5 rounded-full bg-[#FFEDE2] text-sm text-[#6B4C3B]"
-                          >
-                            {t.tag.name}
-                          </motion.span>
-                        ))}
-                      </div>
-                    )}
-                  </motion.div>
+                  </motion.li>
                 ))}
-              </motion.div>
+              </motion.ul>
             </motion.div>
-          ))}
-        </section>
-      ))}
+          </section>
+        );
+      })}
     </div>
   );
 };

@@ -23,8 +23,14 @@ const VocabularyPage = async () => {
       {/* Mobile navigation menu */}
       <VocabularyNavigationMobile units={units} />
 
-      <main className="flex-1 bg-[#FFF9F5] text-[#6B4C3B] rounded-2xl shadow-md p-8 space-y-12">
-        <h1 className="text-3xl font-bold text-[#6B4C3B] mb-6">Vocabulary</h1>
+      <main className="flex-1 bg-[#FFF9F5] text-[#6B4C3B] rounded-3xl border border-[#F3E4DA] p-8 space-y-8">
+        <h1 className="text-4xl font-bold tracking-tight text-[#5A3F2C]">
+          Vocabulary
+        </h1>
+        <p className="text-sm text-[#9C7B6A] -mt-6 border-b pb-2 border-[#e8d7cc]">
+          Browse vocabulary by unit and lesson.
+        </p>
+
         <VocabularyDisplay vocabularyList={vocabularyList} />
       </main>
     </div>
