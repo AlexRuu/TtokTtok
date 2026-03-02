@@ -132,7 +132,7 @@ const matchingAnswerSchema = z.array(
   z.object({
     left: z.string().min(1),
     match: z.string().min(1),
-  })
+  }),
 );
 
 const quizQuestions = z.discriminatedUnion("quizType", [
@@ -145,7 +145,7 @@ const quizQuestions = z.discriminatedUnion("quizType", [
       .refine(
         (options) =>
           new Set(options.map((o) => o.option)).size === options.length,
-        { message: "Options must be unique." }
+        { message: "Options must be unique." },
       ),
   }),
   baseQuestionSchema.extend({
@@ -173,7 +173,6 @@ const quizQuestions = z.discriminatedUnion("quizType", [
 
 const quizSchema = z.object({
   quizQuestion: z.array(quizQuestions),
-  title: z.string().min(1, { message: "A title is required" }),
   lessonId: z.string().min(1, { message: "Please pick a lesson" }),
 });
 
