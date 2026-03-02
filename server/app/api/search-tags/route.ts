@@ -68,8 +68,10 @@ export async function GET(req: Request) {
           lesson: {
             select: {
               lessonNumber: true,
+              title: true,
               unit: {
                 select: {
+                  title: true,
                   unitNumber: true,
                 },
               },
@@ -89,9 +91,11 @@ export async function GET(req: Request) {
           lesson: {
             select: {
               lessonNumber: true,
+              title: true,
               unit: {
                 select: {
                   unitNumber: true,
+                  title: true,
                 },
               },
             },
@@ -130,10 +134,10 @@ export async function GET(req: Request) {
             subtitle,
             href:
               type === "lesson"
-                ? `/lessons/${item.slug}`
+                ? `/units/${item.unit.title}/lessons/${item.slug}`
                 : type === "quiz"
-                  ? `/quizzes/${item.id}`
-                  : `/vocabulary/${item.id}`,
+                  ? `/units/${item.lesson.unit.title}/lessons/${item.slug}/quiz`
+                  : `/units/${item.lesson.unit.title}/lessons/${item.slug}/vocabulary`,
             type,
             score: 1,
           };
