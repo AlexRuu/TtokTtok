@@ -1,5 +1,5 @@
 import prismadb from "@/lib/prismadb";
-import type { PrismaClient, Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 interface Session {
   user?: {
@@ -10,26 +10,26 @@ interface Session {
 }
 
 const setRlsSessionVars = async (
-  tx: PrismaClient,
-  session: Session | null
+  tx: Prisma.TransactionClient,
+  session: Session | null,
 ): Promise<void> => {
   const userId = session?.user?.id ?? "";
   const userRole = session?.user?.role ?? "USER";
   const userEmail = session?.user?.email ?? "";
 
   await Promise.all([
-    tx.$executeRawUnsafe(`SET LOCAL app.current_user_id = '${userId}'`),
-    tx.$executeRawUnsafe(`SET LOCAL app.current_user_role = '${userRole}'`),
-    tx.$executeRawUnsafe(`SET LOCAL app.current_user_email = '${userEmail}'`),
+    tx.$executeRaw`SELECT set_config('app.current_user_id', ${userId}, true)`,
+    tx.$executeRaw`SELECT set_config('app.current_user_role', ${userRole}, true)`,
+    tx.$executeRaw`SELECT set_config('app.current_user_email', ${userEmail}, true)`,
   ]);
 };
 
 export const withRls = async <T>(
   session: Session | null,
-  callback: (tx: Prisma.TransactionClient) => Promise<T>
+  callback: (tx: Prisma.TransactionClient) => Promise<T>,
 ): Promise<T> => {
   return prismadb.$transaction(async (tx) => {
     await setRlsSessionVars(tx, session);
-    return await callback(tx);
+    return callback(tx);
   });
 };
