@@ -10,6 +10,7 @@ import Loader from "@/components/ui/loader";
 import Link from "next/link";
 import useDebounce from "@/hooks/debounce";
 import Image from "next/image";
+import useLoading from "@/hooks/use-loading";
 
 interface Tag {
   id: string;
@@ -31,7 +32,7 @@ const TagFilterClient = ({ allTags }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [results, setResults] = useState<GroupedSearchResults | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { isLoading, stopLoading, startLoading } = useLoading();
 
   const selectedSlugs = useMemo(() => {
     return (
@@ -74,7 +75,7 @@ const TagFilterClient = ({ allTags }: Props) => {
         return;
       }
 
-      setLoading(true);
+      startLoading();
       try {
         const data = await getSearchTagsResults(debouncedSlugs.join(","));
         setResults(data);
@@ -82,11 +83,13 @@ const TagFilterClient = ({ allTags }: Props) => {
         toast.error("Failed to load results. Please try again.");
         setResults(null);
       }
-      setLoading(false);
+      stopLoading();
     };
 
     fetchResults();
   }, [debouncedSlugs]);
+
+  console.log(results);
 
   return (
     <>
@@ -101,7 +104,7 @@ const TagFilterClient = ({ allTags }: Props) => {
               "px-3 py-1.5 rounded-full text-sm font-normal border transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-[#A65A3A]",
               selectedSlugs.includes(tag.slug)
                 ? "bg-[#F8E6DC] text-[#A65A3A] border-[#D69E78]"
-                : "bg-white hover:bg-[#F9F4F2] text-[#6B4C3B] border-[#EADBD3]"
+                : "bg-white hover:bg-[#F9F4F2] text-[#6B4C3B] border-[#EADBD3]",
             )}
           >
             {tag.name}
@@ -119,8 +122,8 @@ const TagFilterClient = ({ allTags }: Props) => {
       </div>
 
       {/* Results */}
-      {loading && <Loader />}
-      {!loading &&
+      {isLoading && <Loader />}
+      {!isLoading &&
         results &&
         !results.lessons.length &&
         !results.quizzes.length &&
@@ -132,7 +135,7 @@ const TagFilterClient = ({ allTags }: Props) => {
           </div>
         )}
 
-      {!loading && !results && (
+      {!isLoading && !results && (
         <div className="flex flex-col items-center justify-center py-14 px-6 space-y-4 text-center">
           <Image
             src="/searching-tteok.png"
@@ -147,7 +150,7 @@ const TagFilterClient = ({ allTags }: Props) => {
         </div>
       )}
 
-      {!loading &&
+      {!isLoading &&
         results &&
         (results.lessons.length > 0 ||
           results.quizzes.length > 0 ||
