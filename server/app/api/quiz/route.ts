@@ -4,20 +4,6 @@ import { quizSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-const generateSlug = (title: string) =>
-  title
-    .toLowerCase()
-    .trim()
-    .replace(/[^\p{Script=Hangul}a-z0-9\s-]/gu, "")
-    .replace(/\s+/g, "-");
-
-const quizTypeToTagMap: Record<string, string> = {
-  MULTIPLE_CHOICE: "Multiple Choice",
-  FILL_IN_THE_BLANK: "Fill In The Blank",
-  TRUE_FALSE: "True or False",
-  MATCHING: "Matching",
-};
-
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -32,7 +18,7 @@ export async function POST(req: Request) {
       return new NextResponse("Invalid quiz data", { status: 400 });
     }
 
-    const { title, quizQuestion, lessonId } = parsed.data;
+    const { quizQuestion, lessonId } = parsed.data;
 
     if (
       !lessonId ||
@@ -54,8 +40,8 @@ export async function POST(req: Request) {
 
       const createdQuiz = await tx.quiz.create({
         data: {
-          title,
-          slug: generateSlug(title),
+          title: `${existingLesson.title} Quiz`,
+          slug: `${existingLesson.slug}-quiz`,
           lesson: { connect: { id: lessonId } },
           quizQuestion: {
             create: quizQuestion.map((q) => ({
@@ -74,24 +60,16 @@ export async function POST(req: Request) {
         },
       });
 
-      const uniqueTagNames = Array.from(
-        new Set(
-          quizQuestion.map((q) => quizTypeToTagMap[q.quizType]).filter(Boolean)
-        )
-      );
-
-      const tags = await tx.tag.findMany({
-        where: { name: { in: uniqueTagNames } },
+      const quizTag = await tx.tag.findUnique({
+        where: { name: "Quiz" },
       });
 
-      for (const tag of tags) {
-        await tx.tagging.create({
-          data: {
-            tagId: tag.id,
-            quizId: createdQuiz.id,
-          },
-        });
-      }
+      await tx.tagging.create({
+        data: {
+          tagId: quizTag.id,
+          quizId: createdQuiz.id,
+        },
+      });
 
       return new NextResponse("Quiz created successfully", { status: 200 });
     });
