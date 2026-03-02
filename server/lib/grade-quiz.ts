@@ -21,13 +21,16 @@ export const gradeQuiz = (
   let totalCorrect = 0;
   let totalPossible = 0;
 
-  const results = questions.map((q) => {
+  const results: QuizResultItem[] = questions.map((q) => {
     const submitted = submittedAnswers.find((a) => a.questionId === q.id);
 
     let submittedAnswerNormalized: string | boolean | MatchingAnswer[] | null =
       null;
     let correctCount = 0;
     let possibleCount = 1;
+
+    // We'll store the formatted correct answer here
+    let correctAnswerFormatted: string = q.answer;
 
     if (submitted) {
       switch (q.quizType) {
@@ -73,11 +76,45 @@ export const gradeQuiz = (
           break;
         }
 
-        default:
+        default: {
           // MULTIPLE_CHOICE
+
+          // Grade the question
           correctCount =
             submitted.answer.toString().charAt(0) === q.answer ? 1 : 0;
+
+          // Format the correct answer as "A: value"
+          let options: { option: string; value: string }[] = [];
+          if (typeof q.options === "string") {
+            try {
+              options = JSON.parse(q.options);
+            } catch {
+              options = [];
+            }
+          } else if (Array.isArray(q.options)) {
+            options = q.options;
+          }
+
+          const correctOption = options.find((o) => o.option === q.answer);
+          correctAnswerFormatted = correctOption
+            ? `${correctOption.option}: ${correctOption.value}`
+            : q.answer;
+
+          // Format the submitted answer the same way
+          if (typeof submitted.answer === "string") {
+            const submittedOption = options.find(
+              (o) => o.option === submitted.answer,
+            );
+            submittedAnswerNormalized = submittedOption
+              ? `${submittedOption.option}: ${submittedOption.value}`
+              : submitted.answer;
+          } else {
+            submittedAnswerNormalized = submitted.answer ?? null;
+          }
+
+          possibleCount = 1;
           break;
+        }
       }
     }
 
@@ -89,8 +126,7 @@ export const gradeQuiz = (
       question: q.question,
       quizType: q.quizType,
       givenAnswer: submittedAnswerNormalized ?? submitted?.answer ?? null,
-      correctAnswer:
-        q.quizType === "MATCHING" ? JSON.parse(q.answer) : q.answer,
+      correctAnswer: correctAnswerFormatted,
       correctCount,
       possibleCount,
     };
