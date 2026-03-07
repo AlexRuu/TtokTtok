@@ -1,7 +1,7 @@
 "use client";
 
 import useLoading from "@/hooks/use-loading";
-import { todoSchema, todoSchemaValues } from "@/schemas/form-schemas";
+import { todoSchema, TodoSchemaValues } from "@/schemas/form-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem } from "../ui/form";
@@ -16,12 +16,12 @@ const TodoForm = ({ onAdd }: { onAdd: () => void }) => {
   const formSchema = todoSchema;
   const router = useRouter();
 
-  const form = useForm<todoSchemaValues>({
+  const form = useForm<TodoSchemaValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { title: "" },
   });
 
-  const onSubmit: SubmitHandler<todoSchemaValues> = async (data) => {
+  const onSubmit: SubmitHandler<TodoSchemaValues> = async (data) => {
     startLoading();
     try {
       const res = await fetch("/api/todo", {

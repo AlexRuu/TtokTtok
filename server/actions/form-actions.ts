@@ -1,8 +1,8 @@
 import {
-  tagSchemaValues,
+  TagSchemaValues,
   UnitsSchemaValues,
-  vocabularySchemaValues,
-  quizSchemaValues,
+  VocabularySchemaValues,
+  QuizSchemaValues,
 } from "@/schemas/form-schemas";
 import { LessonFormType } from "@/schemas/units-schemas";
 import toast from "react-hot-toast";
@@ -21,7 +21,7 @@ const toastError = (action: string, path: string) => {
       },
       className:
         "transition-all transform duration-300 ease-in-out font-medium",
-    }
+    },
   );
 };
 
@@ -29,7 +29,7 @@ const lessonAction = async (
   data: LessonFormType,
   action: string,
   stopLoading: () => void,
-  lessonId?: string
+  lessonId?: string,
 ) => {
   const URL = lessonId ? `/api/lessons/${lessonId}` : "/api/lessons";
   const res = await fetch(URL, {
@@ -45,10 +45,10 @@ const lessonAction = async (
 };
 
 const tagActions = async (
-  data: tagSchemaValues,
+  data: TagSchemaValues,
   action: string,
   stopLoading: () => void,
-  tagId?: string
+  tagId?: string,
 ) => {
   const URL = tagId ? `/api/tags/${tagId}` : "/api/tags";
   const res = await fetch(URL, {
@@ -67,7 +67,7 @@ const unitAction = async (
   data: UnitsSchemaValues,
   action: string,
   stopLoading: () => void,
-  unitId?: string
+  unitId?: string,
 ) => {
   const URL = unitId ? `/api/units/${unitId}` : "/api/units";
   const res = await fetch(URL, {
@@ -83,10 +83,10 @@ const unitAction = async (
 };
 
 const vocabularyAction = async (
-  data: vocabularySchemaValues,
+  data: VocabularySchemaValues,
   action: string,
   stopLoading: () => void,
-  vocabularyId?: string
+  vocabularyId?: string,
 ) => {
   const URL = vocabularyId
     ? `/api/vocabulary/${vocabularyId}`
@@ -104,10 +104,10 @@ const vocabularyAction = async (
 };
 
 const quizActions = async (
-  data: quizSchemaValues,
+  data: QuizSchemaValues,
   action: string,
   stopLoading: () => void,
-  quizId?: string
+  quizId?: string,
 ) => {
   const URL = quizId ? `/api/quiz/${quizId}` : "/api/quiz";
   const res = await fetch(URL, {

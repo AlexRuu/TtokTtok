@@ -1,10 +1,10 @@
 "use client";
 
-import { UnitWithLessons } from "@/types";
+import { Unit } from "@/types";
 import { useEffect, useRef, useState } from "react";
 
 type DesktopProps = {
-  units: UnitWithLessons[];
+  units: Unit[];
 };
 
 const VocabularyNavigationDesktop = ({ units }: DesktopProps) => {

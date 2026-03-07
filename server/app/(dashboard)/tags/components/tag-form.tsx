@@ -14,7 +14,7 @@ import { tagActions } from "@/actions/form-actions";
 import useLoading from "@/hooks/use-loading";
 import { Tag } from "@/lib/generated/prisma/client";
 import { cn } from "@/lib/utils";
-import { tagSchema, tagSchemaValues } from "@/schemas/form-schemas";
+import { tagSchema, TagSchemaValues } from "@/schemas/form-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import React, { startTransition } from "react";
@@ -31,7 +31,7 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
   const { isLoading, startLoading, stopLoading } = useLoading();
   const router = useRouter();
 
-  const form = useForm<tagSchemaValues>({
+  const form = useForm<TagSchemaValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData
       ? { ...initialData }
@@ -43,7 +43,7 @@ const TagForm: React.FC<TagFormProps> = ({ initialData }) => {
         },
   });
 
-  const onSubmit: SubmitHandler<tagSchemaValues> = async (data) => {
+  const onSubmit: SubmitHandler<TagSchemaValues> = async (data) => {
     startLoading();
     try {
       const action = initialData ? "PATCH" : "POST";

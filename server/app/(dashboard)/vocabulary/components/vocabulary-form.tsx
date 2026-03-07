@@ -28,7 +28,7 @@ import {
 } from "@/lib/generated/prisma/client";
 import {
   vocabularySchema,
-  vocabularySchemaValues,
+  VocabularySchemaValues,
 } from "@/schemas/form-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash } from "lucide-react";
@@ -49,7 +49,7 @@ const VocabularyForm: React.FC<VocabularyFormProps> = ({
 }) => {
   const { isLoading, startLoading, stopLoading } = useLoading();
   const router = useRouter();
-  const form = useForm<vocabularySchemaValues>({
+  const form = useForm<VocabularySchemaValues>({
     resolver: zodResolver(vocabularySchema),
     defaultValues: initialData
       ? { ...initialData }
@@ -65,7 +65,7 @@ const VocabularyForm: React.FC<VocabularyFormProps> = ({
     control: form.control,
   });
 
-  const onSubmit: SubmitHandler<vocabularySchemaValues> = async (data) => {
+  const onSubmit: SubmitHandler<VocabularySchemaValues> = async (data) => {
     startLoading();
     try {
       const action = initialData ? "PATCH" : "POST";

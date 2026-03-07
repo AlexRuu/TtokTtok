@@ -1,6 +1,6 @@
 "use client";
 
-import { UnitWithLessons } from "@/types";
+import { Unit } from "@/types";
 import {
   Drawer,
   DrawerContent,
@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 type MobileProps = {
-  units: UnitWithLessons[];
+  units: Unit[];
 };
 
 const VocabularyNavigationMobile = ({ units }: MobileProps) => {

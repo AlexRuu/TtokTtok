@@ -25,7 +25,7 @@ import {
   QuizQuestion,
   Unit,
 } from "@/lib/generated/prisma/client";
-import { quizSchema, quizSchemaValues } from "@/schemas/form-schemas";
+import { quizSchema, QuizSchemaValues } from "@/schemas/form-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -102,7 +102,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
 
   const normalizedQuestions = normalizeQuizQuestions(clonedQuestions);
 
-  const form = useForm<quizSchemaValues>({
+  const form = useForm<QuizSchemaValues>({
     resolver: zodResolver(quizSchema),
     defaultValues: initialData
       ? {
@@ -156,7 +156,7 @@ const QuizForm: React.FC<QuizFormProps> = ({ initialData, lessons }) => {
     }
   };
 
-  const onSubmit: SubmitHandler<quizSchemaValues> = async (data) => {
+  const onSubmit: SubmitHandler<QuizSchemaValues> = async (data) => {
     startLoading();
     try {
       const action = initialData ? "PATCH" : "POST";
