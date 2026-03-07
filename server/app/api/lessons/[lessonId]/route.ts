@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  props: { params: Promise<{ lessonId: string }> }
+  props: { params: Promise<{ lessonId: string }> },
 ) {
   const params = await props.params;
   try {
@@ -26,18 +26,6 @@ export async function PATCH(
 
     const { lessonNumber, title, unitId, tags, blocks } = parsed.data;
 
-    if (
-      !lessonNumber ||
-      !title ||
-      !unitId ||
-      !Array.isArray(tags) ||
-      tags.length === 0 ||
-      !Array.isArray(blocks) ||
-      blocks.length === 0
-    ) {
-      return new NextResponse("Missing one or more fields", { status: 400 });
-    }
-
     // Run the entire update inside withRls so RLS policies apply
     return await withRls(session, async (tx) => {
       const existingLesson = await tx.lesson.findFirst({
@@ -52,10 +40,10 @@ export async function PATCH(
       });
 
       if (!existingLesson) {
-        return new NextResponse("Lesson does not exist", { status: 409 });
+        return new NextResponse("Lesson does not exist", { status: 404 });
       }
 
-      const nextLesson = existingLesson.lessonVersion[0].version + 1;
+      const nextLesson = (existingLesson.lessonVersion[0]?.version ?? 0) + 1;
 
       await tx.lesson.update({
         where: { id: lessonId },
@@ -77,14 +65,12 @@ export async function PATCH(
 
       await tx.tagging.deleteMany({ where: { lessonId } });
 
-      if (tags.length > 0) {
-        await tx.tagging.createMany({
-          data: tags.map((tagId: string) => ({
-            tagId,
-            lessonId,
-          })),
-        });
-      }
+      await tx.tagging.createMany({
+        data: tags.map((tagId: string) => ({
+          tagId,
+          lessonId,
+        })),
+      });
 
       return new NextResponse("Successfully updated lesson", { status: 200 });
     });
@@ -96,7 +82,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  props: { params: Promise<{ lessonId: string }> }
+  props: { params: Promise<{ lessonId: string }> },
 ) {
   const params = await props.params;
   try {
