@@ -2,7 +2,6 @@ import { authOptions } from "@/lib/auth";
 import { withRls } from "@/lib/withRLS";
 import { tagSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
@@ -45,7 +44,7 @@ export async function PATCH(
           borderColour: borderColour,
         },
       });
-      revalidatePath("/tags");
+
       return new NextResponse("Successfully updated tag", { status: 200 });
     });
   } catch (error) {
@@ -79,7 +78,6 @@ export async function DELETE(
       await tx.tag.delete({
         where: { id: tagId },
       });
-      revalidatePath("/tags");
 
       return new NextResponse("Tag was successfully deleted", { status: 200 });
     });
