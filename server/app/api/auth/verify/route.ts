@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   try {
     const ip = getClientIp(req);
 
-    const allowed = await rateLimit(ip, 5, 60);
+    const allowed = await rateLimit(`ip:${ip}`, 5, 60);
 
     if (!allowed) {
       return new Response("Too many requests", { status: 429 });
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       if (!validToken) {
         return NextResponse.json(
           { message: "Token is expired or invalid" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     console.error("Verification error:", error);
     return NextResponse.json(
       { message: "Error verifying user" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
