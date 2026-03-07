@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  props: { params: Promise<{ quizId: string }> }
+  props: { params: Promise<{ quizId: string }> },
 ) {
   const params = await props.params;
   try {
@@ -21,16 +21,12 @@ export async function PATCH(
     const parsed = quizSchema.safeParse(body);
 
     if (!parsed.success) {
-      return new NextResponse("Invalid quiz data", { status: 422 });
+      return new NextResponse("Invalid quiz data", { status: 400 });
     }
 
-    const { title, lessonId, quizQuestion } = parsed.data;
+    const { lessonId, quizQuestion } = parsed.data;
 
-    if (!lessonId || !Array.isArray(quizQuestion) || quizQuestion.length <= 0) {
-      return new NextResponse("Missing one or more fields", { status: 400 });
-    }
-
-    await withRls(session, async (tx) => {
+    return await withRls(session, async (tx) => {
       const existingLesson = await tx.lesson.findUnique({
         where: { id: lessonId },
       });
@@ -45,11 +41,6 @@ export async function PATCH(
       if (!existingQuiz) {
         return new NextResponse("Quiz does not exist", { status: 404 });
       }
-
-      await tx.quiz.update({
-        where: { id: quizId },
-        data: { title },
-      });
 
       await tx.quizQuestion.deleteMany({
         where: { quizId },
@@ -68,10 +59,9 @@ export async function PATCH(
             typeof q.answer === "string" ? q.answer : JSON.stringify(q.answer),
         })),
       });
-    });
-
-    return new NextResponse("Quiz has been updated successfully", {
-      status: 200,
+      return new NextResponse("Quiz has been updated successfully", {
+        status: 200,
+      });
     });
   } catch (error) {
     console.error("There was an error updating quiz", error);
@@ -83,7 +73,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  props: { params: Promise<{ quizId: string }> }
+  props: { params: Promise<{ quizId: string }> },
 ) {
   const params = await props.params;
   try {
@@ -109,7 +99,7 @@ export async function DELETE(
       return new NextResponse("Quiz was successfully deleted", { status: 200 });
     });
   } catch (error) {
-    console.log("There was an error deleting quiz", error);
+    console.error("There was an error deleting quiz", error);
     return new NextResponse("There was an error deleting quiz", {
       status: 500,
     });
