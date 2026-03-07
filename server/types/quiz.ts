@@ -1,14 +1,17 @@
-type MatchingAnswer = { left: string; match: string };
+export type MatchingAnswer = { left: string; match: string };
 
-type SubmittedAnswer = {
+export type MultipleChoiceOptions = string[];
+export type MatchingOptions = { left: string; right: string }[];
+
+export type SubmittedAnswer = {
   questionId: string;
   answer: string | boolean | MatchingAnswer[];
 };
 
-type QuizQuestionType = {
+export type QuizQuestionType = {
   id: string;
   question: string;
   quizType: "MULTIPLE_CHOICE" | "TRUE_FALSE" | "FILL_IN_THE_BLANK" | "MATCHING";
   answer: string;
-  options?: unknown;
+  options?: MultipleChoiceOptions | MatchingOptions;
 };
