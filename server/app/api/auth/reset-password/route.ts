@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   try {
     const ip = getClientIp(req);
 
-    const allowed = await rateLimit(ip, 5, 60);
+    const allowed = await rateLimit(`ip:${ip}`, 5, 60);
 
     if (!allowed) {
       return new Response("Too many requests", { status: 429 });
@@ -26,25 +26,7 @@ export async function POST(req: Request) {
       return new NextResponse("Invalid input", { status: 400 });
     }
 
-    const { token, password, confirmPassword } = parsed.data;
-
-    if (!password || !confirmPassword) {
-      return new NextResponse("Missing password or confirmed password", {
-        status: 400,
-      });
-    }
-
-    if (password !== confirmPassword) {
-      return new NextResponse("Password does not match", { status: 400 });
-    }
-
-    const strongPasswordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
-    if (!strongPasswordRegex.test(password)) {
-      return new NextResponse("Password does not meet security requirements", {
-        status: 400,
-      });
-    }
+    const { token, password } = parsed.data;
 
     // Fetch tokens that are not used and not expired
     return await withRls(session, async (tx) => {
@@ -114,7 +96,7 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const ip = getClientIp(req);
-    const allowed = await rateLimit(ip, 5, 60);
+    const allowed = await rateLimit(`ip:${ip}`, 5, 60);
 
     if (!allowed) {
       return new Response("Too many requests", { status: 429 });
