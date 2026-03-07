@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   try {
     const ip = getClientIp(req);
 
-    const allowed = await rateLimit(ip, 5, 60);
+    const allowed = await rateLimit(`ip:${ip}`, 5, 60);
 
     if (!allowed) {
       return new Response("Too many requests", { status: 429 });
@@ -29,13 +29,8 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       return new NextResponse("Invalid input", { status: 400 });
     }
-    const { firstName, lastName, email, password, confirmPassword } =
-      parsed.data;
+    const { firstName, lastName, email, password } = parsed.data;
 
-    // Check for user data
-    if (!body) {
-      return new NextResponse("Please provide user data", { status: 401 });
-    }
     return await withRls(session, async (tx) => {
       // Check for existing user
       const existingUser = await tx.user.findUnique({
@@ -44,11 +39,6 @@ export async function POST(req: Request) {
 
       if (existingUser) {
         return new NextResponse("Email in use", { status: 400 });
-      }
-
-      // Check to see if the passwords match in the user submitted data
-      if (password !== confirmPassword) {
-        return new NextResponse("Passwords do not match", { status: 400 });
       }
 
       // Hash the password provided
@@ -87,7 +77,7 @@ export async function POST(req: Request) {
       });
     });
   } catch (error) {
-    console.log(error);
-    return new NextResponse("Error creating user", { status: 501 });
+    console.error(error);
+    return new NextResponse("Error creating user", { status: 500 });
   }
 }
