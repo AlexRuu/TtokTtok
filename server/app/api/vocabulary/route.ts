@@ -21,10 +21,6 @@ export async function POST(req: Request) {
 
     const { title, vocabulary, lessonId } = parsed.data;
 
-    if (!lessonId) {
-      return new NextResponse("Lesson is required", { status: 400 });
-    }
-
     return await withRls(session, async (tx) => {
       const existingList = await tx.vocabularyList.findFirst({
         where: {
@@ -80,13 +76,13 @@ export async function POST(req: Request) {
         },
       });
 
-      return NextResponse.json("Successfully created vocabulary", {
+      return new NextResponse("Successfully created vocabulary", {
         status: 201,
       });
     });
   } catch (error) {
-    console.log("Error creating vocabulary", error);
-    return new NextResponse("Error POSTing vocabulary", { status: 500 });
+    console.error("Error creating vocabulary", error);
+    return new NextResponse("Error creating vocabulary", { status: 500 });
   }
 }
 
