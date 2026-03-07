@@ -27,25 +27,13 @@ export async function POST(req: Request) {
 
     const { lessonNumber, title, unitId, tags, blocks } = parsed.data;
 
-    if (
-      !lessonNumber ||
-      !title ||
-      !unitId ||
-      !Array.isArray(tags) ||
-      tags.length === 0 ||
-      !Array.isArray(blocks) ||
-      blocks.length === 0
-    ) {
-      return new NextResponse("Missing one or more fields", { status: 400 });
-    }
-
     return await withRls(session, async (tx) => {
       const existingUnit = await tx.unit.findFirst({
         where: { id: unitId },
       });
 
       if (!existingUnit) {
-        return new NextResponse("Unit does not exist", { status: 409 });
+        return new NextResponse("Unit does not exist", { status: 404 });
       }
 
       const existingLesson = await tx.lesson.findFirst({
@@ -76,14 +64,12 @@ export async function POST(req: Request) {
         },
       });
 
-      if (tags.length > 0) {
-        await tx.tagging.createMany({
-          data: tags.map((tagId: string) => ({
-            tagId,
-            lessonId: lesson.id,
-          })),
-        });
-      }
+      await tx.tagging.createMany({
+        data: tags.map((tagId: string) => ({
+          tagId,
+          lessonId: lesson.id,
+        })),
+      });
 
       return new NextResponse("Successfully added lesson", { status: 201 });
     });
