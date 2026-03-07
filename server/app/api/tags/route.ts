@@ -2,7 +2,6 @@ import { authOptions } from "@/lib/auth";
 import { withRls } from "@/lib/withRLS";
 import { tagSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
-import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 function capitalizeFirstLetter(val: string) {
@@ -36,16 +35,11 @@ export async function POST(req: Request) {
         },
       });
 
-      revalidatePath("/tags");
-
-      return NextResponse.json({
-        message: "Successfully created unit",
-        status: 200,
-      });
+      return new NextResponse("Successfully created tag", { status: 201 });
     });
   } catch (error) {
-    console.error("Error creating unit", error);
-    return new NextResponse("Error creating unit", { status: 500 });
+    console.error("Error creating tag", error);
+    return new NextResponse("Error creating tag", { status: 500 });
   }
 }
 
@@ -54,10 +48,6 @@ export async function GET(_req: Request) {
     const session = await getServerSession(authOptions);
     return await withRls(session, async (tx) => {
       const tags = await tx.tag.findMany({});
-
-      if (!tags) {
-        return new NextResponse("There are no tags available", { status: 400 });
-      }
 
       return NextResponse.json(tags);
     });
