@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     const parsed = unitsSchema.safeParse(body);
 
     if (!parsed.success) {
-      return new NextResponse("Invalid tag data", { status: 400 });
+      return new NextResponse("Invalid unit data", { status: 400 });
     }
 
     const { title } = parsed.data;
@@ -57,10 +57,7 @@ export async function POST(req: Request) {
         },
       });
 
-      return NextResponse.json({
-        message: "Successfully created unit",
-        status: 200,
-      });
+      return new NextResponse("Successfully created unit", { status: 201 });
     });
   } catch (error) {
     console.error("Error creating unit", error);
