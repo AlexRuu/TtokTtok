@@ -10,26 +10,28 @@ datasource db {
 }
 
 model User {
-  id                  String                @id @default(cuid())
-  email               String                @unique
-  password            String?
-  emailVerified       DateTime?
-  image               String?
-  createdAt           DateTime              @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
-  firstName           String
-  lastName            String
-  role                Role                  @default(USER)
-  status              Status                @default(ACTIVE)
-  accounts            Account[]
-  forgotPasswordToken ForgotPasswordToken[]
-  savedVocabulary     SavedVocabulary[]
-  userChapterReview   UserChapterReview[]
-  userLessonProgress  UserLessonProgress[]
-  userQuizAttempt     UserQuizAttempt[]
-  verificationToken   VerificationToken[]
-  userQuizInProgress  UserQuizInProgress[]
-  userStats           UserStats[]
+  id                        String                    @id @default(cuid())
+  email                     String                    @unique
+  password                  String?
+  emailVerified             DateTime?
+  image                     String?
+  createdAt                 DateTime                  @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime                  @default(now()) @updatedAt @db.Timestamptz(6)
+  firstName                 String
+  lastName                  String
+  role                      Role                      @default(USER)
+  status                    Status                    @default(ACTIVE)
+  accounts                  Account[]
+  forgotPasswordToken       ForgotPasswordToken[]
+  savedVocabulary           SavedVocabulary[]
+  userChapterReview         UserChapterReview[]
+  userLessonProgress        UserLessonProgress[]
+  userQuizAttempt           UserQuizAttempt[]
+  verificationToken         VerificationToken[]
+  userQuizInProgress        UserQuizInProgress[]
+  userCompletedLessons      UserCompletedLesson[]
+  userCompletedQuiz         UserCompletedQuiz[]
+  userCompletedVocabularies UserCompletedVocabulary[]
 }
 
 model Account {
@@ -89,14 +91,40 @@ model SavedVocabulary {
   @@unique([userId, vocabularyId])
 }
 
-model UserStats {
-  id                  String       @id @default(cuid())
-  userId              String
-  user                User         @relation(fields: [userId], references: [id])
-  quizzesCompleted    Quiz[]
-  unitsCompleted      Unit[]
-  vocabularyCompleted Vocabulary[]
-  updatedAt           DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
+model UserCompletedLesson {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonId    String
+  completedAt DateTime @default(now()) @db.Timestamptz(6)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+}
+
+model UserCompletedQuiz {
+  id          String   @id @default(cuid())
+  userId      String
+  quizId      String
+  completedAt DateTime @default(now()) @db.Timestamptz(6)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, quizId])
+  @@index([userId])
+}
+
+model UserCompletedVocabulary {
+  id           String     @id @default(cuid())
+  userId       String
+  vocabularyId String
+  completedAt  DateTime   @default(now()) @db.Timestamptz(6)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vocabulary   Vocabulary @relation(fields: [vocabularyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, vocabularyId])
+  @@index([userId])
 }
 
 model UserChapterReview {
@@ -150,26 +178,25 @@ model Unit {
   updatedAt         DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
   lesson            Lesson[]
   userChapterReview UserChapterReview[]
-  userStatsId       String?
-  userStats         UserStats?          @relation(fields: [userStatsId], references: [id])
 }
 
 model Lesson {
-  id                 String               @id @default(cuid())
-  title              String
-  lessonNumber       Int
-  unitId             String
-  createdAt          DateTime             @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime             @default(now()) @updatedAt @db.Timestamptz(6)
-  content            Json
-  slug               String               @unique
-  unit               Unit                 @relation(fields: [unitId], references: [id], onDelete: Cascade)
-  lessonVersion      LessonVersion[]
-  quiz               Quiz[]
-  tagging            Tagging[]
-  userChapterReview  UserChapterReview[]
-  userLessonProgress UserLessonProgress[]
-  vocabularyList     VocabularyList?
+  id                   String                @id @default(cuid())
+  title                String
+  lessonNumber         Int
+  unitId               String
+  createdAt            DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime              @default(now()) @updatedAt @db.Timestamptz(6)
+  content              Json
+  slug                 String                @unique
+  unit                 Unit                  @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  lessonVersion        LessonVersion[]
+  quiz                 Quiz[]
+  tagging              Tagging[]
+  userChapterReview    UserChapterReview[]
+  userLessonProgress   UserLessonProgress[]
+  vocabularyList       VocabularyList?
+  userCompletedLessons UserCompletedLesson[]
 
   @@index([unitId, lessonNumber])
 }
@@ -232,9 +259,8 @@ model Quiz {
   quizQuestion       QuizQuestion[]
   tagging            Tagging[]
   userQuizAttempt    UserQuizAttempt[]
-  UserQuizInProgress UserQuizInProgress[]
-  userStats          UserStats?           @relation(fields: [userStatsId], references: [id])
-  userStatsId        String?
+  userQuizInProgress UserQuizInProgress[]
+  userCompletedQuiz  UserCompletedQuiz[]
 }
 
 model QuizQuestion {
@@ -245,7 +271,7 @@ model QuizQuestion {
   options              Json?
   answer               String
   quiz                 Quiz                @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  UserQuizInProgress   UserQuizInProgress? @relation(fields: [userQuizInProgressId], references: [id])
+  userQuizInProgress   UserQuizInProgress? @relation(fields: [userQuizInProgressId], references: [id])
   userQuizInProgressId String?
 }
 
@@ -272,17 +298,16 @@ model VocabularyList {
 }
 
 model Vocabulary {
-  id               String            @id @default(cuid())
-  english          String
-  korean           String
-  definition       String
-  createdAt        DateTime          @default(now()) @db.Timestamptz(6)
-  updatedAt        DateTime          @default(now()) @updatedAt @db.Timestamptz(6)
-  vocabularyListId String
-  savedVocabulary  SavedVocabulary[]
-  vocabularyList   VocabularyList    @relation(fields: [vocabularyListId], references: [id], onDelete: Cascade)
-  userStats        UserStats?        @relation(fields: [userStatsId], references: [id])
-  userStatsId      String?
+  id                        String                    @id @default(cuid())
+  english                   String
+  korean                    String
+  definition                String
+  createdAt                 DateTime                  @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime                  @default(now()) @updatedAt @db.Timestamptz(6)
+  vocabularyListId          String
+  savedVocabulary           SavedVocabulary[]
+  vocabularyList            VocabularyList            @relation(fields: [vocabularyListId], references: [id], onDelete: Cascade)
+  userCompletedVocabularies UserCompletedVocabulary[]
 }
 
 model ContactMessage {
