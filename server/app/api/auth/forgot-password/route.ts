@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   try {
     const ip = getClientIp(req);
 
-    const allowed = await rateLimit(ip, 5, 900);
+    const allowed = await rateLimit(`ip:${ip}`, 5, 900);
 
     if (!allowed) {
       return new Response("Too many requests", { status: 429 });
@@ -30,10 +30,6 @@ export async function POST(req: Request) {
     }
 
     const { email } = parsed.data;
-
-    if (!email) {
-      return new NextResponse("Please provide an email", { status: 401 });
-    }
 
     const allowedByEmail = await rateLimit(`forgot_password:${email}`, 5, 900);
 
