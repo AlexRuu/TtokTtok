@@ -6,15 +6,50 @@ import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
 import prismadb from "./prismadb";
 import * as argon2 from "argon2";
-import { NextResponse } from "next/server";
 import { getClientIp } from "./getIP";
 import { rateLimit } from "./redis";
+
+interface GitHubProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatar_url: string;
+  email_verified?: never;
+  verified?: never;
+  picture?: never;
+  username?: never;
+}
+
+interface GoogleProfile {
+  id: string;
+  name: string;
+  email: string;
+  picture: string;
+  email_verified: boolean;
+  verified?: never;
+  avatar_url?: never;
+  username?: never;
+}
+
+interface DiscordProfile {
+  id: string;
+  username: string;
+  name?: never;
+  email: string;
+  avatar: string;
+  verified: boolean;
+  avatar_url?: never;
+  picture?: never;
+  email_verified?: never;
+}
+
+type OAuthProfile = GitHubProfile | GoogleProfile | DiscordProfile;
 
 // Auth Helpers
 async function fetchVerifiedEmail(
   provider: string,
   accessToken: string,
-  profile?: any
+  profile?: OAuthProfile,
 ): Promise<string | null> {
   try {
     if (provider === "github") {
@@ -32,18 +67,28 @@ async function fetchVerifiedEmail(
       return emails.find((e) => e.primary && e.verified)?.email || null;
     }
 
-    if (provider === "google" && profile?.email_verified) {
+    if (
+      provider === "google" &&
+      profile &&
+      "email_verified" in profile &&
+      profile.email_verified
+    ) {
       return profile.email;
     }
 
-    if (provider === "discord" && profile?.verified) {
+    if (
+      provider === "discord" &&
+      profile &&
+      "verified" in profile &&
+      profile.verified
+    ) {
       return profile.email;
     }
 
     return null;
   } catch (error) {
     console.error(`${provider} email fetch error:`, error);
-    throw new NextResponse("Error fetching verified email", { status: 500 });
+    throw new Error("Error fetching verified email");
   }
 }
 
@@ -53,7 +98,7 @@ async function getOrCreateUserFromOAuth({
   providerAccountId,
   accessToken,
 }: {
-  profile: any;
+  profile: OAuthProfile;
   provider: string;
   providerAccountId: string;
   accessToken: string;
@@ -67,24 +112,21 @@ async function getOrCreateUserFromOAuth({
 
   email = email.toLowerCase().trim();
 
-  if (!email) {
-    console.warn(`No verified email found for provider: ${provider}`);
-    throw new Error("No verified email found");
-  }
-
   let user = await prismadb.user.findUnique({ where: { email } });
 
   if (!user) {
-    const [firstName, ...lastNameArr] = profile.name?.split(" ") || [];
+    const displayName = "username" in profile ? profile.username : profile.name;
+    const [firstName, ...lastNameArr] = displayName?.split(" ") || [];
     const lastName = lastNameArr.join(" ");
+    const image =
+      "avatar_url" in profile
+        ? profile.avatar_url
+        : "picture" in profile
+          ? profile.picture
+          : null;
 
     user = await prismadb.user.create({
-      data: {
-        email,
-        firstName,
-        lastName,
-        image: profile.avatar_url || profile.picture || null,
-      },
+      data: { email, firstName, lastName, image },
     });
   }
 
@@ -92,7 +134,7 @@ async function getOrCreateUserFromOAuth({
     user.id,
     provider,
     providerAccountId,
-    accessToken
+    accessToken,
   );
 
   await updateUserProfileIfChanged(user, profile);
@@ -109,7 +151,7 @@ async function linkOAuthAccountIfNeeded(
   userId: string,
   provider: string,
   providerAccountId: string,
-  accessToken: string
+  accessToken: string,
 ) {
   try {
     await prismadb.account.upsert({
@@ -132,14 +174,28 @@ async function linkOAuthAccountIfNeeded(
     });
   } catch (error) {
     console.error("Error linking OAuth account:", error);
-    throw new NextResponse("Error creating/updating account", { status: 500 });
+    throw new Error("Error creating/updating account");
   }
 }
 
-async function updateUserProfileIfChanged(user: any, profile: any) {
-  const [firstName, ...lastNameArr] = profile.name?.split(" ") || [];
+async function updateUserProfileIfChanged(
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    image: string | null;
+  },
+  profile: OAuthProfile,
+) {
+  const displayName = "username" in profile ? profile.username : profile.name;
+  const [firstName, ...lastNameArr] = displayName?.split(" ") || [];
   const lastName = lastNameArr.join(" ");
-  const image = profile.avatar_url || profile.picture || null;
+  const image =
+    "avatar_url" in profile
+      ? profile.avatar_url
+      : "picture" in profile
+        ? profile.picture
+        : null;
 
   if (
     user.firstName !== firstName ||
@@ -232,7 +288,7 @@ export const authOptions: NextAuthOptions = {
 
         const isValid = await argon2.verify(
           user.password,
-          credentials.password
+          credentials.password,
         );
 
         return isValid
