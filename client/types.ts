@@ -62,7 +62,7 @@ export interface QuizQuestion {
 export interface QuizResultItem {
   questionId: string;
   question: string;
-  quizType: "MULTIPLE_CHOICE" | "TRUE_FALSE" | "FILL_IN_THE_BLANK" | "MATCHING";
+  quizType: QuizType;
   givenAnswer: string | boolean | { left: string; match: string }[] | null;
   correctAnswer: string;
   correctCount: number;
@@ -133,9 +133,9 @@ export interface Tagging {
   createdAt: string;
   updatedAt: string;
   tag: Tag;
-  lesson: Lesson;
+  lesson?: Lesson;
   quiz?: Quiz;
-  vocabularyList: VocabularyList;
+  vocabularyList?: VocabularyList;
 }
 
 export type TextBlock = {
@@ -183,8 +183,3 @@ export type GroupedSearchResults = {
   quizzes: SearchResult[];
   vocabulary: SearchResult[];
 };
-
-// Helper for quiz page
-export interface UnitWithLessons extends Unit {
-  lesson: Lesson[];
-}
