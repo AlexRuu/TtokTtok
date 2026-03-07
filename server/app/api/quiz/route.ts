@@ -20,14 +20,6 @@ export async function POST(req: Request) {
 
     const { quizQuestion, lessonId } = parsed.data;
 
-    if (
-      !lessonId ||
-      !Array.isArray(quizQuestion) ||
-      quizQuestion.length === 0
-    ) {
-      return new NextResponse("Missing one or more fields", { status: 400 });
-    }
-
     // Step 1: Create the quiz and its questions
     return await withRls(session, async (tx) => {
       const existingLesson = await tx.lesson.findUnique({
@@ -35,7 +27,7 @@ export async function POST(req: Request) {
       });
 
       if (!existingLesson) {
-        return new NextResponse("Lesson does not exist", { status: 409 });
+        return new NextResponse("Lesson does not exist", { status: 404 });
       }
 
       const createdQuiz = await tx.quiz.create({
@@ -64,6 +56,10 @@ export async function POST(req: Request) {
         where: { name: "Quiz" },
       });
 
+      if (!quizTag) {
+        return new NextResponse("Could not find Quiz tag", { status: 409 });
+      }
+
       await tx.tagging.create({
         data: {
           tagId: quizTag.id,
@@ -71,7 +67,7 @@ export async function POST(req: Request) {
         },
       });
 
-      return new NextResponse("Quiz created successfully", { status: 200 });
+      return new NextResponse("Quiz created successfully", { status: 201 });
     });
   } catch (error) {
     console.error("Error creating quiz:", error);
