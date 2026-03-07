@@ -29,7 +29,7 @@ export async function PATCH(req: NextRequest) {
     // fetch user
     return await withRls(session, async (tx) => {
       const user = await tx.user.findUnique({
-        where: { email: session.user.email },
+        where: { email: session.user.email! },
         select: { id: true },
       });
       if (!user)
@@ -43,13 +43,13 @@ export async function PATCH(req: NextRequest) {
       // merge viewed blocks (unique)
       const mergedSet = new Set<number>();
       if (existing?.viewedBlocks?.length)
-        existing?.viewedBlocks?.forEach((n: number) => mergedSet.add(n));
+        existing.viewedBlocks.forEach((n: number) => mergedSet.add(n));
       viewedBlocks.forEach((n: number) => mergedSet.add(n));
       const merged = Array.from(mergedSet).sort((a, b) => a - b);
 
       const finalPercentage = Math.max(
         existing?.percentage ?? 0,
-        Number(percentage ?? 0)
+        Number(percentage ?? 0),
       );
 
       const data = {
@@ -105,7 +105,7 @@ export async function GET(req: NextRequest) {
 
     return await withRls(session, async (tx) => {
       const user = await tx.user.findUnique({
-        where: { email: session.user.email },
+        where: { email: session.user.email! },
         select: { id: true },
       });
 
@@ -133,6 +133,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// POST delegates to PATCH for clients that don't support PATCH
 export async function POST(req: NextRequest) {
   return PATCH(req);
 }
