@@ -1,5 +1,4 @@
 import { authOptions } from "@/lib/auth";
-import prismadb from "@/lib/prismadb";
 import { withRls } from "@/lib/withRLS";
 import { unitsSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
@@ -7,7 +6,7 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  props: { params: Promise<{ unitId: string }> }
+  props: { params: Promise<{ unitId: string }> },
 ) {
   const params = await props.params;
   try {
@@ -55,7 +54,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  props: { params: Promise<{ unitId: string }> }
+  props: { params: Promise<{ unitId: string }> },
 ) {
   const params = await props.params;
   try {
