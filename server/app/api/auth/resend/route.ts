@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   try {
     const ip = getClientIp(req);
 
-    const allowed = await rateLimit(ip, 5, 60);
+    const allowed = await rateLimit(`ip:${ip}`, 5, 60);
 
     if (!allowed) {
       return new Response("Too many requests", { status: 429 });
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
 
     const session = await getServerSession(authOptions);
     const body = await req.json();
+    // Uses forgotPasswordFormSchema as it shares the same shape (email only)
     const parsed = forgotPasswordFormSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -29,10 +30,6 @@ export async function POST(req: Request) {
     }
 
     const { email } = parsed.data;
-
-    if (!email) {
-      return new NextResponse("No Email", { status: 404 });
-    }
 
     const allowedByEmail = await rateLimit(`forgot_password:${email}`, 5, 900);
 
@@ -65,16 +62,16 @@ export async function POST(req: Request) {
       if (recentToken) {
         return new NextResponse(
           "You can only request a new verification email once per minute.",
-          { status: 400 }
+          { status: 400 },
         );
       }
 
       const emailVerificationToken = nanoid(32);
-      const hashedNewPassword = await hash(emailVerificationToken);
+      const hashedVerificationToken = await hash(emailVerificationToken);
       await tx.verificationToken.create({
         data: {
           identifier: email,
-          token: hashedNewPassword,
+          token: hashedVerificationToken,
           userId: user.id,
           expires: addMinutes(new Date(), 10),
         },
@@ -103,6 +100,6 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("Unable to retrieve email", error);
-    return new NextResponse("Unable to retrieve email", { status: 404 });
+    return new NextResponse("Unable to retrieve email", { status: 500 });
   }
 }
