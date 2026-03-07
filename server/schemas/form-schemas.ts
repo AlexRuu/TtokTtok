@@ -84,7 +84,7 @@ const editUserSchema = z.object({
 });
 
 const unitsSchema = z.object({
-  title: z.string().min(1, { message: "Unit title is requird" }),
+  title: z.string().min(1, { message: "Unit title is required" }),
 });
 
 const tagSchema = z.object({
@@ -187,10 +187,10 @@ export type ResetPasswordFormSchema = z.infer<typeof resetPasswordSchema>;
 export type VerifySchema = z.infer<typeof verifySchema>;
 export type EditUserValues = z.infer<typeof editUserSchema>;
 export type UnitsSchemaValues = z.infer<typeof unitsSchema>;
-export type tagSchemaValues = z.infer<typeof tagSchema>;
-export type vocabularySchemaValues = z.infer<typeof vocabularySchema>;
-export type quizSchemaValues = z.infer<typeof quizSchema>;
-export type todoSchemaValues = z.infer<typeof todoSchema>;
+export type TagSchemaValues = z.infer<typeof tagSchema>;
+export type VocabularySchemaValues = z.infer<typeof vocabularySchema>;
+export type QuizSchemaValues = z.infer<typeof quizSchema>;
+export type TodoSchemaValues = z.infer<typeof todoSchema>;
 
 export {
   forgotPasswordFormSchema,
