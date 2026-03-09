@@ -26,7 +26,7 @@ const VerificationPage = () => {
         stopLoading();
         return;
       }
-      setEmail(pendingEmail!);
+      setEmail(pendingEmail);
       stopLoading();
       return;
     }
