@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   try {
     const ip = getClientIp(req);
 
-    const allowed = await rateLimit(ip, 1, 60);
+    const allowed = await rateLimit(`ip:${ip}`, 1, 60);
 
     if (!allowed) {
       return new Response("Too many requests", { status: 429 });
