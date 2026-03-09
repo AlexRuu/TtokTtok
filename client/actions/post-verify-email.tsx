@@ -1,6 +1,6 @@
 const URL = `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/auth/verify`;
 
-const postVeriifyEmail = async (token: string) => {
+const postVerifyEmail = async (token: string) => {
   try {
     const res = await fetch(URL, {
       method: "POST",
@@ -12,9 +12,9 @@ const postVeriifyEmail = async (token: string) => {
 
     return res;
   } catch (error) {
-    console.log("Error verifying email", error);
+    console.error("Error verifying email", error);
     return;
   }
 };
 
-export default postVeriifyEmail;
+export default postVerifyEmail;
