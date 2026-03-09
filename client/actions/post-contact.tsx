@@ -21,7 +21,7 @@ const postContact = async (data: Data) => {
 
     return res;
   } catch (error) {
-    console.log("Error sending contact form", error);
+    console.error("Error sending contact form", error);
     return;
   }
 };
