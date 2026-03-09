@@ -5,7 +5,7 @@ const getResetToken = async (token: string) => {
     const res = await fetch(`${URL}${token}`);
     return res;
   } catch (error) {
-    console.log("Error verifying token", error);
+    console.error("Error verifying token", error);
     return;
   }
 };
