@@ -4,14 +4,13 @@ const getTags = async () => {
   try {
     const res = await fetch(`${URL}`);
     if (!res.ok) {
-      console.log("Error fetching tags.");
+      console.error("Error fetching tags.");
       return null;
     }
-    const tags = res.json();
-    return tags;
+    return res.json();
   } catch (error) {
-    console.log(error);
-    return error;
+    console.error("Error fetching tags", error);
+    return null;
   }
 };
 
