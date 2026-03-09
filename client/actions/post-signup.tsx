@@ -19,7 +19,7 @@ const postSignUp = async (data: Data) => {
     });
     return res;
   } catch (error) {
-    console.log("Error signing up", error);
+    console.error("Error signing up", error);
     return;
   }
 };

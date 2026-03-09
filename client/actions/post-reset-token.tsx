@@ -16,7 +16,7 @@ const postResetToken = async (data: Data, token: string) => {
     });
     return res;
   } catch (error) {
-    console.log("Error resetting password", error);
+    console.error("Error resetting password", error);
     return;
   }
 };
