@@ -12,19 +12,25 @@ export async function GET(_req: Request) {
     }
     return await withRls(session, async (tx) => {
       const profile = await tx.user.findFirst({
-        where: { email: session.user.email },
-        include: { userStats: true },
+        where: { email: session.user.email! },
+        include: {
+          userCompletedLesson: true,
+          userCompletedQuiz: true,
+          userCompletedVocabulary: true,
+        },
       });
 
       if (!profile) {
-        return new NextResponse("Profile not found", { status: 400 });
+        return new NextResponse("Profile not found", { status: 404 });
       }
 
       const userProfile = {
         email: profile.email,
         firstName: profile.firstName,
         lastName: profile.lastName,
-        stats: profile.userStats,
+        completedLessons: profile.userCompletedLesson.length,
+        completedQuizzes: profile.userCompletedQuiz.length,
+        completedVocabulary: profile.userCompletedVocabulary.length,
       };
 
       return NextResponse.json(userProfile);
