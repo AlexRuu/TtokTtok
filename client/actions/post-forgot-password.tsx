@@ -12,7 +12,7 @@ const postForgotPassword = async (email: string) => {
 
     return res;
   } catch (error) {
-    console.log("Could not send password reset email", error);
+    console.error("Could not send password reset email", error);
     return;
   }
 };
