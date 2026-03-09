@@ -13,8 +13,8 @@ const LogoTitle = () => {
         />
       </div>
       <div className="flex text-[2.5rem] sm:text-[2.75rem] font-semibold tracking-tight leading-none -mt-1">
-        <h1 className="text-[#B75F45]">Ttok</h1>
-        <h1 className="text-[#D69E78]">Ttok</h1>
+        <span className="text-[#B75F45]">Ttok</span>
+        <span className="text-[#D69E78]">Ttok</span>
       </div>
     </div>
   );
