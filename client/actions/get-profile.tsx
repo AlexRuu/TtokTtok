@@ -11,7 +11,9 @@ const getProfile = async () => {
       mode: "cors",
       credentials: "include",
     });
-
+    if (!res.ok) {
+      redirect("/signin");
+    }
     const profile = await res.json();
     return profile;
   } catch (error) {
