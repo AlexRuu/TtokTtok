@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "../../../lib/utils";
-import type { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import SearchBar from "./searchBar";
 import { useEffect } from "react";
@@ -13,7 +12,6 @@ interface MobileNavProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   links: { name: string; path: string }[];
-  session: Session | null;
   status: "authenticated" | "unauthenticated" | "loading";
   navHeight: number;
 }
@@ -107,7 +105,7 @@ const MobileNav = ({
                       "inline-block border-b-2 border-transparent transition-colors",
                       pathName === link.path
                         ? "border-[#A65A3A] text-[#A65A3A] font-medium"
-                        : "hover:border-[#E0B9AA]"
+                        : "hover:border-[#E0B9AA]",
                     )}
                   >
                     {link.name}
