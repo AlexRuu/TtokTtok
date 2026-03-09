@@ -13,7 +13,7 @@ export const postSavedVocab = async (vocabularyId: string) => {
 
     return res;
   } catch (error) {
-    console.log("Could not save vocabulary", error);
+    console.error("Could not save vocabulary", error);
   }
 };
 
@@ -30,6 +30,6 @@ export const deleteSavedVocab = async (vocabularyId: string) => {
 
     return res;
   } catch (error) {
-    console.log("Could not delete saved vocabulary", error);
+    console.error("Could not delete saved vocabulary", error);
   }
 };
