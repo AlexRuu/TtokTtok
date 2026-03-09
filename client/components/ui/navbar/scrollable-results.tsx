@@ -10,7 +10,7 @@ const ScrollableResults = ({ children, className }: ScrollableResultsProps) => {
     <div
       className={cn("relative max-h-80 overflow-y-auto px-1 py-2", className)}
     >
-      <ul className="space-y-1">{children}</ul>
+      <div className="space-y-1">{children}</div>
     </div>
   );
 };
