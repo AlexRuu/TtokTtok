@@ -4,16 +4,13 @@ const getUnits = async () => {
   try {
     const res = await fetch(`${URL}`);
     if (!res.ok) {
-      console.log("Error fetching units");
+      console.error("Error fetching units");
       return null;
     }
-
-    const units = res.json();
-    return units;
+    return res.json();
   } catch (error) {
-    console.log(error);
-    return error;
+    console.error(error);
+    return null;
   }
 };
-
 export default getUnits;
