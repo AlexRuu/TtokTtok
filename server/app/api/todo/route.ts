@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const parsed = todoSchema.safeParse(body);
 
     if (!parsed.success) {
-      return new NextResponse("Invalid tag data", { status: 400 });
+      return new NextResponse("Invalid todo data", { status: 400 });
     }
 
     const { title } = parsed.data;
@@ -29,14 +29,14 @@ export async function POST(req: Request) {
       });
 
       return new NextResponse("Successfully created todo item", {
-        status: 200,
+        status: 201,
       });
     });
   } catch (error) {
     console.error("There was an error trying to create the todo item", error);
     return new NextResponse(
       "There was an error trying to create the todo item",
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
