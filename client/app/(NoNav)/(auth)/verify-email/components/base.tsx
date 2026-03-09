@@ -53,7 +53,7 @@ const VerificationPage = () => {
   }, [searchParams, startLoading, stopLoading]);
 
   if (isLoading) {
-    <Loader />;
+    return <Loader />;
   }
 
   if (status == "verifying") return <Verifying email={email} />;
