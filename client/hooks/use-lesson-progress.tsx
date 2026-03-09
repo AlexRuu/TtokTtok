@@ -168,6 +168,7 @@ export function useLessonProgress({
 
   /* ---------------- persistence ---------------- */
   useEffect(() => {
+    if (!hasHydratedInitialProgress.current) return;
     localStorage.setItem(
       STORAGE_KEY(lessonId),
       JSON.stringify({
