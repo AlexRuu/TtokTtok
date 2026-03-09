@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
@@ -25,7 +25,6 @@ export default function Navbar() {
     : "/signin";
 
   const navRef = useRef<HTMLDivElement>(null);
-  const drawerRef = useRef<HTMLDivElement>(null);
 
   // Measure nav height for mobile nav offset
   useEffect(() => {
@@ -40,24 +39,6 @@ export default function Navbar() {
     observer.observe(navRef.current);
     return () => observer.disconnect();
   }, []);
-
-  // Handle click outside to close mobile drawer
-  const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (
-      drawerRef.current &&
-      !drawerRef.current.contains(event.target as Node)
-    ) {
-      setIsOpen(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [isOpen, handleClickOutside]);
 
   useEffect(() => {
     setMounted(true);
@@ -146,7 +127,7 @@ export default function Navbar() {
 
           {/* Mobile menu toggle */}
           <button
-            className="p-2 md:hidden text-[#6B4C3B] focus-visible:ring-2 focus-visible:ring-[#A65A3A] focus-visible:ring-offset-2"
+            className="p-2 md:hidden text-[#6B4C3B] focus-visible:ring-2 focus-visible:ring-[#A65A3A] focus-visible:ring-offset-2 hover:cursor-pointer"
             aria-label="Toggle navigation menu"
             onClick={() => setIsOpen((prev) => !prev)}
           >
@@ -159,7 +140,6 @@ export default function Navbar() {
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         links={links}
-        session={session}
         status={status}
         navHeight={navHeight}
       />
