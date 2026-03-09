@@ -1,11 +1,12 @@
 import { authOptions } from "@/lib/auth";
 import { withRls } from "@/lib/withRLS";
+import { editUserSchema } from "@/schemas/form-schemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  props: { params: Promise<{ id: string }> }
+  props: { params: Promise<{ id: string }> },
 ) {
   const params = await props.params;
   try {
@@ -13,35 +14,19 @@ export async function PATCH(
     if (!session || !session.user || session.user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-
     const body = await req.json();
-
-    if (!body) {
-      return new NextResponse("Insufficient data required", { status: 400 });
+    const parsed = editUserSchema.safeParse(body);
+    if (!parsed.success) {
+      return new NextResponse("Invalid input", { status: 400 });
     }
-
+    const { firstName, lastName, email, role, status } = parsed.data;
     const id = params.id;
-
-    const { firstName, lastName, email, role, status } = body;
-
     return await withRls(session, async (tx) => {
       await tx.user.update({
-        where: {
-          id: id,
-        },
-        data: {
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          status: status,
-          role: role,
-        },
+        where: { id },
+        data: { firstName, lastName, email, status, role },
       });
-
-      return NextResponse.json({
-        message: "Successfully updated user",
-        status: 200,
-      });
+      return new NextResponse("Successfully updated user", { status: 200 });
     });
   } catch (error) {
     console.error("Error updating user", error);
@@ -51,7 +36,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  props: { params: Promise<{ id: string }> }
+  props: { params: Promise<{ id: string }> },
 ) {
   const params = await props.params;
   try {
