@@ -1,13 +1,13 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Verifying from "./verifying";
 import Verified from "./verified";
 import Invalid from "./invalid";
 import useLoading from "@/hooks/use-loading";
 import Loader from "@/components/ui/loader";
-import postVeriifyEmail from "@/actions/post-verify-email";
+import postVerifyEmail from "@/actions/post-verify-email";
 
 const VerificationPage = () => {
   const { isLoading, startLoading, stopLoading } = useLoading();
@@ -33,7 +33,7 @@ const VerificationPage = () => {
 
     const verifyEmail = async () => {
       try {
-        const res = await postVeriifyEmail(token);
+        const res = await postVerifyEmail(token);
         if (res) {
           if (!res.ok) {
             stopLoading();
