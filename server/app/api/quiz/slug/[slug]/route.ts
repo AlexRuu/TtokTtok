@@ -1,10 +1,14 @@
 import { authOptions } from "@/lib/auth";
 import { Lesson, QuizQuestion, Tagging } from "@/lib/generated/prisma/client";
-
 import { getClientIp } from "@/lib/getIP";
 import { gradeQuiz } from "@/lib/grade-quiz";
 import { delRedis, getRedisCache, rateLimit, setRedisCache } from "@/lib/redis";
 import { withRls } from "@/lib/withRLS";
+import {
+  MatchingAnswer,
+  QuizQuestionType,
+  SubmittedAnswer,
+} from "@/types/quiz";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -52,7 +56,7 @@ export async function GET(
     const isUser = !!session?.user?.id;
     const key = session?.user?.id
       ? `quiz:get:${session.user.id}`
-      : `quiz:get:${ip}`;
+      : `quiz:get:ip:${ip}`;
     const cacheKey = `quiz_in_progress:${key}:${params.slug}`;
 
     if (isUser) {
@@ -75,7 +79,7 @@ export async function GET(
           id: string;
           title: string;
           slug: string;
-          quizQuestion: any[];
+          quizQuestion: QuizQuestion[];
           lesson: any;
           tagging: any[];
         } | null;
@@ -131,7 +135,7 @@ export async function GET(
     // Create save entry in DB
     if (isUser) {
       await withRls(session, async (tx) => {
-        tx.userQuizInProgress.create({
+        await tx.userQuizInProgress.create({
           data: {
             user: { connect: { id: session.user.id } },
             quiz: { connect: { id: quiz.id } },
@@ -173,7 +177,7 @@ export async function POST(
     const isUser = !!session?.user?.id;
     const key = session?.user?.id
       ? `quiz:post:${session.user.id}`
-      : `quiz:post:${ip}`;
+      : `quiz:post:ip:${ip}`;
 
     const { allowed, remaining } = await rateLimit(
       key,
