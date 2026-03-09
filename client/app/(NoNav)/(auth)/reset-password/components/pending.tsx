@@ -1,3 +1,5 @@
+"use client";
+
 import { z } from "zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import toast from "react-hot-toast";
