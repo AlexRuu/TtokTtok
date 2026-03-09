@@ -41,7 +41,7 @@ const timelineData = [
   {
     title: "The Birth of Ttok Ttok",
     description:
-      "I tried many apps or online resources, but none of them were quite right. So why not create my own little thing to help those who are trying to learn as well? Ttok Ttok - helping others learn while trying to reinfoce my own understanding.",
+      "I tried many apps or online resources, but none of them were quite right. So why not create my own little thing to help those who are trying to learn as well? Ttok Ttok - helping others learn while trying to reinforce my own understanding.",
     date: "April 2025",
   },
   {
