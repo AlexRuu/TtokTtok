@@ -1,5 +1,6 @@
 "use client";
 
+import postResendEmail from "@/actions/post-resend-verify-email";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/ui/loader";
 import useLoading from "@/hooks/use-loading";
@@ -16,18 +17,9 @@ const Verifying: React.FC<VerifyingProps> = ({ email }) => {
   const resendEmail = async () => {
     startLoading();
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/auth/resend`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: email }),
-        }
-      );
-      if (!res.ok) {
-        const resError = await res.text();
+      const res = await postResendEmail(email);
+      if (!res || !res.ok) {
+        const resError = res ? await res.text() : "";
         toast.error(
           resError || "There was an error resending the confirmation email",
           {
@@ -41,7 +33,7 @@ const Verifying: React.FC<VerifyingProps> = ({ email }) => {
             },
             className:
               "transition-all transform duration-300 ease-in-out font-medium",
-          }
+          },
         );
         stopLoading();
         return;
