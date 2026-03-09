@@ -19,7 +19,7 @@ import useLoading from "@/hooks/use-loading";
 import { cn } from "@/lib/utils";
 import { editUserSchema } from "@/schemas/form-schemas";
 import { EditUserValues } from "@/schemas/form-schemas";
-import { Role, Status, User } from "@/lib/generated/prisma/client";
+import type { User } from "@/lib/generated/prisma/client";
 import {
   Select,
   SelectItem,
@@ -28,6 +28,11 @@ import {
 } from "@/components/ui/select";
 import { startTransition } from "react";
 
+export const Role = { ADMIN: "ADMIN", USER: "USER" } as const;
+export type Role = (typeof Role)[keyof typeof Role];
+
+export const Status = { ACTIVE: "ACTIVE", INACTIVE: "INACTIVE" } as const;
+export type Status = (typeof Status)[keyof typeof Status];
 const formSchema = editUserSchema;
 
 interface EditUserFormProps {
@@ -93,7 +98,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
         router.push("/users");
       });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("There was an error editing user.", {
         style: {
           background: "#ffeef0",
@@ -210,7 +215,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                   <FormLabel
                     htmlFor="status"
                     className={cn(
-                      form.formState.errors.role && form.formState.isSubmitted
+                      form.formState.errors.status && form.formState.isSubmitted
                         ? "text-red-400! before:text-red-400"
                         : "",
                     )}
@@ -218,7 +223,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ initialData }) => {
                     Status
                   </FormLabel>
                   {form.formState.isSubmitted &&
-                    renderError(form.formState.errors.role)}
+                    renderError(form.formState.errors.status)}
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger className="w-full border border-gray-300 rounded-md py-3 px-3 text-base shadow-xs focus:ring-2 focus:ring-indigo-300">
                       {field.value}
