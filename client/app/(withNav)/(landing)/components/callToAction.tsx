@@ -15,8 +15,7 @@ interface CallToActionComponentProps {
 const CallToActionComponent: React.FC<CallToActionComponentProps> = ({
   fadeInUp,
 }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { data: session, status } = useSession();
+  const { status } = useSession();
 
   return (
     <section className="py-20 bg-[#FFE6D8] text-center rounded-b-xl">
@@ -34,7 +33,7 @@ const CallToActionComponent: React.FC<CallToActionComponentProps> = ({
           <p className="text-lg text-[#6B4C3B]/80 mb-8">
             Let&apos;s learn something new today!
           </p>
-          <Link href="/lessons">
+          <Link href="/units">
             <Button className="hover:cursor-pointer w-full font-semibold bg-[#B75F45] hover:bg-[#D69E78] text-white py-4 sm:py-5 text-base sm:text-md rounded-xl transition-all shadow-sm hover:scale-[1.01] hover:shadow-md duration-200 ease-in-out focus:ring-2 focus:ring-indigo-300 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400">
               Go To Lessons
             </Button>
