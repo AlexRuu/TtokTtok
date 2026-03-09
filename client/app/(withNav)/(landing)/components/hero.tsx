@@ -95,7 +95,7 @@ const HeroComponent: React.FC<HeroComponentProps> = ({ fadeInUp }) => {
         transition={{ duration: 0.6, delay: 0.5 }}
         className="mt-8"
       >
-        <Link href="/lessons">
+        <Link href="/units">
           <Button className="w-full font-semibold bg-indigo-200 hover:bg-indigo-300 text-indigo-900 flex items-center justify-center gap-2 hover:cursor-pointer py-4 sm:py-5 text-base sm:text-md rounded-xl transition-all shadow-sm hover:scale-[1.01] hover:shadow-md duration-200 ease-in-out focus:ring-2 focus:ring-indigo-300 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400">
             Start Learning
           </Button>
