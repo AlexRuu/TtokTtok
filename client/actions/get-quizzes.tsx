@@ -6,7 +6,7 @@ const getQuizzes = async () => {
     if (!res.ok) throw new Error("Failed to fetch quizzes");
     return res.json();
   } catch (error) {
-    console.error(error);
+    console.error("Failed to fetch quizzes", error);
     return [];
   }
 };
