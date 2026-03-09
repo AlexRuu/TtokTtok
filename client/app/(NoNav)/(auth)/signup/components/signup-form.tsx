@@ -179,7 +179,7 @@ const SignUpForm = () => {
                         form.formState.errors.firstName &&
                           form.formState.isSubmitted
                           ? "text-red-400!"
-                          : "text-gray-500"
+                          : "text-gray-500",
                       )}
                     >
                       First Name
@@ -228,7 +228,7 @@ const SignUpForm = () => {
                         form.formState.errors.lastName &&
                           form.formState.isSubmitted
                           ? "text-red-400!"
-                          : "text-gray-500"
+                          : "text-gray-500",
                       )}
                     >
                       Last Name
@@ -277,7 +277,7 @@ const SignUpForm = () => {
                       "peer-invalid:before:text-red-500",
                       form.formState.errors.email && form.formState.isSubmitted
                         ? "text-red-400!"
-                        : "text-gray-500"
+                        : "text-gray-500",
                     )}
                   >
                     Email
@@ -336,7 +336,7 @@ const SignUpForm = () => {
                       form.formState.errors.password &&
                         form.formState.isSubmitted
                         ? "text-red-400!"
-                        : "text-gray-500"
+                        : "text-gray-500",
                     )}
                   >
                     Password
@@ -382,7 +382,7 @@ const SignUpForm = () => {
                       <p
                         className="text-sm text-red-400 -mt-1 flex items-center"
                         aria-live="polite"
-                        id="password-error"
+                        id="confirmPassword-error"
                       >
                         <CircleAlert size={15} className="mr-1" />
                         {form.formState.errors.confirmPassword.message}
@@ -400,7 +400,7 @@ const SignUpForm = () => {
                       form.formState.errors.confirmPassword &&
                         form.formState.isSubmitted
                         ? "text-red-400!"
-                        : "text-gray-500"
+                        : "text-gray-500",
                     )}
                   >
                     Confirm Password
