@@ -3,14 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { MailCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 const Verified = () => {
   const router = useRouter();
-
-  useEffect(() => {
-    localStorage.removeItem("pendingEmail");
-  }, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#fdfaf6] p-6 px-4">
