@@ -93,7 +93,7 @@ const StudySession = ({ vocabulary }: Props) => {
             return (
               <div
                 key={vocab.id}
-                className="shrink-0 w-full flex justify-center items-center px-6 py-8 min-h-[475px]"
+                className="shrink-0 w-full flex justify-center items-center px-6 py-8 min-h-118.75"
               >
                 {/* Flip Card */}
                 <motion.div

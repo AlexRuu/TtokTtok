@@ -43,7 +43,7 @@ export const QuizCooldown = ({
 
   return (
     <div className="flex flex-col items-center justify-center p-8 max-w-3xl mx-auto bg-[#FFF8F3] text-[#6B4C3B] mt-10 rounded-2xl shadow-sm border border-[#FFE4D2]/60 overflow-hidden">
-      <div className="flex flex-col items-center justify-between text-center gap-6 sm:gap-8 min-h-[600px]">
+      <div className="flex flex-col items-center justify-between text-center gap-6 sm:gap-8 min-h-150">
         <div className="space-y-1">
           <h2 className="text-2xl font-semibold text-[#6B4C3B]">
             {ready
@@ -71,7 +71,7 @@ export const QuizCooldown = ({
               y: ready ? -4 : 0,
             }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="flex space-x-2 h-[60px] sm:h-[70px]"
+            className="flex space-x-2 h-15 sm:h-17.5"
           >
             {digits.map((digit, idx) =>
               digit === ":" ? (
@@ -88,7 +88,7 @@ export const QuizCooldown = ({
                 >
                   {digit}
                 </div>
-              )
+              ),
             )}
           </motion.div>
 
@@ -106,7 +106,7 @@ export const QuizCooldown = ({
               alt="Waiting Tteok"
               width={340}
               height={340}
-              className="rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.06)] bg-[#FFFDFB] max-w-[80vw] sm:max-w-[340px]"
+              className="rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.06)] bg-[#FFFDFB] max-w-[80vw] sm:max-w-85"
             />
           </motion.div>
 

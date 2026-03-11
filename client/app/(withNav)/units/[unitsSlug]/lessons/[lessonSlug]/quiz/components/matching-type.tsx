@@ -67,7 +67,7 @@ const MatchingQuiz: React.FC<MatchingQuizProps> = ({
       {/* Inner wrapper keeps left + right centered with spacing */}
       <div className="flex flex-row gap-24">
         {/* Left Column */}
-        <div className="flex flex-col gap-3 w-[180px] items-end">
+        <div className="flex flex-col gap-3 w-45 items-end">
           {question.options.map((opt) => {
             const isSelected = selectedLeft === opt.left;
             const isMatched = matches[opt.left] !== undefined;
@@ -80,8 +80,8 @@ const MatchingQuiz: React.FC<MatchingQuizProps> = ({
                   isSelected
                     ? "border-[#5A3F2C] bg-[#FFF2E6]"
                     : isMatched
-                    ? "opacity-50"
-                    : "bg-white"
+                      ? "opacity-50"
+                      : "bg-white"
                 }`}
                 onClick={() => handleLeftClick(opt.left)}
               >
@@ -92,7 +92,7 @@ const MatchingQuiz: React.FC<MatchingQuizProps> = ({
         </div>
 
         {/* Right Column */}
-        <div className="flex flex-col gap-3 w-[180px] items-start">
+        <div className="flex flex-col gap-3 w-45 items-start">
           {question.options.map((opt) => {
             const isMatched = Object.values(matches).includes(opt.right);
 
