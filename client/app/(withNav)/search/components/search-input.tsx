@@ -19,7 +19,7 @@ interface SearchInputProps {
 
 const SearchInput: React.FC<SearchInputProps> = ({ initialQuery = "" }) => {
   const router = useRouter();
-  const { isLoading, startLoading } = useLoading();
+  const { isLoading } = useLoading();
 
   const form = useForm<FormValues>({
     defaultValues: { q: initialQuery },
@@ -34,10 +34,6 @@ const SearchInput: React.FC<SearchInputProps> = ({ initialQuery = "" }) => {
     }
   };
 
-  useEffect(() => {
-    console.log(isLoading);
-  }, [isLoading]);
-
   const handleClear = () => {
     form.setValue("q", "");
     router.push("/search");
@@ -45,7 +41,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ initialQuery = "" }) => {
 
   useEffect(() => {
     form.setValue("q", initialQuery);
-  }, [initialQuery]);
+  }, [initialQuery, form]);
 
   return (
     <Form {...form}>

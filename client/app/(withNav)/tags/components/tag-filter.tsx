@@ -87,9 +87,7 @@ const TagFilterClient = ({ allTags }: Props) => {
     };
 
     fetchResults();
-  }, [debouncedSlugs]);
-
-  console.log(results);
+  }, [debouncedSlugs, startLoading, stopLoading]);
 
   return (
     <>
