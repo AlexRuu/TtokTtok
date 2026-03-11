@@ -36,7 +36,7 @@ const VocabularyClient = ({ vocabularyList }: VocabularyProps) => {
     };
 
     fetchSavedVocab();
-  }, []);
+  }, [session?.user, startLoading, stopLoading]);
 
   if (isLoading) return <Loader />;
 
