@@ -10,7 +10,6 @@ import { Bookmark } from "lucide-react";
 
 interface Props {
   vocabularyId: string;
-  initiallySaved?: boolean;
   savedIds: string[];
   setSavedIds: (ids: string[]) => void;
 }
