@@ -20,11 +20,7 @@ const SearchPageWrapper: React.FC<{ children: React.ReactNode }> = ({
     } else {
       stopLoading();
     }
-  }, [query, lastQuery]);
-
-  useEffect(() => {
-    console.log(isLoading);
-  }, [isLoading]);
+  }, [query, lastQuery, startLoading, stopLoading]);
 
   return <>{isLoading ? <Loader /> : children}</>;
 };
