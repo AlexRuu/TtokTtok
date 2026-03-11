@@ -38,14 +38,13 @@ const VocabularyGrid = ({
               items-center
               justify-center
               text-center
-              min-h-[120px]
+              min-h-30
             "
           >
             {loggedIn === true && (
               <div className="absolute top-3 right-3">
                 <SaveVocabButton
                   vocabularyId={vocab.id}
-                  initiallySaved={isSaved}
                   savedIds={savedIds}
                   setSavedIds={setSavedIds}
                 />
