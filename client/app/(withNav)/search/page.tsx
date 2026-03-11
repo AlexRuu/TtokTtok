@@ -76,7 +76,7 @@ const SearchPage = async (props: SearchPageProps) => {
               alt="Searching Tteok"
               width={400}
               height={400}
-              className="mb-4 rounded-2xl border border-[#F3E7DF] shadow-sm w-full max-w-[300px]"
+              className="mb-4 rounded-2xl border border-[#F3E7DF] shadow-sm w-full max-w-75"
             />
           </div>
         )}

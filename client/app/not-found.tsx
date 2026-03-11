@@ -1,5 +1,3 @@
-import Footer from "@/components/ui/footer";
-import Navbar from "@/components/ui/navbar/navbar";
 import PageContainer from "@/components/ui/page-container";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,7 +31,7 @@ export default function NotFound() {
           </p>
           <Link
             href="/"
-            className="mt-6 inline-block bg-indigo-200 hover:bg-indigo-300 text-indigo-900 font-semibold px-6 py-3 rounded-xl shadow transition"
+            className="mt-6 inline-block bg-[#FFE4D6] hover:bg-[#FFD1B8] text-[#6B4C3B] font-semibold px-6 py-3 rounded-xl shadow transition"
           >
             Back to Home
           </Link>
