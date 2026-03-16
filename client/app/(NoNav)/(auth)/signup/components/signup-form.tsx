@@ -21,6 +21,7 @@ import PasswordTracker from "./password-checker";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import postSignUp from "@/actions/post-signup";
+import InlineLoader from "@/components/ui/inline-loader";
 
 const passwordSchema = z
   .string()
@@ -421,7 +422,11 @@ const SignUpForm = () => {
             disabled={form.formState.isSubmitting}
             aria-live="assertive"
           >
-            {form.formState.isSubmitting ? "Signing Up..." : "Sign Up"}
+            {form.formState.isSubmitting ? (
+              <InlineLoader color="#3730a3" />
+            ) : (
+              "Sign Up"
+            )}
           </Button>
         </form>
       </Form>

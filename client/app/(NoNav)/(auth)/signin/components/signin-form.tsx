@@ -23,6 +23,7 @@ import Loader from "@/components/ui/loader";
 import useLoading from "@/hooks/use-loading";
 import { cn } from "@/lib/utils";
 import LogoTitle from "../../components/logo";
+import InlineLoader from "@/components/ui/inline-loader";
 
 type ProviderId = "github" | "google" | "discord";
 
@@ -143,7 +144,7 @@ const SignInForm = () => {
                         form.formState.errors.email &&
                           form.formState.isSubmitted
                           ? "border-red-400 focus:ring-red-400"
-                          : ""
+                          : "",
                       )}
                     />
                   </FormControl>
@@ -168,7 +169,7 @@ const SignInForm = () => {
                       "peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-[#A1C6EA] peer-focus:px-1 peer-focus:bg-white",
                       form.formState.errors.email && form.formState.isSubmitted
                         ? "text-red-400!"
-                        : "text-gray-500"
+                        : "text-gray-500",
                     )}
                   >
                     Email
@@ -196,7 +197,7 @@ const SignInForm = () => {
                         form.formState.errors.password &&
                           form.formState.isSubmitted
                           ? "border-red-400 focus:ring-red-400"
-                          : ""
+                          : "",
                       )}
                     />
                   </FormControl>
@@ -222,7 +223,7 @@ const SignInForm = () => {
                       form.formState.errors.password &&
                         form.formState.isSubmitted
                         ? "text-red-400!"
-                        : "text-gray-500"
+                        : "text-gray-500",
                     )}
                   >
                     Password
@@ -250,7 +251,11 @@ const SignInForm = () => {
             aria-busy={isLoading || form.formState.isSubmitting}
             aria-live="assertive"
           >
-            {form.formState.isSubmitting ? "Logging in..." : "Login"}
+            {form.formState.isSubmitting ? (
+              <InlineLoader color="#3730a3" />
+            ) : (
+              "Login"
+            )}
           </Button>
           <p className="text-xs text-center text-gray-500 mt-2">
             By logging in, you agree to our{" "}

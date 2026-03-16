@@ -16,6 +16,7 @@ import postQuizResult from "@/actions/post-quiz-submission";
 import { QuizResults } from "./quiz-results";
 import { formatTime } from "@/lib/utils";
 import { QuizCooldown } from "./countdown";
+import InlineLoader from "@/components/ui/inline-loader";
 
 // Quiz type helpers
 const isMC = (q: QuizQuestion) => q.quizType === "MULTIPLE_CHOICE";
@@ -403,7 +404,7 @@ const QuizClient = ({ quizSlug }: QuizClientProps) => {
           onClick={handleSubmit}
           className="bg-[#FFB899] hover:bg-[#FF9E80] text-white rounded-full float-end hover:cursor-pointer"
         >
-          Submit Quiz
+          {isLoading ? <InlineLoader color="#FFFFFF" /> : "Submit Quiz"}
         </Button>
       )}
     </div>

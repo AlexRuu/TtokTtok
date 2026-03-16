@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
 import useLoading from "@/hooks/use-loading";
+import InlineLoader from "@/components/ui/inline-loader";
 
 interface FormValues {
   q: string;
@@ -87,7 +88,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ initialQuery = "" }) => {
             disabled={isLoading}
             className="rounded-r-2xl bg-[#EEDFD3] text-[#6B4C3B] hover:bg-[#E5D3C5] text-sm px-4 py-2"
           >
-            {isLoading ? "Searching…" : "Search"}
+            {isLoading ? <InlineLoader color="#6B4C3B" /> : "Search"}
           </Button>
         </div>
       </form>

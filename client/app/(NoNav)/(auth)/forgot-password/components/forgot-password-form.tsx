@@ -20,6 +20,7 @@ import { useState } from "react";
 import EmailSent from "./email-sent";
 import { cn } from "@/lib/utils";
 import postForgotPassword from "@/actions/post-forgot-password";
+import InlineLoader from "@/components/ui/inline-loader";
 
 const formSchema = z.object({
   email: z
@@ -121,7 +122,7 @@ const ForgotPasswordForm = () => {
                         form.formState.errors.email &&
                           form.formState.isSubmitted
                           ? "text-red-400"
-                          : "text-gray-500"
+                          : "text-gray-500",
                       )}
                     >
                       Email
@@ -139,7 +140,11 @@ const ForgotPasswordForm = () => {
               disabled={form.formState.isSubmitting}
               aria-live="assertive"
             >
-              Reset Password
+              {form.formState.isSubmitting ? (
+                <InlineLoader color="#3730a3" />
+              ) : (
+                "Reset Password"
+              )}
             </Button>
             <Button
               type="button"

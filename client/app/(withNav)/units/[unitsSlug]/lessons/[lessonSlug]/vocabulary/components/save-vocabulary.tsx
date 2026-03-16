@@ -4,6 +4,7 @@ import {
   deleteSavedVocab,
   postSavedVocab,
 } from "@/actions/post-delete-saved-vocab";
+import InlineLoader from "@/components/ui/inline-loader";
 import useLoading from "@/hooks/use-loading";
 import { motion } from "framer-motion";
 import { Bookmark } from "lucide-react";
@@ -66,12 +67,16 @@ const SaveVocabButton = ({ vocabularyId, savedIds, setSavedIds }: Props) => {
         animate={{ scale: isLoading ? 0.85 : 1 }}
         transition={{ duration: 0.15 }}
       >
-        <Bookmark
-          className={`
+        {isLoading ? (
+          <InlineLoader size={3} color="#8A6B5A" />
+        ) : (
+          <Bookmark
+            className={`
             w-4 h-4 hover:cursor-pointer
             ${isSaved ? "fill-[#8A6B5A] text-[#8A6B5A]" : "text-[#B89B8C]"}
           `}
-        />
+          />
+        )}
       </motion.div>
     </motion.button>
   );
