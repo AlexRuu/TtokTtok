@@ -1,5 +1,4 @@
 import { BarChart2, BookOpen, Pencil } from "lucide-react";
-import React from "react";
 
 const HowItWorks = () => {
   return (
